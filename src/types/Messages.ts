@@ -8,7 +8,7 @@ export type CreateRoomRequest = {};
 
 export const CREATE_ROOM_RESPONSE = 'createRoomResponse';
 export type RoomCreatedResponse = {
-  roomId: string;
+  roomInfo: RoomInfo;
   playerId: number;
 };
 
@@ -32,6 +32,40 @@ export type JoinRoomFailureResponse = {
 export type JoinRoomResponse =
   | ({ success: true } & JoinRoomSuccessResponse)
   | ({ success: false } & JoinRoomFailureResponse);
+
+/****************** Room info updated **********************/
+
+export const ROOM_INFO_UPDATED_NOTIFICATION = 'roomInfoUpdatedNotification';
+
+/****************** Choose piece **********************/
+
+// Request
+export const CHOOSE_PIECE_REQUEST = 'choosePieceRequest';
+export type ChoosePieceRequest = {
+  name: string;
+};
+
+/****************** Choose part **********************/
+
+// Request
+export const CHOOSE_PART_REQUEST = 'choosePartRequest';
+export type ChoosePartRequest = {
+  name: 'primo' | 'secondo';
+};
+
+/****************** Ready *****************/
+
+export const READY_REQUEST = 'readyRequest';
+export type ReadyRequest = {
+  ready: boolean;
+};
+
+/****************** Start game *****************/
+
+export const START_GAME_NOTIFICATION = 'startGameNotification';
+export type StartGameNotification = {
+  inSeconds: number;
+};
 
 /****************** Miscellaneous *****************/
 export const MALFORMED_MESSAGE_RESPONSE = 'malformedMessageResponse';

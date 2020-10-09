@@ -1,17 +1,21 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import {
   CREATE_ROOM_REQUEST,
   CREATE_ROOM_RESPONSE,
+  JoinRoomFailureResponse,
   JoinRoomResponse,
+  JoinRoomSuccessResponse,
   JOIN_ROOM_REQUEST,
   JOIN_ROOM_RESPONSE,
   MalformedMessageResponse,
   MALFORMED_MESSAGE_RESPONSE,
   RoomCreatedResponse,
+  ROOM_INFO_UPDATED_NOTIFICATION,
   UnknownErrorResponse,
   UNKNOWN_MESSAGE_RESPONSE,
 } from '../types/Messages';
+import { RoomInfo } from '../types/RoomInfo';
 import socket from '../utils/socket';
 
 const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
@@ -19,6 +23,8 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   isCreate,
 }) => {
   const history = useHistory();
+  const [roomState, setRoomState] = useState({} as RoomInfo);
+  const [playerId, setPlayerId] = useState(-1);
 
   // TODO refactor socket io listeners to a separate file
   useEffect(() => {
@@ -27,9 +33,10 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
 
     socket.on(
       CREATE_ROOM_RESPONSE,
-      ({ roomId, playerId }: RoomCreatedResponse) => {
-        // TODO fill room state
-        history.push(`/duet?id=${roomId}`);
+      ({ roomInfo, playerId }: RoomCreatedResponse) => {
+        history.push(`/duet?id=${roomInfo.id}`);
+        setRoomState(roomInfo);
+        setPlayerId(playerId);
       }
     );
 
@@ -45,15 +52,22 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
       console.log(error);
     });
 
-    socket.on(JOIN_ROOM_RESPONSE, ({ success }: JoinRoomResponse) => {
-      if (!success) {
+    socket.on(JOIN_ROOM_RESPONSE, (res: JoinRoomResponse) => {
+      if (!res.success) {
         // failed to join room, so create a room instead
         // TODO snackbar
+        const { code, message } = res as JoinRoomFailureResponse;
         history.push('/duet');
         return;
       }
 
-      // TODO fill room state
+      const { roomInfo, playerId } = res as JoinRoomSuccessResponse;
+      setRoomState(roomInfo);
+      setPlayerId(playerId);
+    });
+
+    socket.on(ROOM_INFO_UPDATED_NOTIFICATION, (roomInfo: RoomInfo) => {
+      setRoomState(roomInfo);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -77,6 +91,8 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
       </>
     );
   }
+
+  // TODO isLoading until playerId and roomInfo are set
 
   return (
     <>
