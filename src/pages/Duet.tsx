@@ -1,44 +1,24 @@
-import React, { useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
+import DuetRoom from '../components/DuetRoom';
 
 const Duet: React.FC = () => {
-  const maybeRoomId = new URLSearchParams(useLocation().search).get('id');
+  const location = useLocation();
+  const maybeRoomId = new URLSearchParams(location.search).get('id');
+
+  // Used to prevent DuetRoom from sending a join room request
+  // isCreate is only set to true when maybeRoomId is set to null at some time
+  // this takes advantage of how the only way to join a room is by opening
+  // a link (full page reload), whereas there is no restriction to creating a room.
+  const [isCreate, setIsCreate] = useState(maybeRoomId === null);
 
   useEffect(() => {
-    // connect to ws server
-
-    // only done on first load. All subsequent re-renders should use
-    // some state varaible to determine whether to render a room or not
     if (maybeRoomId === null) {
-      // tell server to create room.
-      // receive roomId from server and join room.
-      // update url
-    } else {
-      // tell server that client wants to join room
-      // receive room id and status
+      setIsCreate(true);
     }
-  }, []);
+  }, [maybeRoomId]);
 
-  if (maybeRoomId === null) {
-    return (
-      <>
-        <h3>Creating room...</h3>
-        <Link to="/">
-          <button>Back</button>
-        </Link>
-      </>
-    );
-  }
-
-  return (
-    <>
-      <h3>Duet</h3>
-
-      <Link to="/">
-        <button>Back</button>
-      </Link>
-    </>
-  );
+  return <DuetRoom maybeRoomId={maybeRoomId} isCreate={isCreate} />;
 };
 
 export default Duet;
