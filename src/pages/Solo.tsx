@@ -17,8 +17,12 @@ const Solo: React.FC = () => {
       start={calculateStartNote(range)}
       range={range}
       keyWidth={keyWidth}
-      handleKeyDown={note => console.log(`Start playing: ${note}`)}
-      handleKeyUp={note => console.log(`Stop playing: ${note}`)}
+      didPlayNote={(note, playerId) =>
+        console.log(`Start playing: ${note} by ${playerId}`)
+      }
+      didStopNote={(note, playerId) =>
+        console.log(`Start playing: ${note} by ${playerId}`)
+      }
     />
   );
 

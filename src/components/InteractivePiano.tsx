@@ -8,16 +8,16 @@ type Props = {
   start: number;
   range: number;
   keyWidth: number;
-  handleKeyDown: (key: number) => void;
-  handleKeyUp: (key: number) => void;
+  didPlayNote: (key: number, playerId: number) => void;
+  didStopNote: (key: number, playerId: number) => void;
 };
 
 const InteractivePiano: React.FC<Props> = ({
   start,
   range,
   keyWidth,
-  handleKeyDown,
-  handleKeyUp,
+  didPlayNote,
+  didStopNote,
 }) => {
   const [startNote, setStartNote] = useState(start);
   const endNote = startNote + range;
@@ -76,8 +76,8 @@ const InteractivePiano: React.FC<Props> = ({
         endNote={endNote}
         keyWidth={keyWidth}
         keyboardMap={keyboardMap}
-        handleKeyDown={handleKeyDown}
-        handleKeyUp={handleKeyUp}
+        didPlayNote={didPlayNote}
+        didStopNote={didStopNote}
       />
       <OctaveShiftKey
         icon={'>'}

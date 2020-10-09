@@ -1,7 +1,11 @@
 import React from 'react';
 import '../InteractivePiano.css';
 
-const PianoContainer = ({ children }) => {
+type Props = {
+  children: React.ReactNode;
+};
+
+const PianoContainer: React.FC<Props> = ({ children }) => {
   return (
     <div
       className={'interactive-piano__piano-container'}

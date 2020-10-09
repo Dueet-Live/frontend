@@ -1,17 +1,23 @@
 import { difference } from 'lodash';
+import { List } from 'lodash';
+import { Player } from 'soundfont-player';
+import { NullSoundFontPlayerNoteAudio, AudioPlayer } from './AudioPlayer';
 
 export default class Instrument {
-  constructor(audioPlayer) {
+  audioPlayer: AudioPlayer;
+  activeNoteMap: { [key: string]: Player | NullSoundFontPlayerNoteAudio };
+
+  constructor(audioPlayer: AudioPlayer) {
     this.audioPlayer = audioPlayer;
     this.activeNoteMap = {};
   }
 
-  playNotes(activeNotes) {
+  playNotes(activeNotes: List<string>) {
     this.stopPlayingInactiveNotes(activeNotes);
     this.startPlayingNewlyActiveNotes(activeNotes);
   }
 
-  stopPlayingInactiveNotes(activeNotes) {
+  stopPlayingInactiveNotes(activeNotes: List<string>) {
     const previouslyActiveNotes = this.getActiveNotes();
     const inactiveNotes = difference(previouslyActiveNotes, activeNotes);
 
@@ -21,7 +27,7 @@ export default class Instrument {
     });
   }
 
-  startPlayingNewlyActiveNotes(activeNotes) {
+  startPlayingNewlyActiveNotes(activeNotes: List<string>) {
     const previouslyActiveNotes = this.getActiveNotes();
     const newlyActiveNotes = difference(activeNotes, previouslyActiveNotes);
 

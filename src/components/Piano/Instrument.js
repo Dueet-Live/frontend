@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import InstrumentAudio from './InstrumentAudio';
 
 function isRegularKey(event) {
@@ -31,23 +31,23 @@ export default class Instrument extends Component {
   }
 
   // Listen for keydown event
-  handleNotePlayByOtherPlayer = (note, player) => {
-    // TODO: replace with user id
-    if (player === -1) {
+  handleNotePlayByOtherPlayer = (note, playerId) => {
+    // TODO: replace with current player id
+    if (playerId === -1) {
       return;
     }
 
-    this.startPlayingNote(note, player);
+    this.startPlayingNote(note, playerId);
   };
 
   // Listen for keyup event
-  handleNoteStopByOtherPlayer = (note, player) => {
-    // TODO: replace with user id
-    if (player === -1) {
+  handleNoteStopByOtherPlayer = (note, playerId) => {
+    // TODO: replace with current player id
+    if (playerId === -1) {
       return;
     }
 
-    this.stopPlayingNote(note, player);
+    this.stopPlayingNote(note, playerId);
   };
 
   getNoteFromKeyboardKey(keyboardKey) {
@@ -59,7 +59,7 @@ export default class Instrument extends Component {
     if (isRegularKey(event) && !event.repeat) {
       const note = this.getNoteFromKeyboardKey(event.key);
       if (note) {
-        // TODO: replace with real user id
+        // TODO: replace with current player id
         this.startPlayingNote(note, -1);
       }
     }
@@ -69,23 +69,25 @@ export default class Instrument extends Component {
     if (isRegularKey(event)) {
       const note = this.getNoteFromKeyboardKey(event.key);
       if (note) {
-        // TODO: replace with real user id
+        // TODO: replace with current player id
         this.stopPlayingNote(note, -1);
       }
     }
   }
 
-  startPlayingNote(note, player) {
+  startPlayingNote(note, playerId) {
+    this.props.didPlayNote(note, playerId);
     this.setState(({ notesPlaying }) => ({
-      notesPlaying: [...notesPlaying, { note, player }],
+      notesPlaying: [...notesPlaying, { note, playerId }],
     }));
   }
 
-  stopPlayingNote(note, player) {
+  stopPlayingNote(note, playerId) {
+    this.props.didStopNote(note, playerId);
     this.setState(({ notesPlaying }) => ({
       notesPlaying: notesPlaying.filter(
         notePlaying =>
-          notePlaying.note !== note || notePlaying.player !== player
+          notePlaying.note !== note || notePlaying.playerId !== playerId
       ),
     }));
   }
@@ -95,7 +97,7 @@ export default class Instrument extends Component {
     const { notesPlaying } = this.state;
 
     return (
-      <Fragment>
+      <>
         {renderInstrument({
           notesPlaying,
           onPlayNoteStart: this.startPlayingNote,
@@ -105,7 +107,7 @@ export default class Instrument extends Component {
           notes={notesPlaying.map(notePlaying => notePlaying.note)}
           instrument={instrument}
         />
-      </Fragment>
+      </>
     );
   }
 }

@@ -1,5 +1,6 @@
 import { InstrumentName } from 'soundfont-player';
-import AudioPlayer from './AudioPlayer';
+import { List } from 'lodash';
+import { AudioPlayer } from './AudioPlayer';
 import Instrument from './Instrument';
 
 export default class InstrumentPlayer {
@@ -15,7 +16,7 @@ export default class InstrumentPlayer {
     this.audioPlayer.setInstrument(instrumentName);
   }
 
-  playNotes(notes: Int32Array) {
+  playNotes(notes: List<string>) {
     this.instrument.playNotes(notes);
   }
 }

@@ -10,7 +10,7 @@ import AudioContext from './AudioContext';
  * https://github.com/danigb/soundfont-player
  */
 
-class NullSoundFontPlayerNoteAudio {
+export class NullSoundFontPlayerNoteAudio {
   // eslint-disable-next-line class-methods-use-this
   stop() {}
 }
@@ -22,7 +22,7 @@ class NullSoundFontPlayer {
   }
 }
 
-export default class AudioPlayer {
+export class AudioPlayer {
   audioContext: AudioContext;
   soundFontPlayer: NullSoundFontPlayer | Player;
 
