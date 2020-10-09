@@ -4,7 +4,15 @@ import isAccidentalNote from './utils/isAccidentalNote';
 import getNotesBetween from './utils/getNotesBetween';
 import getKeyboardShortcutForNote from './utils/getKeyboardShortcutsForNote';
 
-const Piano = ({ startNote, endNote, keyboardMap, renderPianoKey }) => {
+const Piano = ({
+  startNote,
+  endNote,
+  keyWidth,
+  keyboardMap,
+  renderPianoKey,
+  handleKeyUp,
+  handleKeyDown,
+}) => {
   const notes = getNotesBetween(startNote, endNote);
 
   return (
@@ -16,10 +24,17 @@ const Piano = ({ startNote, endNote, keyboardMap, renderPianoKey }) => {
           <Fragment key={note}>
             {renderPianoKey({
               note,
+              keyWidth,
               isNoteAccidental: isAccidentalNote(note),
               isNotePlaying: notesPlaying.includes(note),
-              startPlayingNote: () => onPlayNoteStart(note),
-              stopPlayingNote: () => onPlayNoteEnd(note),
+              startPlayingNote: () => {
+                onPlayNoteStart(note);
+                handleKeyDown(note);
+              },
+              stopPlayingNote: () => {
+                onPlayNoteEnd(note);
+                handleKeyUp(note);
+              },
               keyboardShortcuts: getKeyboardShortcutForNote(keyboardMap, note),
             })}
           </Fragment>

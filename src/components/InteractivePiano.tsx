@@ -9,38 +9,46 @@ type Props = {
   start: number;
   range: number;
   keyWidth: number;
+  handleKeyDown: (key: number) => void;
+  handleKeyUp: (key: number) => void;
 };
 
-const InteractivePiano: React.FC<Props> = ({ start, range, keyWidth }) => {
+const InteractivePiano: React.FC<Props> = ({
+  start,
+  range,
+  keyWidth,
+  handleKeyDown,
+  handleKeyUp,
+}) => {
   const [startNote, setStartNote] = useState(start);
   const endNote = startNote + range;
 
   // TODO: update with octave shift
   const keyboardMap = {
-    Q: 'C4',
-    2: 'C#4',
-    W: 'D4',
-    3: 'D#4',
-    E: 'E4',
-    R: 'F4',
-    5: 'F#4',
-    T: 'G4',
-    6: 'G#4',
-    Y: 'A4',
-    7: 'A#4',
-    U: 'B4',
-    V: 'C5',
-    G: 'C#5',
-    B: 'D5',
-    H: 'D#5',
-    N: 'E5',
-    M: 'F5',
-    K: 'F#5',
-    ',': 'G5',
-    L: 'G#5',
-    '.': 'A5',
-    ';': 'A#5',
-    '/': 'B5',
+    Q: 60,
+    2: 61,
+    W: 62,
+    3: 63,
+    E: 64,
+    R: 65,
+    5: 66,
+    T: 67,
+    6: 68,
+    Y: 69,
+    7: 70,
+    U: 71,
+    V: 72,
+    G: 73,
+    B: 74,
+    H: 75,
+    N: 76,
+    M: 77,
+    K: 78,
+    ',': 79,
+    L: 80,
+    '.': 81,
+    ';': 82,
+    '/': 83,
   };
 
   const lowestMidiNote = 21;
@@ -67,8 +75,11 @@ const InteractivePiano: React.FC<Props> = ({ start, range, keyWidth }) => {
       <Piano
         startNote={startNote}
         endNote={endNote}
+        keyWidth={keyWidth}
         renderPianoKey={PianoKey}
         keyboardMap={keyboardMap}
+        handleKeyDown={handleKeyDown}
+        handleKeyUp={handleKeyUp}
       />
       <OctaveShiftKey
         icon={'r'}

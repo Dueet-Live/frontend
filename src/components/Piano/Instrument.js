@@ -54,14 +54,12 @@ export default class Instrument extends Component {
   }
 
   startPlayingNote(note) {
-    console.log(`Start playing: ${note}`);
     this.setState(({ notesPlaying }) => ({
       notesPlaying: [...notesPlaying, note],
     }));
   }
 
   stopPlayingNote(note) {
-    console.log(`Stop playing: ${note}`);
     this.setState(({ notesPlaying }) => ({
       notesPlaying: notesPlaying.filter(notePlaying => notePlaying !== note),
     }));

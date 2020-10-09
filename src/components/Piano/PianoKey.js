@@ -2,7 +2,7 @@ import React from 'react';
 import * as Tone from 'tone';
 import '../InteractivePiano.css';
 
-const AccidentalKey = ({ isPlaying, text, eventHandlers }) => {
+const AccidentalKey = ({ isPlaying, keyWidth, text, eventHandlers }) => {
   return (
     <div className={'interactive-piano__accidental-key__wrapper'}>
       <button
@@ -10,6 +10,7 @@ const AccidentalKey = ({ isPlaying, text, eventHandlers }) => {
           isPlaying ? 'interactive-piano__accidental-key--playing' : ''
         }`}
         {...eventHandlers}
+        style={{ width: keyWidth }}
       >
         <div className={'interactive-piano__text'}>{text}</div>
       </button>
@@ -17,13 +18,14 @@ const AccidentalKey = ({ isPlaying, text, eventHandlers }) => {
   );
 };
 
-const NaturalKey = ({ isPlaying, text, eventHandlers }) => {
+const NaturalKey = ({ isPlaying, keyWidth, text, eventHandlers }) => {
   return (
     <button
       className={`interactive-piano__natural-key ${
         isPlaying ? 'interactive-piano__natural-key--playing' : ''
       }`}
       {...eventHandlers}
+      style={{ width: keyWidth }}
     >
       <div className={'interactive-piano__text'}>{text}</div>
     </button>
@@ -32,6 +34,7 @@ const NaturalKey = ({ isPlaying, text, eventHandlers }) => {
 
 const PianoKey = ({
   note,
+  keyWidth,
   isNoteAccidental,
   isNotePlaying,
   startPlayingNote,
@@ -39,25 +42,21 @@ const PianoKey = ({
   keyboardShortcuts,
 }) => {
   const handleMouseDown = () => {
-    console.log(`Mouse down ${note}`);
     startPlayingNote();
   };
 
   const handleMouseUp = () => {
-    console.log(`Mouse up ${note}`);
     stopPlayingNote();
   };
 
   const handleMouseEnter = event => {
     if (event.buttons) {
-      console.log(`Mouse enter ${note}`);
       startPlayingNote();
     }
   };
 
   const handleMouseLeave = event => {
     if (event.buttons) {
-      console.log(`Mouse leave ${note}`);
       stopPlayingNote();
     }
   };
@@ -95,6 +94,7 @@ const PianoKey = ({
     <KeyComponent
       isPlaying={isNotePlaying}
       text={isNoteAccidental ? '' : Tone.Frequency(note, 'midi').toNote()}
+      keyWidth={isNoteAccidental ? (keyWidth / 50) * 36 : keyWidth}
       // text={keyboardShortcuts.join(' / ')}
       eventHandlers={eventHandlers}
     />

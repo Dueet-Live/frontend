@@ -25,7 +25,6 @@
   transform: translateX(-50%);
   cursor: pointer;
   background: #444;
-  width: 36px;
   height: 120px;
   border-radius: 0px 0px 3px 3px;
   border: 3px solid #444;
@@ -44,7 +43,6 @@
 .interactive-piano__natural-key {
   cursor: pointer;
   background: #fafafa;
-  width: 50px;
   height: 180px;
   margin: 0 2px;
   border-radius: 0 0 3px 3px;
@@ -72,8 +70,8 @@
 .interactive-piano__octave-shift-key {
   cursor: pointer;
   background: #c0b3d8de;
-  width: 30px;
   height: 180px;
+  width: 30px;
   margin: 0 2px;
   border-radius: 0 0 3px 3px;
   border: none;
