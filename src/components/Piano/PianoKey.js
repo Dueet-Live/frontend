@@ -1,14 +1,27 @@
 import React from 'react';
 import * as Tone from 'tone';
 import '../InteractivePiano.css';
+import { calculateBlackKeyWidth } from '../../utils/calculateKeyboardDimension';
+import isAccidentalNote from './utils/isAccidentalNote';
 
 const AccidentalKey = ({ isPlaying, keyWidth, text, eventHandlers }) => {
+  const getClassName = () => {
+    if (isPlaying.length === 0) {
+      return '';
+    } else {
+      // TODO: replace with user id
+      if (isPlaying[0].player === -1) {
+        return 'interactive-piano__accidental-key--playing-by-me';
+      } else {
+        return 'interactive-piano__accidental-key--playing-by-others';
+      }
+    }
+  };
+
   return (
     <div className={'interactive-piano__accidental-key__wrapper'}>
       <button
-        className={`interactive-piano__accidental-key ${
-          isPlaying ? 'interactive-piano__accidental-key--playing' : ''
-        }`}
+        className={`interactive-piano__accidental-key ${getClassName()}`}
         {...eventHandlers}
         style={{ width: keyWidth }}
       >
@@ -19,11 +32,22 @@ const AccidentalKey = ({ isPlaying, keyWidth, text, eventHandlers }) => {
 };
 
 const NaturalKey = ({ isPlaying, keyWidth, text, eventHandlers }) => {
+  const getClassName = () => {
+    if (isPlaying.length === 0) {
+      return '';
+    } else {
+      // TODO: replace with user id
+      if (isPlaying[0].player === -1) {
+        return 'interactive-piano__natural-key--playing-by-me';
+      } else {
+        return 'interactive-piano__natural-key--playing-by-others';
+      }
+    }
+  };
+
   return (
     <button
-      className={`interactive-piano__natural-key ${
-        isPlaying ? 'interactive-piano__natural-key--playing' : ''
-      }`}
+      className={`interactive-piano__natural-key ${getClassName()}`}
       {...eventHandlers}
       style={{ width: keyWidth }}
     >
@@ -35,11 +59,10 @@ const NaturalKey = ({ isPlaying, keyWidth, text, eventHandlers }) => {
 const PianoKey = ({
   note,
   keyWidth,
-  isNoteAccidental,
   isNotePlaying,
   startPlayingNote,
   stopPlayingNote,
-  keyboardShortcuts,
+  keyboardShortcut,
 }) => {
   const handleMouseDown = () => {
     startPlayingNote();
@@ -88,13 +111,14 @@ const PianoKey = ({
     // onTouchCancel: onTouchCancel
   };
 
+  const isNoteAccidental = isAccidentalNote(note);
   const KeyComponent = isNoteAccidental ? AccidentalKey : NaturalKey;
 
   return (
     <KeyComponent
       isPlaying={isNotePlaying}
       text={isNoteAccidental ? '' : Tone.Frequency(note, 'midi').toNote()}
-      keyWidth={isNoteAccidental ? (keyWidth / 50) * 36 : keyWidth}
+      keyWidth={isNoteAccidental ? calculateBlackKeyWidth(keyWidth) : keyWidth}
       // text={keyboardShortcuts.join(' / ')}
       eventHandlers={eventHandlers}
     />

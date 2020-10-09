@@ -30,6 +30,26 @@ export default class Instrument extends Component {
     window.removeEventListener('keyup', this.handleKeyUp);
   }
 
+  // Listen for keydown event
+  handleNotePlayByOtherPlayer = (note, player) => {
+    // TODO: replace with user id
+    if (player === -1) {
+      return;
+    }
+
+    this.startPlayingNote(note, player);
+  };
+
+  // Listen for keyup event
+  handleNoteStopByOtherPlayer = (note, player) => {
+    // TODO: replace with user id
+    if (player === -1) {
+      return;
+    }
+
+    this.stopPlayingNote(note, player);
+  };
+
   getNoteFromKeyboardKey(keyboardKey) {
     const { keyboardMap } = this.props;
     return keyboardMap[keyboardKey.toUpperCase()];
@@ -39,7 +59,8 @@ export default class Instrument extends Component {
     if (isRegularKey(event) && !event.repeat) {
       const note = this.getNoteFromKeyboardKey(event.key);
       if (note) {
-        this.startPlayingNote(note);
+        // TODO: replace with real user id
+        this.startPlayingNote(note, -1);
       }
     }
   }
@@ -48,20 +69,24 @@ export default class Instrument extends Component {
     if (isRegularKey(event)) {
       const note = this.getNoteFromKeyboardKey(event.key);
       if (note) {
-        this.stopPlayingNote(note);
+        // TODO: replace with real user id
+        this.stopPlayingNote(note, -1);
       }
     }
   }
 
-  startPlayingNote(note) {
+  startPlayingNote(note, player) {
     this.setState(({ notesPlaying }) => ({
-      notesPlaying: [...notesPlaying, note],
+      notesPlaying: [...notesPlaying, { note, player }],
     }));
   }
 
-  stopPlayingNote(note) {
+  stopPlayingNote(note, player) {
     this.setState(({ notesPlaying }) => ({
-      notesPlaying: notesPlaying.filter(notePlaying => notePlaying !== note),
+      notesPlaying: notesPlaying.filter(
+        notePlaying =>
+          notePlaying.note !== note || notePlaying.player !== player
+      ),
     }));
   }
 
@@ -76,7 +101,10 @@ export default class Instrument extends Component {
           onPlayNoteStart: this.startPlayingNote,
           onPlayNoteEnd: this.stopPlayingNote,
         })}
-        <InstrumentAudio notes={notesPlaying} instrument={instrument} />
+        <InstrumentAudio
+          notes={notesPlaying.map(notePlaying => notePlaying.note)}
+          instrument={instrument}
+        />
       </Fragment>
     );
   }

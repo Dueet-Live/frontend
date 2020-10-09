@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import Piano from './Piano/Piano';
 import PianoContainer from './Piano/PianoContainer';
-import PianoKey from './Piano/PianoKey';
 import OctaveShiftKey from './Piano/OctaveShiftKey';
 import './InteractivePiano.css';
 
@@ -68,7 +67,7 @@ const InteractivePiano: React.FC<Props> = ({
   return (
     <PianoContainer>
       <OctaveShiftKey
-        icon={'l'}
+        icon={'<'}
         onClick={shiftDownOctave}
         disabled={startNote === lowestMidiNote}
       />
@@ -76,13 +75,12 @@ const InteractivePiano: React.FC<Props> = ({
         startNote={startNote}
         endNote={endNote}
         keyWidth={keyWidth}
-        renderPianoKey={PianoKey}
         keyboardMap={keyboardMap}
         handleKeyDown={handleKeyDown}
         handleKeyUp={handleKeyUp}
       />
       <OctaveShiftKey
-        icon={'r'}
+        icon={'>'}
         onClick={shiftUpOctave}
         disabled={endNote === highestMidiNote}
       />

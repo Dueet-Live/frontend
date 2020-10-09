@@ -5,12 +5,22 @@ import useWindowDimensions from '../utils/useWindowDimensions';
 import {
   calculateKeyboardRange,
   calculateKeyWidth,
+  calculateStartNote,
 } from '../utils/calculateKeyboardDimension';
 
 const Solo: React.FC = () => {
   const { width } = useWindowDimensions();
   const keyWidth = calculateKeyWidth(width);
   const range = calculateKeyboardRange(width);
+  const piano = (
+    <InteractivePiano
+      start={calculateStartNote(range)}
+      range={range}
+      keyWidth={keyWidth}
+      handleKeyDown={note => console.log(`Start playing: ${note}`)}
+      handleKeyUp={note => console.log(`Stop playing: ${note}`)}
+    />
+  );
 
   return (
     <>
@@ -20,15 +30,7 @@ const Solo: React.FC = () => {
       </Link>
 
       {/* TODO: Position the piano */}
-      <div>
-        <InteractivePiano
-          start={60 - Math.floor(range / 2)}
-          range={range}
-          keyWidth={keyWidth}
-          handleKeyDown={note => console.log(`Start playing: ${note}`)}
-          handleKeyUp={note => console.log(`Stop playing: ${note}`)}
-        />
-      </div>
+      <div>{piano}</div>
     </>
   );
 };

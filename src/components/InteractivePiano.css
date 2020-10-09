@@ -35,8 +35,13 @@
   color: #dbdbdb;
 }
 
-.interactive-piano__accidental-key--playing {
+.interactive-piano__accidental-key--playing-by-me {
   background: #904ae9;
+  color: #fff;
+}
+
+.interactive-piano__accidental-key--playing-by-others {
+  background: #E1A546;
   color: #fff;
 }
 
@@ -53,9 +58,14 @@
   color: #444;
 }
 
-.interactive-piano__natural-key--playing {
+.interactive-piano__natural-key--playing-by-me {
   border-bottom: 10px solid #904ae9;
   color: #904ae9;
+}
+
+.interactive-piano__natural-key--playing-by-others {
+  border-bottom: 10px solid #E1A546;
+  color: #E1A546;
 }
 
 .interactive-piano__text {

@@ -1,6 +1,7 @@
 import React, { Fragment } from 'react';
 import Instrument from './Instrument';
-import isAccidentalNote from './utils/isAccidentalNote';
+import PianoKey from './PianoKey';
+
 import getNotesBetween from './utils/getNotesBetween';
 import getKeyboardShortcutForNote from './utils/getKeyboardShortcutsForNote';
 
@@ -9,7 +10,6 @@ const Piano = ({
   endNote,
   keyWidth,
   keyboardMap,
-  renderPianoKey,
   handleKeyUp,
   handleKeyDown,
 }) => {
@@ -22,21 +22,24 @@ const Piano = ({
       renderInstrument={({ notesPlaying, onPlayNoteStart, onPlayNoteEnd }) =>
         notes.map(note => (
           <Fragment key={note}>
-            {renderPianoKey({
-              note,
-              keyWidth,
-              isNoteAccidental: isAccidentalNote(note),
-              isNotePlaying: notesPlaying.includes(note),
-              startPlayingNote: () => {
-                onPlayNoteStart(note);
+            <PianoKey
+              note={note}
+              keyWidth={keyWidth}
+              isNotePlaying={notesPlaying.filter(
+                notePlaying => notePlaying.note === note
+              )}
+              startPlayingNote={() => {
+                // TODO: replace with user id
+                onPlayNoteStart(note, -1);
                 handleKeyDown(note);
-              },
-              stopPlayingNote: () => {
-                onPlayNoteEnd(note);
+              }}
+              stopPlayingNote={() => {
+                // TODO: replace with user id
+                onPlayNoteEnd(note, -1);
                 handleKeyUp(note);
-              },
-              keyboardShortcuts: getKeyboardShortcutForNote(keyboardMap, note),
-            })}
+              }}
+              keyboardShortcut={getKeyboardShortcutForNote(keyboardMap, note)}
+            />
           </Fragment>
         ))
       }
