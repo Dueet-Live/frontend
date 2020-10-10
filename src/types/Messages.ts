@@ -66,6 +66,14 @@ export const START_GAME_NOTIFICATION = 'startGameNotification';
 export type StartGameNotification = {
   inSeconds: number;
 };
+/****************** Note played *****************/
+
+export const NOTE_PLAYED = 'notePlayed';
+export type NotePlayEvent = 'keyup' | 'keydown';
+export type NotePlayedRequest = {
+  note: number;
+  event: NotePlayEvent;
+};
 
 /****************** Miscellaneous *****************/
 export const MALFORMED_MESSAGE_RESPONSE = 'malformedMessageResponse';
