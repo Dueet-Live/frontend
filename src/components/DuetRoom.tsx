@@ -1,22 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
-import {
-  CREATE_ROOM_REQUEST,
-  CREATE_ROOM_RESPONSE,
-  JoinRoomFailureResponse,
-  JoinRoomResponse,
-  JoinRoomSuccessResponse,
-  JOIN_ROOM_REQUEST,
-  JOIN_ROOM_RESPONSE,
-  MalformedMessageResponse,
-  MALFORMED_MESSAGE_RESPONSE,
-  RoomCreatedResponse,
-  ROOM_INFO_UPDATED_NOTIFICATION,
-  UnknownErrorResponse,
-  UNKNOWN_MESSAGE_RESPONSE,
-} from '../types/Messages';
 import { RoomInfo } from '../types/RoomInfo';
-import socket from '../utils/socket';
+import socket, { addListeners, createRoom, joinRoom } from '../utils/socket';
 
 const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   maybeRoomId,
@@ -31,51 +16,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
     // connect to ws server
     socket.open();
 
-    socket.on(
-      CREATE_ROOM_RESPONSE,
-      ({ roomInfo, playerId }: RoomCreatedResponse) => {
-        setRoomState(roomInfo);
-        setPlayerId(playerId);
-        history.push(`/duet?id=${roomInfo.id}`);
-      }
-    );
-
-    socket.on(
-      MALFORMED_MESSAGE_RESPONSE,
-      ({ message }: MalformedMessageResponse) => {
-        // TODO decide what to do depending on error. For now we just throw them
-        // to create
-        // TODO snackbar
-        console.log(message + '... creating new room');
-        history.push('/duet');
-      }
-    );
-    socket.on(UNKNOWN_MESSAGE_RESPONSE, ({ error }: UnknownErrorResponse) => {
-      // TODO decide what to do depending on error. For now we just throw them
-      // to create
-      // TODO snackbar
-      console.log(error + '... creating new room');
-      history.push('/duet');
-    });
-
-    socket.on(JOIN_ROOM_RESPONSE, (res: JoinRoomResponse) => {
-      if (!res.success) {
-        // failed to join room, so create a room instead
-        // TODO snackbar
-        const { code, message } = res as JoinRoomFailureResponse;
-        console.log(code + ': ' + message + '... creating new room');
-        history.push('/duet');
-        return;
-      }
-
-      const { roomInfo, playerId } = res as JoinRoomSuccessResponse;
-      setRoomState(roomInfo);
-      setPlayerId(playerId);
-    });
-
-    socket.on(ROOM_INFO_UPDATED_NOTIFICATION, (roomInfo: RoomInfo) => {
-      setRoomState(roomInfo);
-    });
+    addListeners(setPlayerId, setRoomState, history);
 
     return () => {
       socket.close();
@@ -85,9 +26,9 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
 
   useEffect(() => {
     if (maybeRoomId === null) {
-      socket.emit(CREATE_ROOM_REQUEST, {});
+      createRoom();
     } else if (!isCreate) {
-      socket.emit(JOIN_ROOM_REQUEST, { roomId: maybeRoomId });
+      joinRoom(maybeRoomId);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [maybeRoomId]);
