@@ -2,6 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import { RoomInfo } from '../types/RoomInfo';
 import socket, { addListeners, createRoom, joinRoom } from '../utils/socket';
+import useWindowDimensions from '../utils/useWindowDimensions';
+import {
+  calculateKeyboardRange,
+  calculateKeyWidth,
+  calculateStartNote,
+} from '../utils/calculateKeyboardDimension';
+import InteractivePiano from './InteractivePiano';
 
 const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   maybeRoomId,
@@ -10,6 +17,22 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   const history = useHistory();
   const [roomState, setRoomState] = useState({} as RoomInfo);
   const [playerId, setPlayerId] = useState(-1);
+  const { width } = useWindowDimensions();
+  const keyWidth = calculateKeyWidth(width);
+  const range = calculateKeyboardRange(width);
+  const piano = (
+    <InteractivePiano
+      start={calculateStartNote(range)}
+      range={range}
+      keyWidth={keyWidth}
+      didPlayNote={(note, playerId) =>
+        console.log(`Start playing: ${note} by ${playerId}`)
+      }
+      didStopNote={(note, playerId) =>
+        console.log(`Stop playing: ${note} by ${playerId}`)
+      }
+    />
+  );
 
   // TODO refactor socket io listeners to a separate file
   useEffect(() => {
@@ -68,6 +91,8 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
       <Link to="/">
         <button>Back</button>
       </Link>
+
+      <div>{piano}</div>
     </>
   );
 };
