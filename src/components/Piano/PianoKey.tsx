@@ -30,25 +30,25 @@ const PianoKey: React.FC<Props> = ({
   const [useTouchEvents, setUseTouchEvents] = useState(false);
 
   const handleMouseDown = () => {
-    console.log(`Mouse down ${note}`);
+    // console.log(`Mouse down ${note}`);
     startPlayingNote();
   };
 
   const handleMouseUp = () => {
-    console.log(`Mouse up ${note}`);
+    // console.log(`Mouse up ${note}`);
     stopPlayingNote();
   };
 
   const handleMouseEnter = (event: React.MouseEvent<HTMLButtonElement>) => {
     if (event.buttons) {
-      console.log(`Mouse enter ${note}`);
+      // console.log(`Mouse enter ${note}`);
       startPlayingNote();
     }
   };
 
   const handleMouseLeave = (event: React.MouseEvent<HTMLButtonElement>) => {
     if (event.buttons) {
-      console.log(`Mouse leave ${note}`);
+      // console.log(`Mouse leave ${note}`);
       stopPlayingNote();
     }
   };

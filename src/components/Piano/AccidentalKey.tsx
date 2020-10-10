@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { PlayerContext } from '../PlayerContext';
 import '../InteractivePiano.css';
 
 type PlayingNote = {
@@ -19,12 +20,12 @@ const AccidentalKey: React.FC<Props> = ({
   text,
   eventHandlers,
 }) => {
+  const { me } = useContext(PlayerContext);
   const getClassName = () => {
     if (playingNote.length === 0) {
       return '';
     } else {
-      // TODO: replace with current player id
-      if (playingNote[0].playerId === -1) {
+      if (playingNote[0].playerId === me) {
         return 'interactive-piano__accidental-key--playing-by-me';
       } else {
         return 'interactive-piano__accidental-key--playing-by-others';

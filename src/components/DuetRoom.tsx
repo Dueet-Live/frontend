@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import { RoomInfo } from '../types/RoomInfo';
+import { PlayerInfo } from '../types/PlayerInfo';
 import socket, { addListeners, createRoom, joinRoom } from '../utils/socket';
 import useWindowDimensions from '../utils/useWindowDimensions';
 import {
@@ -9,6 +10,8 @@ import {
   calculateStartNote,
 } from '../utils/calculateKeyboardDimension';
 import InteractivePiano from './InteractivePiano';
+import { playNote, stopNote } from '../utils/socket';
+import { PlayerContext } from './PlayerContext';
 
 const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   maybeRoomId,
@@ -17,22 +20,21 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   const history = useHistory();
   const [roomState, setRoomState] = useState({} as RoomInfo);
   const [playerId, setPlayerId] = useState(-1);
+
   const { width } = useWindowDimensions();
   const keyWidth = calculateKeyWidth(width);
   const range = calculateKeyboardRange(width);
-  const piano = (
-    <InteractivePiano
-      start={calculateStartNote(range)}
-      range={range}
-      keyWidth={keyWidth}
-      didPlayNote={(note, playerId) =>
-        console.log(`Start playing: ${note} by ${playerId}`)
-      }
-      didStopNote={(note, playerId) =>
-        console.log(`Stop playing: ${note} by ${playerId}`)
-      }
-    />
-  );
+  const getFriendId = (players: PlayerInfo[], myId: number) => {
+    if (!players) {
+      return null;
+    }
+    const friendInfo = players.filter(player => player.id !== myId);
+    if (friendInfo.length === 0) {
+      return null;
+    } else {
+      return friendInfo[0].id;
+    }
+  };
 
   // TODO refactor socket io listeners to a separate file
   useEffect(() => {
@@ -92,7 +94,30 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
         <button>Back</button>
       </Link>
 
-      <div>{piano}</div>
+      <div>
+        <PlayerContext.Provider
+          value={{
+            me: playerId,
+            friend: getFriendId(roomState.players, playerId),
+          }}
+        >
+          <InteractivePiano
+            start={calculateStartNote(range)}
+            range={range}
+            keyWidth={keyWidth}
+            didPlayNote={(note, playedBy) => {
+              if (playerId === playedBy) {
+                playNote(note);
+              }
+            }}
+            didStopNote={(note, playedBy) => {
+              if (playerId === playedBy) {
+                stopNote(note);
+              }
+            }}
+          />
+        </PlayerContext.Provider>
+      </div>
     </>
   );
 };
