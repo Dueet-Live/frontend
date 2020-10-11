@@ -1,16 +1,39 @@
 import React, { Component } from 'react';
+import { InstrumentName } from 'soundfont-player';
 import InstrumentAudio from './InstrumentAudio';
 import { addNotePlayListener } from '../../utils/socket';
 import { PlayerContext } from '../PlayerContext';
+import { PlayingNote } from '../../types/PlayingNote';
 
-function isRegularKey(event) {
+type Props = {
+  instrument: InstrumentName;
+  keyboardMap: { [key: string]: number };
+  didPlayNote: (note: number, playerId: number) => void;
+  didStopNote: (note: number, playerId: number) => void;
+  renderInstrument: ({
+    notesPlaying,
+    onPlayNoteStart,
+    onPlayNoteEnd,
+  }: {
+    notesPlaying: PlayingNote[];
+    onPlayNoteStart: (note: number, playerId: number) => void;
+    onPlayNoteEnd: (note: number, playerId: number) => void;
+  }) => JSX.Element[];
+};
+
+type State = {
+  notesPlaying: PlayingNote[];
+};
+
+function isRegularKey(event: KeyboardEvent) {
   return !event.ctrlKey && !event.metaKey && !event.shiftKey;
 }
 
-export default class Instrument extends Component {
+export default class Instrument extends Component<Props> {
   static contextType = PlayerContext;
+  state: State;
 
-  constructor(props) {
+  constructor(props: Props) {
     super(props);
 
     this.state = {
@@ -38,22 +61,22 @@ export default class Instrument extends Component {
     window.removeEventListener('keyup', this.handleKeyUp);
   }
 
-  handleNotePlayByOtherPlayer = note => {
+  handleNotePlayByOtherPlayer = (note: number) => {
     let playerId = this.context.friend;
     this.startPlayingNote(note, playerId);
   };
 
-  handleNoteStopByOtherPlayer = note => {
+  handleNoteStopByOtherPlayer = (note: number) => {
     let playerId = this.context.friend;
     this.stopPlayingNote(note, playerId);
   };
 
-  getNoteFromKeyboardKey(keyboardKey) {
+  getNoteFromKeyboardKey(keyboardKey: string) {
     const { keyboardMap } = this.props;
     return keyboardMap[keyboardKey.toUpperCase()];
   }
 
-  handleKeyDown(event) {
+  handleKeyDown(event: KeyboardEvent) {
     if (isRegularKey(event) && !event.repeat) {
       const note = this.getNoteFromKeyboardKey(event.key);
       if (note) {
@@ -62,7 +85,7 @@ export default class Instrument extends Component {
     }
   }
 
-  handleKeyUp(event) {
+  handleKeyUp(event: KeyboardEvent) {
     if (isRegularKey(event)) {
       const note = this.getNoteFromKeyboardKey(event.key);
       if (note) {
@@ -71,16 +94,16 @@ export default class Instrument extends Component {
     }
   }
 
-  startPlayingNote(note, playerId) {
+  startPlayingNote(note: number, playerId: number) {
     this.props.didPlayNote(note, playerId);
-    this.setState(({ notesPlaying }) => ({
+    this.setState(({ notesPlaying }: State) => ({
       notesPlaying: [...notesPlaying, { note, playerId }],
     }));
   }
 
-  stopPlayingNote(note, playerId) {
+  stopPlayingNote(note: number, playerId: number) {
     this.props.didStopNote(note, playerId);
-    this.setState(({ notesPlaying }) => ({
+    this.setState(({ notesPlaying }: State) => ({
       notesPlaying: notesPlaying.filter(
         notePlaying =>
           notePlaying.note !== note || notePlaying.playerId !== playerId
@@ -100,14 +123,10 @@ export default class Instrument extends Component {
           onPlayNoteEnd: this.stopPlayingNote,
         })}
         <InstrumentAudio
-          notes={notesPlaying.map(notePlaying => notePlaying.note)}
+          notes={notesPlaying.map(notePlaying => notePlaying.note.toString())}
           instrument={instrument}
         />
       </>
     );
   }
 }
-
-Instrument.defaultProps = {
-  keyboardMap: {},
-};

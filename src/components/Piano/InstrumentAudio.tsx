@@ -1,9 +1,17 @@
 import { Component } from 'react';
-import { isEqual } from 'lodash';
+import { isEqual, List } from 'lodash';
+import { InstrumentName } from 'soundfont-player';
 import InstrumentPlayer from './utils/InstrumentPlayer';
 
-export default class InstrumentAudio extends Component {
-  constructor(props) {
+type Props = {
+  instrument: InstrumentName;
+  notes: List<string>;
+};
+
+export default class InstrumentAudio extends Component<Props> {
+  instrumentPlayer?: InstrumentPlayer;
+
+  constructor(props: Props) {
     super(props);
 
     this.setInstrument = this.setInstrument.bind(this);
@@ -16,7 +24,7 @@ export default class InstrumentAudio extends Component {
     this.playNotes();
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps: Props) {
     if (!isEqual(this.props.instrument, prevProps.instrument)) {
       this.setInstrument();
     }
@@ -27,20 +35,18 @@ export default class InstrumentAudio extends Component {
   }
 
   setInstrument() {
-    this.instrumentPlayer.setInstrument(this.props.instrument);
+    if (this.instrumentPlayer) {
+      this.instrumentPlayer.setInstrument(this.props.instrument);
+    }
   }
 
   playNotes() {
-    this.instrumentPlayer.playNotes(this.props.notes);
+    if (this.instrumentPlayer) {
+      this.instrumentPlayer.playNotes(this.props.notes);
+    }
   }
 
-  // eslint-disable-next-line class-methods-use-this
   render() {
     return null;
   }
 }
-
-InstrumentAudio.defaultProps = {
-  instrument: 'acoustic_grand_piano',
-  notes: [],
-};
