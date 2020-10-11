@@ -13,10 +13,11 @@ import { ReactComponent as icon9 } from '../svg/wolf.svg';
 
 type Props = SvgIconProps & {
   num: number;
+  myPlayerId: number;
 };
 
 // Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a>
-const PlayerIcon: React.FC<Props> = ({ num, ...props }) => {
+const PlayerIcon: React.FC<Props> = ({ num, myPlayerId, ...props }) => {
   const getIcon = () => {
     switch (num) {
       case 0:
@@ -43,7 +44,21 @@ const PlayerIcon: React.FC<Props> = ({ num, ...props }) => {
         return icon0;
     }
   };
-  return <SvgIcon component={getIcon()} viewBox="0 0 512 512" {...props} />;
+
+  // TODO should probably define these in a theme
+  const color = num === myPlayerId ? '#904ae9' : '#e1a546';
+  return (
+    <SvgIcon
+      component={getIcon()}
+      viewBox="0 0 512 512"
+      {...props}
+      style={{
+        padding: '1px',
+        border: `3px solid ${color}`,
+        borderRadius: '50%',
+      }}
+    />
+  );
 };
 
 export default PlayerIcon;

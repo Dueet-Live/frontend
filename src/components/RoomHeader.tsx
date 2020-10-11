@@ -58,9 +58,11 @@ const RoomHeader: React.FC<{ isSolo?: boolean; isPlaying?: boolean }> = ({
       </Typography>
     ) : (
       <Box alignContent="center" display="flex">
-        {me !== -1 && <PlayerIcon num={me} className={classes.icon} />}
+        {me !== -1 && (
+          <PlayerIcon num={me} myPlayerId={me} className={classes.icon} />
+        )}
         {friend !== null && (
-          <PlayerIcon num={friend} className={classes.icon} />
+          <PlayerIcon num={friend} myPlayerId={me} className={classes.icon} />
         )}
         {me === -1 ||
           (friend === null && (
