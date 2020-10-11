@@ -17,9 +17,18 @@ export function calculateKeyWidth(totalWidth: number): number {
   return keyboardWidth / (octaves * 7) - totalKeyMargin;
 }
 
+export function calculateKeyHeight(screenHeight: number): number {
+  return Math.min(screenHeight / 2, 180);
+}
+
 // Set white-black key width ratio here
 export function calculateBlackKeyWidth(whiteKeyWidth: number): number {
   return (whiteKeyWidth / 50) * 36;
+}
+
+// Set white-black key height ratio here
+export function calculateBlackKeyHeight(whiteKeyHeight: number): number {
+  return (whiteKeyHeight / 3) * 2;
 }
 
 export function calculateStartNote(range: number): number {

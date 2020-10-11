@@ -4,6 +4,8 @@ import PianoKey from './PianoKey';
 import { PlayerContext } from '../PlayerContext';
 import getNotesBetween from './utils/getNotesBetween';
 import getKeyboardShortcutForNote from './utils/getKeyboardShortcutsForNote';
+import useWindowDimensions from '../../utils/useWindowDimensions';
+import { calculateKeyHeight } from '../../utils/calculateKeyboardDimension';
 
 type Props = {
   startNote: number;
@@ -22,6 +24,8 @@ const Piano: React.FC<Props> = ({
   didPlayNote,
   didStopNote,
 }) => {
+  const { height } = useWindowDimensions();
+  const keyHeight = calculateKeyHeight(height);
   const notes = getNotesBetween(startNote, endNote);
   const { me } = useContext(PlayerContext);
 
@@ -37,6 +41,7 @@ const Piano: React.FC<Props> = ({
             key={note}
             note={note}
             keyWidth={keyWidth}
+            keyHeight={keyHeight}
             playingNote={notesPlaying.filter(
               notePlaying => notePlaying.note === note
             )}
