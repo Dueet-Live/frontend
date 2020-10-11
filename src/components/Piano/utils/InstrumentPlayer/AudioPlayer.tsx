@@ -34,7 +34,7 @@ export class AudioPlayer {
   // For a full list of supported instruments, refer to:
   // https://github.com/danigb/soundfont-player/blob/master/instruments.json
   setInstrument(instrumentName: InstrumentName) {
-    SoundFontPlayer.instrument(this.audioContext, instrumentName)
+    SoundFontPlayer.instrument(this.audioContext, instrumentName, { gain: 2 })
       .then(soundFontPlayer => {
         this.soundFontPlayer = soundFontPlayer;
       })

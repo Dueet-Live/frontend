@@ -68,13 +68,18 @@
   color: #E1A546;
 }
 
-.interactive-piano__text {
+.interactive-piano__text-container {
   pointer-events: none;
   height: 100%;
   display: flex;
-  align-items: flex-end;
-  justify-content: center;
+  flex-direction: column;
+  justify-content: flex-end;
   font-size: 1rem;
+}
+
+.interactive-piano__text--top-text {
+  color: rgb(136, 134, 134);
+  margin-bottom: 3px; 
 }
 
 .interactive-piano__octave-shift-key {

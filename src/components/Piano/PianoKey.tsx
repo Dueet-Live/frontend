@@ -85,9 +85,9 @@ const PianoKey: React.FC<Props> = ({
   return (
     <KeyComponent
       playingNote={playingNote}
-      text={isNoteAccidental ? '' : Tone.Frequency(note, 'midi').toNote()}
-      // Alternatively show keyboard shortcut
-      // text={keyboardShortcuts.join(' / ')}
+      // TODO: only show shortcuts on desktop
+      topText={note % 12 === 0 ? Tone.Frequency(note, 'midi').toNote() : ''}
+      bottomText={`${keyboardShortcut.join('/')}`}
       keyWidth={isNoteAccidental ? calculateBlackKeyWidth(keyWidth) : keyWidth}
       eventHandlers={eventHandlers}
     />
