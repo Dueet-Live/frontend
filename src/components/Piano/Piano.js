@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import Instrument from './Instrument';
 import PianoKey from './PianoKey';
-
+import { PlayerContext } from '../PlayerContext';
 import getNotesBetween from './utils/getNotesBetween';
 import getKeyboardShortcutForNote from './utils/getKeyboardShortcutsForNote';
 
@@ -10,8 +10,8 @@ import getKeyboardShortcutForNote from './utils/getKeyboardShortcutsForNote';
 //   endNote: number,
 //   keyWidth: number,
 //   keyboardMap: { [key: string]: number }
-//   handleKeyUp: (note: number) => void
-//   handleKeyDown: (note: number) => void
+//   didPlayNote: (note: number, playerId: number) => void
+//   didStopNote: (note: number, playerId: number) => void
 // }
 
 const Piano = ({
@@ -23,6 +23,7 @@ const Piano = ({
   didStopNote,
 }) => {
   const notes = getNotesBetween(startNote, endNote);
+  const { me } = useContext(PlayerContext);
 
   return (
     <Instrument
@@ -40,12 +41,10 @@ const Piano = ({
               notePlaying => notePlaying.note === note
             )}
             startPlayingNote={() => {
-              // TODO: replace with current player id
-              onPlayNoteStart(note, -1);
+              onPlayNoteStart(note, me);
             }}
             stopPlayingNote={() => {
-              // TODO: replace with current player id
-              onPlayNoteEnd(note, -1);
+              onPlayNoteEnd(note, me);
             }}
             keyboardShortcut={getKeyboardShortcutForNote(keyboardMap, note)}
           />

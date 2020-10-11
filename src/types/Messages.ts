@@ -66,11 +66,12 @@ export const START_GAME_NOTIFICATION = 'startGameNotification';
 export type StartGameNotification = {
   inSeconds: number;
 };
+
 /****************** Note played *****************/
 
 export const NOTE_PLAYED = 'notePlayed';
 export type NotePlayEvent = 'keyup' | 'keydown';
-export type NotePlayedRequest = {
+export type NotePlayedMessage = {
   note: number;
   event: NotePlayEvent;
 };

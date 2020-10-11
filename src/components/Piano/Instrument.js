@@ -1,11 +1,15 @@
 import React, { Component } from 'react';
 import InstrumentAudio from './InstrumentAudio';
+import { addNotePlayListener } from '../../utils/socket';
+import { PlayerContext } from '../PlayerContext';
 
 function isRegularKey(event) {
   return !event.ctrlKey && !event.metaKey && !event.shiftKey;
 }
 
 export default class Instrument extends Component {
+  static contextType = PlayerContext;
+
   constructor(props) {
     super(props);
 
@@ -23,6 +27,10 @@ export default class Instrument extends Component {
   componentDidMount() {
     window.addEventListener('keydown', this.handleKeyDown);
     window.addEventListener('keyup', this.handleKeyUp);
+    addNotePlayListener(
+      this.handleNotePlayByOtherPlayer,
+      this.handleNoteStopByOtherPlayer
+    );
   }
 
   componentWillUnmount() {
@@ -30,23 +38,13 @@ export default class Instrument extends Component {
     window.removeEventListener('keyup', this.handleKeyUp);
   }
 
-  // Listen for keydown event
-  handleNotePlayByOtherPlayer = (note, playerId) => {
-    // TODO: replace with current player id
-    if (playerId === -1) {
-      return;
-    }
-
+  handleNotePlayByOtherPlayer = note => {
+    let playerId = this.context.friend;
     this.startPlayingNote(note, playerId);
   };
 
-  // Listen for keyup event
-  handleNoteStopByOtherPlayer = (note, playerId) => {
-    // TODO: replace with current player id
-    if (playerId === -1) {
-      return;
-    }
-
+  handleNoteStopByOtherPlayer = note => {
+    let playerId = this.context.friend;
     this.stopPlayingNote(note, playerId);
   };
 
@@ -59,8 +57,7 @@ export default class Instrument extends Component {
     if (isRegularKey(event) && !event.repeat) {
       const note = this.getNoteFromKeyboardKey(event.key);
       if (note) {
-        // TODO: replace with current player id
-        this.startPlayingNote(note, -1);
+        this.startPlayingNote(note, this.context.me);
       }
     }
   }
@@ -69,8 +66,7 @@ export default class Instrument extends Component {
     if (isRegularKey(event)) {
       const note = this.getNoteFromKeyboardKey(event.key);
       if (note) {
-        // TODO: replace with current player id
-        this.stopPlayingNote(note, -1);
+        this.stopPlayingNote(note, this.context.me);
       }
     }
   }

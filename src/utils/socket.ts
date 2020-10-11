@@ -14,6 +14,8 @@ import {
   ROOM_INFO_UPDATED_NOTIFICATION,
   UnknownErrorResponse,
   UNKNOWN_MESSAGE_RESPONSE,
+  NOTE_PLAYED,
+  NotePlayedMessage,
 } from '../types/Messages';
 import { RoomInfo } from '../types/RoomInfo';
 
@@ -27,6 +29,7 @@ export function addListeners(
   setRoomState: (roomInfo: RoomInfo) => void,
   history: History<unknown>
 ) {
+  /*************** Create room ***************/
   socket.on(
     CREATE_ROOM_RESPONSE,
     ({ roomInfo, playerId }: RoomCreatedResponse) => {
@@ -36,6 +39,7 @@ export function addListeners(
     }
   );
 
+  /****************** Miscellaneous *****************/
   socket.on(
     MALFORMED_MESSAGE_RESPONSE,
     ({ message }: MalformedMessageResponse) => {
@@ -54,6 +58,7 @@ export function addListeners(
     history.push('/duet');
   });
 
+  /********************* Join room ****************/
   socket.on(JOIN_ROOM_RESPONSE, (res: JoinRoomResponse) => {
     if (!res.success) {
       // failed to join room, so create a room instead
@@ -69,8 +74,24 @@ export function addListeners(
     setPlayerId(playerId);
   });
 
+  /****************** Room info updated **********************/
   socket.on(ROOM_INFO_UPDATED_NOTIFICATION, (roomInfo: RoomInfo) => {
     setRoomState(roomInfo);
+  });
+}
+
+export function addNotePlayListener(
+  handleNotePlayByOtherPlayer: (note: number) => void,
+  handleNoteStopByOtherPlayer: (note: number) => void
+) {
+  socket.on(NOTE_PLAYED, ({ note, event }: NotePlayedMessage) => {
+    console.log(`received ${event}: ${note}`);
+    if (event === 'keydown') {
+      handleNotePlayByOtherPlayer(note);
+    }
+    if (event === 'keyup') {
+      handleNoteStopByOtherPlayer(note);
+    }
   });
 }
 
@@ -80,6 +101,14 @@ export function createRoom() {
 
 export function joinRoom(id: string) {
   socket.emit(JOIN_ROOM_REQUEST, { roomId: id });
+}
+
+export function playNote(note: number) {
+  socket.emit(NOTE_PLAYED, { note, event: 'keydown' });
+}
+
+export function stopNote(note: number) {
+  socket.emit(NOTE_PLAYED, { note, event: 'keyup' });
 }
 
 export default socket;
