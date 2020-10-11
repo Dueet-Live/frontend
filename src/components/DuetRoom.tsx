@@ -1,3 +1,4 @@
+import { makeStyles } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import { PlayerInfo } from '../types/PlayerInfo';
@@ -17,11 +18,20 @@ import socket, {
 import useWindowDimensions from '../utils/useWindowDimensions';
 import InteractivePiano from './InteractivePiano';
 import { PlayerContext } from './PlayerContext';
+import RoomHeader from './RoomHeader';
+
+const useStyles = makeStyles(theme => ({
+  piano: {
+    position: 'absolute',
+    bottom: 0,
+  },
+}));
 
 const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   maybeRoomId,
   isCreate,
 }) => {
+  const classes = useStyles();
   const history = useHistory();
   const [roomState, setRoomState] = useState({} as RoomInfo);
   const [playerId, setPlayerId] = useState(-1);
@@ -90,21 +100,14 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
 
   return (
     <>
-      <h3>Duet</h3>
-      <h4>Code: {roomState.id}</h4>
-      <h4>Players: {roomState.players.length} </h4>
-
-      <Link to="/">
-        <button>Back</button>
-      </Link>
-
-      <div>
-        <PlayerContext.Provider
-          value={{
-            me: playerId,
-            friend: getFriendId(roomState.players, playerId),
-          }}
-        >
+      <PlayerContext.Provider
+        value={{
+          me: playerId,
+          friend: getFriendId(roomState.players, playerId),
+        }}
+      >
+        <RoomHeader />
+        <div className={classes.piano}>
           <InteractivePiano
             start={calculateStartNote(range)}
             range={range}
@@ -120,8 +123,8 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
               }
             }}
           />
-        </PlayerContext.Provider>
-      </div>
+        </div>
+      </PlayerContext.Provider>
     </>
   );
 };

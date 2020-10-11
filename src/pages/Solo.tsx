@@ -1,12 +1,12 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import InteractivePiano from '../components/InteractivePiano';
-import useWindowDimensions from '../utils/useWindowDimensions';
+import RoomHeader from '../components/RoomHeader';
 import {
   calculateKeyboardRange,
   calculateKeyWidth,
   calculateStartNote,
 } from '../utils/calculateKeyboardDimension';
+import useWindowDimensions from '../utils/useWindowDimensions';
 
 const Solo: React.FC = () => {
   const { width } = useWindowDimensions();
@@ -28,10 +28,7 @@ const Solo: React.FC = () => {
 
   return (
     <>
-      <h3>Solo</h3>
-      <Link to="/">
-        <button>Back</button>
-      </Link>
+      <RoomHeader isSolo />
 
       {/* TODO: Position the piano */}
       <div>{piano}</div>
