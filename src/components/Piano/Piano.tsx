@@ -5,16 +5,16 @@ import { PlayerContext } from '../PlayerContext';
 import getNotesBetween from './utils/getNotesBetween';
 import getKeyboardShortcutForNote from './utils/getKeyboardShortcutsForNote';
 
-// type Props = {
-//   startNote: number
-//   endNote: number,
-//   keyWidth: number,
-//   keyboardMap: { [key: string]: number }
-//   didPlayNote: (note: number, playerId: number) => void
-//   didStopNote: (note: number, playerId: number) => void
-// }
+type Props = {
+  startNote: number;
+  endNote: number;
+  keyWidth: number;
+  keyboardMap: { [key: string]: number };
+  didPlayNote: (note: number, playerId: number) => void;
+  didStopNote: (note: number, playerId: number) => void;
+};
 
-const Piano = ({
+const Piano: React.FC<Props> = ({
   startNote,
   endNote,
   keyWidth,
