@@ -68,26 +68,30 @@
   color: #E1A546;
 }
 
-.interactive-piano__text {
+.interactive-piano__text-container {
   pointer-events: none;
   height: 100%;
   display: flex;
-  align-items: flex-end;
-  justify-content: center;
+  flex-direction: column;
+  justify-content: flex-end;
   font-size: 1rem;
+}
+
+.interactive-piano__text--top-text {
+  color: rgb(136, 134, 134);
+  margin-bottom: 3px; 
 }
 
 .interactive-piano__octave-shift-key {
   cursor: pointer;
-  background: #c0b3d8de;
+  background: #BAAED1;
   height: 180px;
   width: 30px;
-  margin: 0 2px;
-  border-radius: 0 0 3px 3px;
   border: none;
-  padding: 10px;
   outline: none;
-  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .interactive-piano__octave-shift-key:first-of-type {

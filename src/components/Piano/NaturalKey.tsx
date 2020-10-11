@@ -1,23 +1,21 @@
 import React, { useContext } from 'react';
 import { PlayerContext } from '../PlayerContext';
+import { PlayingNote } from '../../types/PlayingNote';
 import '../InteractivePiano.css';
-
-type PlayingNote = {
-  note: number;
-  playerId: number;
-};
 
 type Props = {
   playingNote: PlayingNote[];
   keyWidth: number;
-  text: string;
+  topText: string;
+  bottomText: string;
   eventHandlers: any;
 };
 
 const NaturalKey: React.FC<Props> = ({
   playingNote,
   keyWidth,
-  text,
+  topText = '',
+  bottomText,
   eventHandlers,
 }) => {
   const { me } = useContext(PlayerContext);
@@ -39,7 +37,10 @@ const NaturalKey: React.FC<Props> = ({
       style={{ width: keyWidth }}
       {...eventHandlers}
     >
-      <div className={'interactive-piano__text'}>{text}</div>
+      <div className={'interactive-piano__text-container'}>
+        <div className="interactive-piano__text--top-text">{topText}</div>
+        <div className="interactive-piano__text--bottom-text">{bottomText}</div>
+      </div>
     </button>
   );
 };

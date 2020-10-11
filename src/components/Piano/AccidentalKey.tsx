@@ -6,14 +6,16 @@ import '../InteractivePiano.css';
 type Props = {
   playingNote: PlayingNote[];
   keyWidth: number;
-  text: string;
+  topText: string;
+  bottomText: string;
   eventHandlers: any;
 };
 
 const AccidentalKey: React.FC<Props> = ({
   playingNote,
   keyWidth,
-  text,
+  topText = '',
+  bottomText,
   eventHandlers,
 }) => {
   const { me } = useContext(PlayerContext);
@@ -36,7 +38,12 @@ const AccidentalKey: React.FC<Props> = ({
         style={{ width: keyWidth }}
         {...eventHandlers}
       >
-        <div className={'interactive-piano__text'}>{text}</div>
+        <div className={'interactive-piano__text-container'}>
+          <div className="interactive-piano__text--top-text">{topText}</div>
+          <div className="interactive-piano__text--bottom-text">
+            {bottomText}
+          </div>
+        </div>
       </button>
     </div>
   );

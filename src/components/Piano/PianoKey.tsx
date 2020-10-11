@@ -81,13 +81,20 @@ const PianoKey: React.FC<Props> = ({
 
   const isNoteAccidental = isAccidentalNote(note);
   const KeyComponent = isNoteAccidental ? AccidentalKey : NaturalKey;
+  const getBottomText = () => {
+    if (keyboardShortcut.length === 0) {
+      return '';
+    } else {
+      // If there are multiple shortcuts, display the first shortcut only
+      return keyboardShortcut[0];
+    }
+  };
 
   return (
     <KeyComponent
       playingNote={playingNote}
-      text={isNoteAccidental ? '' : Tone.Frequency(note, 'midi').toNote()}
-      // Alternatively show keyboard shortcut
-      // text={keyboardShortcuts.join(' / ')}
+      topText={note % 12 === 0 ? Tone.Frequency(note, 'midi').toNote() : ''}
+      bottomText={getBottomText()}
       keyWidth={isNoteAccidental ? calculateBlackKeyWidth(keyWidth) : keyWidth}
       eventHandlers={eventHandlers}
     />
