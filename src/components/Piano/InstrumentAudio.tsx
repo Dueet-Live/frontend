@@ -1,11 +1,11 @@
 import { Component } from 'react';
-import { isEqual, List } from 'lodash';
+import { isEqual } from './utils/arrayHelpers';
 import { InstrumentName } from 'soundfont-player';
 import InstrumentPlayer from './utils/InstrumentPlayer';
 
 type Props = {
   instrument: InstrumentName;
-  notes: List<string>;
+  notes: string[];
 };
 
 export default class InstrumentAudio extends Component<Props> {
@@ -25,7 +25,7 @@ export default class InstrumentAudio extends Component<Props> {
   }
 
   componentDidUpdate(prevProps: Props) {
-    if (!isEqual(this.props.instrument, prevProps.instrument)) {
+    if (this.props.instrument !== prevProps.instrument) {
       this.setInstrument();
     }
 

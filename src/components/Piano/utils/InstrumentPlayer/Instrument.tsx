@@ -1,5 +1,4 @@
-import { difference } from 'lodash';
-import { List } from 'lodash';
+import { difference } from '../arrayHelpers';
 import { Player } from 'soundfont-player';
 import { NullSoundFontPlayerNoteAudio, AudioPlayer } from './AudioPlayer';
 
@@ -12,12 +11,12 @@ export default class Instrument {
     this.activeNoteMap = {};
   }
 
-  playNotes(activeNotes: List<string>) {
+  playNotes(activeNotes: string[]) {
     this.stopPlayingInactiveNotes(activeNotes);
     this.startPlayingNewlyActiveNotes(activeNotes);
   }
 
-  stopPlayingInactiveNotes(activeNotes: List<string>) {
+  stopPlayingInactiveNotes(activeNotes: string[]) {
     const previouslyActiveNotes = this.getActiveNotes();
     const inactiveNotes = difference(previouslyActiveNotes, activeNotes);
 
@@ -27,7 +26,7 @@ export default class Instrument {
     });
   }
 
-  startPlayingNewlyActiveNotes(activeNotes: List<string>) {
+  startPlayingNewlyActiveNotes(activeNotes: string[]) {
     const previouslyActiveNotes = this.getActiveNotes();
     const newlyActiveNotes = difference(activeNotes, previouslyActiveNotes);
 
