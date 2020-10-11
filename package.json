@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@types/lodash": "^4.14.161",
+    "@material-ui/core": "^4.11.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-router-dom": "^5.2.0",
@@ -13,6 +13,7 @@
     "tone": "^14.7.58"
   },
   "devDependencies": {
+    "@types/lodash": "^4.14.162",
     "@types/node": "^12.0.0",
     "@types/react": "^16.9.0",
     "@types/react-dom": "^16.9.0",
@@ -38,9 +39,6 @@
     "format:fix": "prettier --write \"src/**/*.{js,ts,jsx,tsx,scss}\"",
     "check": "yarn run typecheck && yarn run lint && yarn run format",
     "fix": "yarn run lint:fix && yarn run format:fix"
-  },
-  "eslintConfig": {
-    "extends": "react-app"
   },
   "browserslist": {
     "production": [

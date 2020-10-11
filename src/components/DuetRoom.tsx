@@ -1,16 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
-import { RoomInfo } from '../types/RoomInfo';
 import { PlayerInfo } from '../types/PlayerInfo';
-import socket, { addListeners, createRoom, joinRoom } from '../utils/socket';
-import useWindowDimensions from '../utils/useWindowDimensions';
+import { RoomInfo } from '../types/RoomInfo';
 import {
   calculateKeyboardRange,
   calculateKeyWidth,
   calculateStartNote,
 } from '../utils/calculateKeyboardDimension';
+import socket, {
+  addListeners,
+  createRoom,
+  joinRoom,
+  playNote,
+  stopNote,
+} from '../utils/socket';
+import useWindowDimensions from '../utils/useWindowDimensions';
 import InteractivePiano from './InteractivePiano';
-import { playNote, stopNote } from '../utils/socket';
 import { PlayerContext } from './PlayerContext';
 
 const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
@@ -36,7 +41,6 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
     }
   };
 
-  // TODO refactor socket io listeners to a separate file
   useEffect(() => {
     // connect to ws server
     socket.open();

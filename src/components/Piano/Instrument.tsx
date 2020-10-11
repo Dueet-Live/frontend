@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { InstrumentName } from 'soundfont-player';
-import InstrumentAudio from './InstrumentAudio';
+import { PlayingNote } from '../../types/PlayingNote';
 import { addNotePlayListener } from '../../utils/socket';
 import { PlayerContext } from '../PlayerContext';
-import { PlayingNote } from '../../types/PlayingNote';
+import InstrumentAudio from './InstrumentAudio';
 
 type Props = {
   instrument: InstrumentName;
