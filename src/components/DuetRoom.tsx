@@ -1,6 +1,6 @@
 import { makeStyles } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { PlayerInfo } from '../types/PlayerInfo';
 import { RoomInfo } from '../types/RoomInfo';
 import {
@@ -66,37 +66,12 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   useEffect(() => {
     if (maybeRoomId === null) {
       createRoom();
+      setPlayerId(-1);
     } else if (!isCreate) {
       joinRoom(maybeRoomId);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [maybeRoomId]);
-
-  // TODO rather than these, we can probably straight up load the piano and
-  // the rest of the elements on the screen, but modify the room status part
-  // of the screen accordingly instead.
-  if (maybeRoomId === null) {
-    return (
-      <>
-        <h3>Creating room...</h3>
-        <Link to="/">
-          <button>Back</button>
-        </Link>
-      </>
-    );
-  }
-
-  // trying to join room
-  if (playerId === -1) {
-    return (
-      <>
-        <h3>Joining room...</h3>
-        <Link to="/">
-          <button>Back</button>
-        </Link>
-      </>
-    );
-  }
 
   return (
     <>
