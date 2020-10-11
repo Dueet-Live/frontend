@@ -20,7 +20,7 @@ const InteractivePiano: React.FC<Props> = ({
   didStopNote,
 }) => {
   const [startNote, setStartNote] = useState(start);
-  const endNote = startNote + range;
+  const endNote = startNote + range - 1;
 
   // TODO: update with octave shift
   const keyboardMap = {
