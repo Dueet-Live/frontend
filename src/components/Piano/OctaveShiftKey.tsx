@@ -1,23 +1,38 @@
 import React from 'react';
+import { makeStyles } from '@material-ui/core';
 import '../InteractivePiano.css';
+import ChevronLeftIcon from '../../icons/ChevronRightIcon';
+import ChevronRightIcon from '../../icons/ChevronLeftIcon';
 
 type Props = {
-  icon: string;
+  type: string;
   onClick: () => void;
   disabled: boolean;
 };
 
-const OctaveShiftKey: React.FC<Props> = ({ icon, onClick, disabled }) => {
+const icons: { [type: string]: React.FC<any> } = {
+  left: ChevronLeftIcon,
+  right: ChevronRightIcon,
+};
+
+const useStyles = makeStyles(theme => ({
+  icon: {
+    fill: theme.palette.primary.main,
+  },
+}));
+
+const OctaveShiftKey: React.FC<Props> = ({ type, onClick, disabled }) => {
+  const classes = useStyles();
+  const Icon = icons[type];
+
   return (
-    <div className={'interactive-piano__octave-shift-key__wrapper'}>
-      <button
-        className={`interactive-piano__octave-shift-key`}
-        onClick={onClick}
-        disabled={disabled}
-      >
-        <div>{icon}</div>
-      </button>
-    </div>
+    <button
+      className={`interactive-piano__octave-shift-key`}
+      onClick={onClick}
+      disabled={disabled}
+    >
+      <Icon className={classes.icon} />
+    </button>
   );
 };
 

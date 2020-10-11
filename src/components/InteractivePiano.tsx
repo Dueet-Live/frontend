@@ -51,7 +51,7 @@ const InteractivePiano: React.FC<Props> = ({
   return (
     <PianoContainer>
       <OctaveShiftKey
-        icon={'<'}
+        type="left"
         onClick={shiftDownOctave}
         disabled={startNote === lowestMidiNote}
       />
@@ -64,7 +64,7 @@ const InteractivePiano: React.FC<Props> = ({
         didStopNote={didStopNote}
       />
       <OctaveShiftKey
-        icon={'>'}
+        type="right"
         onClick={shiftUpOctave}
         disabled={endNote === highestMidiNote}
       />
