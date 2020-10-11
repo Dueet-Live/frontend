@@ -4,6 +4,7 @@ import PianoContainer from './Piano/PianoContainer';
 import OctaveShiftKey from './Piano/OctaveShiftKey';
 import getKeyboardShortcutsMapping from '../utils/getKeyboardShorcutsMapping';
 import './InteractivePiano.css';
+import { useTheme, useMediaQuery } from '@material-ui/core';
 
 type Props = {
   start: number;
@@ -43,6 +44,8 @@ const InteractivePiano: React.FC<Props> = ({
     setStartNote(startNote + diff);
   };
 
+  const theme = useTheme();
+  const isDesktopView = useMediaQuery(theme.breakpoints.up('md'));
   const keyboardMap = getKeyboardShortcutsMapping(startNote, range);
 
   return (
@@ -56,7 +59,7 @@ const InteractivePiano: React.FC<Props> = ({
         startNote={startNote}
         endNote={endNote}
         keyWidth={keyWidth}
-        keyboardMap={keyboardMap}
+        keyboardMap={isDesktopView ? keyboardMap : {}}
         didPlayNote={didPlayNote}
         didStopNote={didStopNote}
       />
