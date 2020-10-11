@@ -1,1 +1,1 @@
-export default window.AudioContext;
+export const AudioContext = window.AudioContext;

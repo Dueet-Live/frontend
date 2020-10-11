@@ -1,5 +1,5 @@
 import SoundFontPlayer, { InstrumentName, Player } from 'soundfont-player';
-import AudioContext from './AudioContext';
+import { AudioContext } from './AudioContext';
 
 /**
  * Define a null object for soundfont-player instruments.
