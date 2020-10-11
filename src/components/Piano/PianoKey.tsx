@@ -13,6 +13,7 @@ type PlayingNote = {
 type Props = {
   note: number;
   keyWidth: number;
+  keyHeight: number;
   playingNote: PlayingNote[];
   startPlayingNote: () => void;
   stopPlayingNote: () => void;
@@ -22,6 +23,7 @@ type Props = {
 const PianoKey: React.FC<Props> = ({
   note,
   keyWidth,
+  keyHeight,
   playingNote,
   startPlayingNote,
   stopPlayingNote,
@@ -96,6 +98,9 @@ const PianoKey: React.FC<Props> = ({
       topText={note % 12 === 0 ? Tone.Frequency(note, 'midi').toNote() : ''}
       bottomText={getBottomText()}
       keyWidth={isNoteAccidental ? calculateBlackKeyWidth(keyWidth) : keyWidth}
+      keyHeight={
+        isNoteAccidental ? calculateBlackKeyWidth(keyHeight) : keyHeight
+      }
       eventHandlers={eventHandlers}
     />
   );

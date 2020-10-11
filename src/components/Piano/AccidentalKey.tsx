@@ -6,6 +6,7 @@ import '../InteractivePiano.css';
 type Props = {
   playingNote: PlayingNote[];
   keyWidth: number;
+  keyHeight: number;
   topText: string;
   bottomText: string;
   eventHandlers: any;
@@ -14,6 +15,7 @@ type Props = {
 const AccidentalKey: React.FC<Props> = ({
   playingNote,
   keyWidth,
+  keyHeight,
   topText = '',
   bottomText,
   eventHandlers,
@@ -35,7 +37,7 @@ const AccidentalKey: React.FC<Props> = ({
     <div className={'interactive-piano__accidental-key__wrapper'}>
       <button
         className={`interactive-piano__accidental-key ${getClassName()}`}
-        style={{ width: keyWidth }}
+        style={{ width: keyWidth, height: keyHeight }}
         {...eventHandlers}
       >
         <div className={'interactive-piano__text-container'}>
