@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import PianoKey from './PianoKey';
 import { PlayerContext } from '../PlayerContext';
 import getNotesBetween from './utils/getNotesBetween';
@@ -41,6 +41,81 @@ const Piano: React.FC<Props> = ({
   const [useTouchEvents, setUseTouchEvents] = useState(false);
   const [touchedNotes, setTouchedNotes] = useState(new Set<number>());
 
+  /* Handle state change */
+  const startPlayingNote = useCallback(
+    (note: number, playerId: number) => {
+      didPlayNote(note, playerId);
+      setPlayingNotes(playingNotes => {
+        return [...playingNotes, { note, playerId }];
+      });
+    },
+    [didPlayNote]
+  );
+
+  const stopPlayingNote = useCallback(
+    (note: number, playerId: number) => {
+      didStopNote(note, playerId);
+      setPlayingNotes(playingNotes => {
+        return playingNotes.filter(
+          notePlaying =>
+            notePlaying.note !== note || notePlaying.playerId !== playerId
+        );
+      });
+    },
+    [didStopNote]
+  );
+
+  /* Handle friends' notes */
+  const handleNotePlayByFriend = useCallback(
+    (note: number) => {
+      if (friend) {
+        startPlayingNote(note, friend);
+      }
+    },
+    [friend, startPlayingNote]
+  );
+
+  const handleNoteStopByFriend = useCallback(
+    (note: number) => {
+      if (friend) {
+        stopPlayingNote(note, friend);
+      }
+    },
+    [friend, stopPlayingNote]
+  );
+
+  /* Handle keyboard input */
+  const getNoteFromKeyboardKey = useCallback(
+    (keyboardKey: string) => {
+      return keyboardMap[keyboardKey.toUpperCase()];
+    },
+    [keyboardMap]
+  );
+
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      if (isRegularKey(event) && !event.repeat) {
+        const note = getNoteFromKeyboardKey(event.key);
+        if (note) {
+          startPlayingNote(note, me);
+        }
+      }
+    },
+    [me, startPlayingNote, getNoteFromKeyboardKey]
+  );
+
+  const handleKeyUp = useCallback(
+    (event: KeyboardEvent) => {
+      if (isRegularKey(event)) {
+        const note = getNoteFromKeyboardKey(event.key);
+        if (note) {
+          stopPlayingNote(note, me);
+        }
+      }
+    },
+    [me, stopPlayingNote, getNoteFromKeyboardKey]
+  );
+
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
@@ -51,62 +126,12 @@ const Piano: React.FC<Props> = ({
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  /* Handle state change */
-  const startPlayingNote = (note: number, playerId: number) => {
-    didPlayNote(note, playerId);
-    setPlayingNotes(playingNotes => {
-      return [...playingNotes, { note, playerId }];
-    });
-  };
-
-  const stopPlayingNote = (note: number, playerId: number) => {
-    didStopNote(note, playerId);
-    setPlayingNotes(playingNotes => {
-      return playingNotes.filter(
-        notePlaying =>
-          notePlaying.note !== note || notePlaying.playerId !== playerId
-      );
-    });
-  };
-
-  /* Handle friends' notes */
-  const handleNotePlayByFriend = (note: number) => {
-    if (friend) {
-      startPlayingNote(note, friend);
-    }
-  };
-
-  const handleNoteStopByFriend = (note: number) => {
-    if (friend) {
-      stopPlayingNote(note, friend);
-    }
-  };
-
-  /* Handle keyboard input */
-  const getNoteFromKeyboardKey = (keyboardKey: string) => {
-    return keyboardMap[keyboardKey.toUpperCase()];
-  };
-
-  const handleKeyDown = (event: KeyboardEvent) => {
-    if (isRegularKey(event) && !event.repeat) {
-      const note = getNoteFromKeyboardKey(event.key);
-      if (note) {
-        startPlayingNote(note, me);
-      }
-    }
-  };
-
-  const handleKeyUp = (event: KeyboardEvent) => {
-    if (isRegularKey(event)) {
-      const note = getNoteFromKeyboardKey(event.key);
-      if (note) {
-        stopPlayingNote(note, me);
-      }
-    }
-  };
+  }, [
+    handleKeyUp,
+    handleKeyDown,
+    handleNotePlayByFriend,
+    handleNoteStopByFriend,
+  ]);
 
   /* Handle touchscreen input */
   const handleTouchStart = (event: React.TouchEvent<HTMLDivElement>) => {
