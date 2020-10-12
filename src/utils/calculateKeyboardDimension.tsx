@@ -143,7 +143,7 @@ export function getOffsetMap(
   range: number,
   keyWidth: number
 ) {
-  let currOffset = 0;
+  let currOffset = octaveShiftKeyWidth;
   let map: { [note: number]: number } = {};
   map[startNote] = 0;
   for (let i = 1; i < range; i += 1) {
