@@ -4,6 +4,12 @@ export type Note = {
   midi: number;
 };
 
+export type KeyboardDimension = {
+  start: number;
+  range: number;
+  keyWidth: number;
+};
+
 export type SongInfo = {
   bpm: number;
   beatsPerBar: number; // TODO: add info about whether beat = half/quarter/eigth note etc.

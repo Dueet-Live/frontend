@@ -1,5 +1,7 @@
 import { Note } from './types';
 import { FallingNote } from './FallingNote';
+import { calculateBlackKeyWidth } from '../../utils/calculateKeyboardDimension';
+import isAccidentalNote from '../Piano/utils/isAccidentalNote';
 
 /*************** For time. ****************/
 /**
@@ -69,7 +71,8 @@ export const startAnimation = (
   speed: number,
   lookAheadTime: number,
   notes: Array<Note>,
-  offsetMap: { [note: number]: number }
+  offsetMap: { [note: number]: number },
+  keyWidth: number
 ): void => {
   let isFirstTime = true;
   let fallingNotes: Array<FallingNote> = [];
@@ -92,9 +95,12 @@ export const startAnimation = (
       const note = notes[firstHiddenNoteIndex];
       const fallingNoteLen = note.duration * speed;
       const horizontalPos = offsetMap[note.midi] + MARGIN;
-      const width = offsetMap[note.midi + 1] - offsetMap[note.midi] - MARGIN;
-      console.log(horizontalPos);
-      console.log(horizontalPos);
+      const width =
+        (isAccidentalNote(note.midi)
+          ? calculateBlackKeyWidth(keyWidth)
+          : keyWidth) -
+        MARGIN * 2;
+      console.log(note.midi, horizontalPos, width);
       fallingNotes.push(
         new FallingNote(horizontalPos, width, fallingNoteLen, -fallingNoteLen)
       );

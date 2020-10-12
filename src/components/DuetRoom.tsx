@@ -1,9 +1,11 @@
 import { Box, Grid, makeStyles } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
+import { useTheme, useMediaQuery } from '@material-ui/core';
 import { RoomInfo } from '../types/RoomInfo';
 import {
   calculateDefaultPianoDimension,
+  calculateGamePianoDimension,
   calculateKeyHeight,
 } from '../utils/calculateKeyboardDimension';
 import socket, {
@@ -21,6 +23,7 @@ import RoomHeader from './RoomHeader';
 import { Waterfall } from './Waterfall';
 import { SamplePiece } from './Waterfall/sample';
 import { Note } from './Waterfall/types';
+import { getKeyboardMappingWithSpecificStart } from '../utils/getKeyboardShorcutsMapping';
 
 const useStyles = makeStyles(theme => ({
   piano: {
@@ -39,7 +42,8 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   const [playerId, setPlayerId] = useState(-1);
 
   const { width, height } = useWindowDimensions();
-  const keyboardDimension = calculateDefaultPianoDimension(width);
+  // Before game start, use `calculateDefaultPianoDimension(width)
+  const keyboardDimension = calculateGamePianoDimension(width, 60, 60);
   const keyHeight = calculateKeyHeight(height);
   const getFriendId = (roomState: RoomInfo, myId: number) => {
     const players = roomState.players;
@@ -53,6 +57,16 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
       return friendInfo[0].id;
     }
   };
+  const theme = useTheme();
+  const isDesktopView = useMediaQuery(theme.breakpoints.up('md'));
+  // 60 is the regular start note
+  const keyboardMap = isDesktopView
+    ? getKeyboardMappingWithSpecificStart(
+        60,
+        keyboardDimension['start'],
+        keyboardDimension['range']
+      )
+    : undefined;
 
   // TODO: remove this
   const piece = JSON.parse(SamplePiece);
@@ -97,6 +111,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
           <Box display="flex" flexDirection="column" height="100%">
             <RoomHeader />
             <Waterfall
+              {...keyboardDimension}
               bpm={120} // TODO: customise
               beatsPerBar={4}
               smallStartNote={60}
@@ -106,6 +121,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
             <InteractivePiano
               {...keyboardDimension}
               keyHeight={keyHeight}
+              keyboardMap={keyboardMap}
               didPlayNote={(note, playedBy) => {
                 if (playerId === playedBy) {
                   playNote(note);

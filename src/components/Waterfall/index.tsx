@@ -1,11 +1,10 @@
 import React, { useEffect } from 'react';
 import {
-  calculateGamePianoDimension,
   calculateKeyHeight,
   getOffsetMap,
 } from '../../utils/calculateKeyboardDimension';
 import useWindowDimensions from '../../utils/useWindowDimensions';
-import { SongInfo } from './types';
+import { KeyboardDimension, SongInfo } from './types';
 import {
   delayStartTime,
   calculateLookAheadTime,
@@ -16,17 +15,20 @@ import {
 const CANVAS_ID = 'waterfall-canvas';
 
 export const Waterfall = ({
+  start,
+  range,
+  keyWidth,
   bpm,
   beatsPerBar,
   smallStartNote,
   regularStartNote,
   notes,
-}: SongInfo) => {
+}: SongInfo & KeyboardDimension) => {
   const { width, height } = useWindowDimensions();
-  const { start, range, keyWidth } = calculateGamePianoDimension(width, 74, 74);
   const waterfallHeight = height - calculateKeyHeight(height);
 
   const offsetMap = getOffsetMap(start, range, keyWidth);
+  console.log(offsetMap);
   useEffect(() => {
     const canvas = document.getElementById(CANVAS_ID) as HTMLCanvasElement;
     const ctx = !canvas.getContext
@@ -48,9 +50,10 @@ export const Waterfall = ({
       speed,
       lookAheadTime,
       notes,
-      offsetMap
+      offsetMap,
+      keyWidth
     );
-  }, [bpm, beatsPerBar, notes, offsetMap]);
+  }, [bpm, beatsPerBar, notes, offsetMap, keyWidth]);
 
   return (
     <canvas id={CANVAS_ID} width={width} height={waterfallHeight}>
