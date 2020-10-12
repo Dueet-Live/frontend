@@ -1,4 +1,4 @@
-import { makeStyles } from '@material-ui/core';
+import { Box, Grid, makeStyles } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { RoomInfo } from '../types/RoomInfo';
@@ -18,6 +18,9 @@ import InteractivePiano from './InteractivePiano';
 import { PlayerContext } from './PlayerContext';
 import { RoomContext } from './RoomContext';
 import RoomHeader from './RoomHeader';
+import { Waterfall } from './Waterfall';
+import { SamplePiece } from './Waterfall/sample';
+import { Note } from './Waterfall/types';
 
 const useStyles = makeStyles(theme => ({
   piano: {
@@ -50,6 +53,10 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
       return friendInfo[0].id;
     }
   };
+
+  // TODO: remove this
+  const piece = JSON.parse(SamplePiece);
+  const notes: Array<Note> = piece.notes; // TODO: get the right notes
 
   useEffect(() => {
     // connect to ws server
@@ -87,8 +94,15 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
             friend: getFriendId(roomState, playerId),
           }}
         >
-          <RoomHeader />
-          <div className={classes.piano}>
+          <Box display="flex" flexDirection="column" height="100%">
+            <RoomHeader />
+            <Waterfall
+              bpm={120} // TODO: customise
+              beatsPerBar={4}
+              smallStartNote={60}
+              regularStartNote={60}
+              notes={notes}
+            />
             <InteractivePiano
               {...keyboardDimension}
               keyHeight={keyHeight}
@@ -103,7 +117,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
                 }
               }}
             />
-          </div>
+          </Box>
         </PlayerContext.Provider>
       </RoomContext.Provider>
     </>
