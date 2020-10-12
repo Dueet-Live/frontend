@@ -1,7 +1,6 @@
 import {
   AppBar,
   Box,
-  Button,
   IconButton,
   Link,
   makeStyles,
@@ -11,9 +10,9 @@ import {
 import { ArrowBack } from '@material-ui/icons';
 import React, { useContext } from 'react';
 import { useHistory } from 'react-router-dom';
-import PickASongIcon from '../icons/PickASongIcon';
 import PlayerIcon from '../icons/PlayerIcon';
 import SettingsIcon from '../icons/SettingsIcon';
+import PickASongButton from './PickASongButton';
 import { PlayerContext } from './PlayerContext';
 
 const useStyles = makeStyles(theme => ({
@@ -29,9 +28,7 @@ const useStyles = makeStyles(theme => ({
   settingIcon: {
     marginLeft: theme.spacing(1),
   },
-  pickASongButton: {
-    backgroundColor: '#c0b3d8de',
-  },
+
   link: {
     color: '#0000EE',
   },
@@ -94,10 +91,8 @@ const RoomHeader: React.FC<{ isSolo?: boolean; isPlaying?: boolean }> = ({
           >
             <ArrowBack />
           </IconButton>
-          <Button className={classes.pickASongButton}>
-            <PickASongIcon className={classes.icon} />
-            <Typography variant="body1">Pick a song</Typography>
-          </Button>
+          {/* TODO Make this button responsive. It should truncate when too long */}
+          <PickASongButton isSolo={isSolo} />
           <Box component="span" className={classes.empty} />
           {roomDetails()}
           <IconButton edge="end" size="small" className={classes.settingIcon}>

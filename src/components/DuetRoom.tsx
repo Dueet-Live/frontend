@@ -16,6 +16,7 @@ import socket, {
 import useWindowDimensions from '../utils/useWindowDimensions';
 import InteractivePiano from './InteractivePiano';
 import { PlayerContext } from './PlayerContext';
+import { RoomContext } from './RoomContext';
 import RoomHeader from './RoomHeader';
 
 const useStyles = makeStyles(theme => ({
@@ -74,30 +75,37 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
 
   return (
     <>
-      <PlayerContext.Provider
+      <RoomContext.Provider
         value={{
-          me: playerId,
-          friend: getFriendId(roomState, playerId),
+          roomInfo: roomState,
+          setRoomInfo: setRoomState,
         }}
       >
-        <RoomHeader />
-        <div className={classes.piano}>
-          <InteractivePiano
-            {...keyboardDimension}
-            keyHeight={keyHeight}
-            didPlayNote={(note, playedBy) => {
-              if (playerId === playedBy) {
-                playNote(note);
-              }
-            }}
-            didStopNote={(note, playedBy) => {
-              if (playerId === playedBy) {
-                stopNote(note);
-              }
-            }}
-          />
-        </div>
-      </PlayerContext.Provider>
+        <PlayerContext.Provider
+          value={{
+            me: playerId,
+            friend: getFriendId(roomState, playerId),
+          }}
+        >
+          <RoomHeader />
+          <div className={classes.piano}>
+            <InteractivePiano
+              {...keyboardDimension}
+              keyHeight={keyHeight}
+              didPlayNote={(note, playedBy) => {
+                if (playerId === playedBy) {
+                  playNote(note);
+                }
+              }}
+              didStopNote={(note, playedBy) => {
+                if (playerId === playedBy) {
+                  stopNote(note);
+                }
+              }}
+            />
+          </div>
+        </PlayerContext.Provider>
+      </RoomContext.Provider>
     </>
   );
 };
