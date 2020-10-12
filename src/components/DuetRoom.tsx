@@ -9,10 +9,10 @@ import {
 } from '../utils/calculateKeyboardDimension';
 import socket, {
   addListeners,
+  choosePart,
   createRoom,
   joinRoom,
   playNote,
-  selectPart,
   stopNote,
 } from '../utils/socket';
 import { useDimensions } from '../utils/useDimensions';
@@ -136,7 +136,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
               primo={partsSelection.primo}
               secondo={partsSelection.secondo}
               didSelect={(part: Part) => {
-                selectPart(part);
+                choosePart(part);
               }}
             />
           </div>
