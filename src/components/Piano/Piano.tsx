@@ -3,8 +3,6 @@ import PianoKey from './PianoKey';
 import { PlayerContext } from '../PlayerContext';
 import getNotesBetween from './utils/getNotesBetween';
 import getKeyboardShortcutForNote from './utils/getKeyboardShortcutsForNote';
-import useWindowDimensions from '../../utils/useWindowDimensions';
-import { calculateKeyHeight } from '../../utils/calculateKeyboardDimension';
 import '../InteractivePiano.css';
 import { PlayingNote } from '../../types/PlayingNote';
 import InstrumentAudio from './InstrumentAudio';
@@ -14,6 +12,7 @@ type Props = {
   startNote: number;
   endNote: number;
   keyWidth: number;
+  keyHeight: number;
   keyboardMap: { [key: string]: number };
   didPlayNote: (note: number, playerId: number) => void;
   didStopNote: (note: number, playerId: number) => void;
@@ -27,12 +26,11 @@ const Piano: React.FC<Props> = ({
   startNote,
   endNote,
   keyWidth,
+  keyHeight,
   keyboardMap,
   didPlayNote,
   didStopNote,
 }) => {
-  const { height } = useWindowDimensions();
-  const keyHeight = calculateKeyHeight(height);
   const notes = getNotesBetween(startNote, endNote);
   const { me, friend } = useContext(PlayerContext);
   const [playingNotes, setPlayingNotes] = useState<PlayingNote[]>([]);
@@ -138,21 +136,25 @@ const Piano: React.FC<Props> = ({
     event.stopPropagation();
     setUseTouchEvents(true);
     setTouchedNotes(getTouchedNotes(event.touches));
+    console.log(`(Parent) Mouch start ${Array.from(touchedNotes.toString())}`);
   };
 
   const handleTouchEnd = (event: React.TouchEvent<HTMLDivElement>) => {
     event.stopPropagation();
     setTouchedNotes(getTouchedNotes(event.touches));
+    console.log(`(Parent) Mouch end ${Array.from(touchedNotes).toString()}`);
   };
 
   const handleTouchCancel = (event: React.TouchEvent<HTMLDivElement>) => {
     event.stopPropagation();
     setTouchedNotes(getTouchedNotes(event.touches));
+    console.log(`(Parent) Mouch cancel ${Array.from(touchedNotes).toString()}`);
   };
 
   const handleTouchMove = (event: React.TouchEvent<HTMLDivElement>) => {
     event.stopPropagation();
     setTouchedNotes(getTouchedNotes(event.touches));
+    console.log(`(Parent) Mouch move ${Array.from(touchedNotes).toString()}`);
   };
 
   const getTouchedNotes = (touches: React.TouchList) => {
