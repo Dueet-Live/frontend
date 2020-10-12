@@ -4,9 +4,8 @@ import { useHistory } from 'react-router-dom';
 import { PlayerInfo } from '../types/PlayerInfo';
 import { RoomInfo } from '../types/RoomInfo';
 import {
-  calculateKeyboardRange,
-  calculateKeyWidth,
-  calculateStartNote,
+  calculateDefaultPianoDimension,
+  calculateKeyHeight,
 } from '../utils/calculateKeyboardDimension';
 import socket, {
   addListeners,
@@ -36,9 +35,9 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   const [roomState, setRoomState] = useState({} as RoomInfo);
   const [playerId, setPlayerId] = useState(-1);
 
-  const { width } = useWindowDimensions();
-  const keyWidth = calculateKeyWidth(width);
-  const range = calculateKeyboardRange(width);
+  const { width, height } = useWindowDimensions();
+  const keyboardDimension = calculateDefaultPianoDimension(width);
+  const keyHeight = calculateKeyHeight(height);
   const getFriendId = (players: PlayerInfo[], myId: number) => {
     if (!players) {
       return null;
@@ -84,9 +83,8 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
         <RoomHeader />
         <div className={classes.piano}>
           <InteractivePiano
-            start={calculateStartNote(range)}
-            range={range}
-            keyWidth={keyWidth}
+            {...keyboardDimension}
+            keyHeight={keyHeight}
             didPlayNote={(note, playedBy) => {
               if (playerId === playedBy) {
                 playNote(note);

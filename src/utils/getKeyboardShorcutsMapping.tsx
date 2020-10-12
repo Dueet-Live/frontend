@@ -31,11 +31,13 @@ const shortcuts = [
   ['['],
 ];
 
-export default function getKeyboardShortcutsMapping(
-  startNote: number,
+// CASUAL MODE
+// Always center the mappings
+export function getKeyboardMapping(
+  startNote: number, // the leftmost note on screen
   range: number
 ): { [key: string]: number } {
-  let firstMappedKey = startNote;
+  let firstMappedNote = startNote;
   let offset = 0;
   // If start note is not C, find the next C
   if (startNote % 12 !== 0) {
@@ -45,13 +47,32 @@ export default function getKeyboardShortcutsMapping(
   if (range > 30) {
     offset += Math.floor(range / 12 / 2 - 1) * 12;
   }
-  firstMappedKey += offset;
+  firstMappedNote += offset;
 
   const mapRange = Math.min(30, range - offset);
   const map: { [key: string]: number } = {};
   for (let i = 0; i < mapRange; i++) {
     const shortcutKeys = shortcuts[i];
-    const note = firstMappedKey + i;
+    const note = firstMappedNote + i;
+    shortcutKeys.forEach(shortcut => {
+      map[shortcut] = note;
+    });
+  }
+  return map;
+}
+
+// GAME MODE (desktop view)
+// Assume the start note and first mapped note are both C here
+export function getKeyboardMappingWithSpecificStart(
+  firstMappedNote: number,
+  startNote: number,
+  range: number
+): { [key: string]: number } {
+  const mapRange = Math.min(30, range - (firstMappedNote - startNote));
+  const map: { [key: string]: number } = {};
+  for (let i = 0; i < mapRange; i++) {
+    const shortcutKeys = shortcuts[i];
+    const note = firstMappedNote + i;
     shortcutKeys.forEach(shortcut => {
       map[shortcut] = note;
     });
