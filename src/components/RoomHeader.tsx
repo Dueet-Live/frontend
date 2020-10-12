@@ -52,11 +52,17 @@ const RoomHeader: React.FC<{ isSolo?: boolean; isPlaying?: boolean }> = ({
     if (isSolo) return <></>;
 
     // TODO: add a border like how it looks in the mockup
-    return (
+    return me === -1 ? (
+      <Typography variant="body1" color="textPrimary">
+        Connecting...
+      </Typography>
+    ) : (
       <Box alignContent="center" display="flex">
-        {me !== -1 && <PlayerIcon num={me} className={classes.icon} />}
+        {me !== -1 && (
+          <PlayerIcon num={me} myPlayerId={me} className={classes.icon} />
+        )}
         {friend !== null && (
-          <PlayerIcon num={friend} className={classes.icon} />
+          <PlayerIcon num={friend} myPlayerId={me} className={classes.icon} />
         )}
         {me === -1 ||
           (friend === null && (
