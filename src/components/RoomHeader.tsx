@@ -51,33 +51,34 @@ const RoomHeader: React.FC<{ isSolo?: boolean; isPlaying?: boolean }> = ({
   const roomDetails = () => {
     if (isSolo) return <></>;
 
-    // TODO: add a border like how it looks in the mockup
-    return me === -1 ? (
-      <Typography variant="body1" color="textPrimary">
-        Connecting...
-      </Typography>
-    ) : (
+    if (me === -1) {
+      // TODO: add a border like how it looks in the mockup
+      return (
+        <Typography variant="body1" color="textPrimary">
+          Connecting...
+        </Typography>
+      );
+    }
+
+    return (
       <Box alignContent="center" display="flex">
-        {me !== -1 && (
-          <PlayerIcon num={me} myPlayerId={me} className={classes.icon} />
-        )}
+        <PlayerIcon num={me} myPlayerId={me} className={classes.icon} />
         {friend !== null && (
           <PlayerIcon num={friend} myPlayerId={me} className={classes.icon} />
         )}
-        {me === -1 ||
-          (friend === null && (
-            <Link
-              component="button"
-              variant="body1"
-              className={classes.link}
-              onClick={
-                async () => navigator.clipboard.writeText(window.location.href)
-                // TODO add a notification
-              }
-            >
-              (Copy link)
-            </Link>
-          ))}
+        {friend === null && (
+          <Link
+            component="button"
+            variant="body1"
+            className={classes.link}
+            onClick={
+              async () => navigator.clipboard.writeText(window.location.href)
+              // TODO add a notification
+            }
+          >
+            (Copy link)
+          </Link>
+        )}
       </Box>
     );
   };
