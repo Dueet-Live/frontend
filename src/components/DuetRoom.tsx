@@ -132,6 +132,8 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
 
           {/* available space for the rest of the content */}
           <div ref={middleBoxRef} className={classes.box}>
+            {/* TODO: remove this when doing waterfall */}
+            {JSON.stringify(middleBoxDimensions)}
             <PartSelection
               primo={partsSelection.primo}
               secondo={partsSelection.secondo}
