@@ -2,19 +2,18 @@ import React from 'react';
 import InteractivePiano from '../components/InteractivePiano';
 import RoomHeader from '../components/RoomHeader';
 import {
-  calculateDefaultPianoDimension, calculateKeyHeight
+  calculateDefaultPianoDimension,
+  calculateKeyHeight,
 } from '../utils/calculateKeyboardDimension';
 import useWindowDimensions from '../utils/useWindowDimensions';
 
 const Solo: React.FC = () => {
   const { width, height } = useWindowDimensions();
-  const keyboardDimension = calculateDefaultPianoDimension(width)
+  const keyboardDimension = calculateDefaultPianoDimension(width);
   const keyHeight = calculateKeyHeight(height);
   const piano = (
     <InteractivePiano
-      {
-      ...keyboardDimension
-      }
+      {...keyboardDimension}
       keyHeight={keyHeight}
       didPlayNote={(note, playerId) => {
         // console.log(`Start playing: ${note} by ${playerId}`);
