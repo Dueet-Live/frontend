@@ -95,6 +95,10 @@ export function addNotePlayListener(
   });
 }
 
+export function removeNotePlayListener() {
+  socket.removeEventListener(NOTE_PLAYED);
+}
+
 export function createRoom() {
   socket.emit(CREATE_ROOM_REQUEST, {});
 }
@@ -104,10 +108,12 @@ export function joinRoom(id: string) {
 }
 
 export function playNote(note: number) {
+  // console.log(`Send ${note} start`)
   socket.emit(NOTE_PLAYED, { note, event: 'keydown' });
 }
 
 export function stopNote(note: number) {
+  // console.log(`Send ${note} stop`)
   socket.emit(NOTE_PLAYED, { note, event: 'keyup' });
 }
 
