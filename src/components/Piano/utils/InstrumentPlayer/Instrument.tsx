@@ -22,6 +22,7 @@ export default class Instrument {
 
     inactiveNotes.forEach(note => {
       this.activeNoteMap[note].stop();
+      // console.log("Stop " + note);
       delete this.activeNoteMap[note];
     });
   }

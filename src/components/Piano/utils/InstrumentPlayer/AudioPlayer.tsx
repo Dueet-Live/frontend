@@ -44,6 +44,7 @@ export class AudioPlayer {
   }
 
   playNote(note: string) {
+    // console.log("Play " + note)
     return this.soundFontPlayer.play(note);
   }
 }
