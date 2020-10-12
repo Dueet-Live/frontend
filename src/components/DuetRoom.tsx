@@ -20,6 +20,7 @@ import useWindowDimensions from '../utils/useWindowDimensions';
 import InteractivePiano from './InteractivePiano';
 import { PartSelection } from './PartSelection';
 import { PlayerContext } from './PlayerContext';
+import { RoomContext } from './RoomContext';
 import RoomHeader from './RoomHeader';
 
 const useStyles = makeStyles(theme => ({
@@ -111,48 +112,55 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   const partsSelection = getPartsSelection(roomState);
 
   return (
-    <PlayerContext.Provider
+    <RoomContext.Provider
       value={{
-        me: playerId,
-        friend: friendId,
+        roomInfo: roomState,
+        setRoomInfo: setRoomState,
       }}
     >
-      <Box className={classes.root}>
-        {/* header */}
-        <div className={classes.header}>
-          <RoomHeader />
-        </div>
+      <PlayerContext.Provider
+        value={{
+          me: playerId,
+          friend: friendId,
+        }}
+      >
+        <Box className={classes.root}>
+          {/* header */}
+          <div className={classes.header}>
+            <RoomHeader />
+          </div>
 
-        {/* available space for the rest of the content */}
-        <div ref={middleBoxRef} className={classes.box}>
-          <PartSelection
-            primo={partsSelection.primo}
-            secondo={partsSelection.secondo}
-            didSelect={(part: Part) => {
-              selectPart(part);
-            }}
-          />
-        </div>
+          {/* available space for the rest of the content */}
+          <div ref={middleBoxRef} className={classes.box}>
+            <PartSelection
+              primo={partsSelection.primo}
+              secondo={partsSelection.secondo}
+              didSelect={(part: Part) => {
+                selectPart(part);
+              }}
+            />
+          </div>
 
-        {/* piano */}
-        <div className={classes.piano}>
-          <InteractivePiano
-            {...keyboardDimension}
-            keyHeight={keyHeight}
-            didPlayNote={(note, playedBy) => {
-              if (playerId === playedBy) {
-                playNote(note);
-              }
-            }}
-            didStopNote={(note, playedBy) => {
-              if (playerId === playedBy) {
-                stopNote(note);
-              }
-            }}
-          />
-        </div>
-      </Box>
-    </PlayerContext.Provider>
+          {/* piano */}
+          <div className={classes.piano}>
+            <InteractivePiano
+              {...keyboardDimension}
+              keyHeight={keyHeight}
+              didPlayNote={(note, playedBy) => {
+                if (playerId === playedBy) {
+                  playNote(note);
+                }
+              }}
+              didStopNote={(note, playedBy) => {
+                if (playerId === playedBy) {
+                  stopNote(note);
+                }
+              }}
+            />
+          </div>
+        </Box>
+      </PlayerContext.Provider>
+    </RoomContext.Provider>
   );
 };
 

@@ -2,6 +2,7 @@ import { History } from 'history';
 import io from 'socket.io-client';
 import {
   CHOOSE_PART_REQUEST,
+  CHOOSE_PIECE_REQUEST,
   CREATE_ROOM_REQUEST,
   CREATE_ROOM_RESPONSE,
   JoinRoomFailureResponse,
@@ -97,6 +98,10 @@ export function addNotePlayListener(
   });
 }
 
+export function removeNotePlayListener() {
+  socket.removeEventListener(NOTE_PLAYED);
+}
+
 export function createRoom() {
   socket.emit(CREATE_ROOM_REQUEST, {});
 }
@@ -106,15 +111,21 @@ export function joinRoom(id: string) {
 }
 
 export function playNote(note: number) {
+  // console.log(`Send ${note} start`)
   socket.emit(NOTE_PLAYED, { note, event: 'keydown' });
 }
 
 export function stopNote(note: number) {
+  // console.log(`Send ${note} stop`)
   socket.emit(NOTE_PLAYED, { note, event: 'keyup' });
 }
 
-export const selectPart = (part: Part) => {
-  socket.emit(CHOOSE_PART_REQUEST, { id: part });
+export const choosePart = (id: Part) => {
+  socket.emit(CHOOSE_PART_REQUEST, { id });
 };
+
+export function choosePiece(id: string) {
+  socket.emit(CHOOSE_PIECE_REQUEST, { id });
+}
 
 export default socket;

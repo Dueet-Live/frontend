@@ -143,9 +143,9 @@ export function getOffsetMap(
   range: number,
   keyWidth: number
 ) {
-  let currOffset = 0;
+  let currOffset = octaveShiftKeyWidth;
   let map: { [note: number]: number } = {};
-  map[startNote] = 0;
+  map[startNote] = currOffset;
   for (let i = 1; i < range; i += 1) {
     // If previous key is black key
     if (isAccidentalNote(startNote + i - 1)) {

@@ -16,40 +16,26 @@ type Props = SvgIconProps & {
   myPlayerId: number;
 };
 
+const playerMap = [
+  icon0,
+  icon1,
+  icon2,
+  icon3,
+  icon4,
+  icon5,
+  icon6,
+  icon7,
+  icon8,
+  icon9,
+];
+
 // Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a>
 const PlayerIcon: React.FC<Props> = ({ num, myPlayerId, ...props }) => {
-  const getIcon = () => {
-    switch (num) {
-      case 0:
-        return icon0;
-      case 1:
-        return icon1;
-      case 2:
-        return icon2;
-      case 3:
-        return icon3;
-      case 4:
-        return icon4;
-      case 5:
-        return icon5;
-      case 6:
-        return icon6;
-      case 7:
-        return icon7;
-      case 8:
-        return icon8;
-      case 9:
-        return icon9;
-      default:
-        return icon0;
-    }
-  };
-
   // TODO should probably define these in a theme
   const color = num === myPlayerId ? '#904ae9' : '#e1a546';
   return (
     <SvgIcon
-      component={getIcon()}
+      component={playerMap[num]}
       viewBox="0 0 512 512"
       {...props}
       style={{

@@ -6,7 +6,10 @@ import getKeyboardShortcutForNote from './utils/getKeyboardShortcutsForNote';
 import '../InteractivePiano.css';
 import { PlayingNote } from '../../types/PlayingNote';
 import InstrumentAudio from './InstrumentAudio';
-import { addNotePlayListener } from '../../utils/socket';
+import {
+  addNotePlayListener,
+  removeNotePlayListener,
+} from '../../utils/socket';
 
 type Props = {
   startNote: number;
@@ -123,6 +126,7 @@ const Piano: React.FC<Props> = ({
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
+      removeNotePlayListener();
     };
   }, [
     handleKeyUp,
