@@ -1,6 +1,7 @@
 import { History } from 'history';
 import io from 'socket.io-client';
 import {
+  CHOOSE_PART_REQUEST,
   CREATE_ROOM_REQUEST,
   CREATE_ROOM_RESPONSE,
   JoinRoomFailureResponse,
@@ -10,12 +11,13 @@ import {
   JOIN_ROOM_RESPONSE,
   MalformedMessageResponse,
   MALFORMED_MESSAGE_RESPONSE,
+  NotePlayedMessage,
+  NOTE_PLAYED,
+  Part,
   RoomCreatedResponse,
   ROOM_INFO_UPDATED_NOTIFICATION,
   UnknownErrorResponse,
   UNKNOWN_MESSAGE_RESPONSE,
-  NOTE_PLAYED,
-  NotePlayedMessage,
 } from '../types/Messages';
 import { RoomInfo } from '../types/RoomInfo';
 
@@ -110,5 +112,9 @@ export function playNote(note: number) {
 export function stopNote(note: number) {
   socket.emit(NOTE_PLAYED, { note, event: 'keyup' });
 }
+
+export const selectPart = (part: Part) => {
+  socket.emit(CHOOSE_PART_REQUEST, { id: part });
+};
 
 export default socket;

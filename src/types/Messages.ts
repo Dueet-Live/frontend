@@ -42,15 +42,16 @@ export const ROOM_INFO_UPDATED_NOTIFICATION = 'roomInfoUpdatedNotification';
 // Request
 export const CHOOSE_PIECE_REQUEST = 'choosePieceRequest';
 export type ChoosePieceRequest = {
-  name: string;
+  id: string;
 };
 
 /****************** Choose part **********************/
 
 // Request
 export const CHOOSE_PART_REQUEST = 'choosePartRequest';
+export type Part = 'primo' | 'secondo';
 export type ChoosePartRequest = {
-  name: 'primo' | 'secondo';
+  id: Part;
 };
 
 /****************** Ready *****************/

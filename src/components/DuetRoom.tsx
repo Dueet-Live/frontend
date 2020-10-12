@@ -1,6 +1,7 @@
 import { Box, makeStyles } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
+import { Part } from '../types/Messages';
 import { RoomInfo } from '../types/RoomInfo';
 import {
   calculateDefaultPianoDimension,
@@ -11,11 +12,13 @@ import socket, {
   createRoom,
   joinRoom,
   playNote,
+  selectPart,
   stopNote,
 } from '../utils/socket';
 import { useDimensions } from '../utils/useDimensions';
 import useWindowDimensions from '../utils/useWindowDimensions';
 import InteractivePiano from './InteractivePiano';
+import { PartSelection } from './PartSelection';
 import { PlayerContext } from './PlayerContext';
 import RoomHeader from './RoomHeader';
 
@@ -36,6 +39,38 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
+const getFriendId = (roomState: RoomInfo, myId: number) => {
+  const players = roomState.players;
+  if (!players) {
+    return null;
+  }
+  const friendInfo = players.filter(player => player.id !== myId);
+  if (friendInfo.length === 0) {
+    return null;
+  } else {
+    return friendInfo[0].id;
+  }
+};
+
+const getPartsSelection = (roomState: RoomInfo) => {
+  const primo: number[] = [];
+  const secondo: number[] = [];
+
+  const players = roomState.players;
+  if (!players) {
+    return { primo, secondo };
+  }
+
+  for (const player of roomState.players) {
+    if (player.assignedPart === 'primo') {
+      primo.push(player.id);
+    } else if (player.assignedPart === 'secondo') {
+      secondo.push(player.id);
+    }
+  }
+  return { primo, secondo };
+};
+
 const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   maybeRoomId,
   isCreate,
@@ -48,18 +83,6 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   const { width, height } = useWindowDimensions();
   const keyboardDimension = calculateDefaultPianoDimension(width);
   const keyHeight = calculateKeyHeight(height);
-  const getFriendId = (roomState: RoomInfo, myId: number) => {
-    const players = roomState.players;
-    if (!players) {
-      return null;
-    }
-    const friendInfo = players.filter(player => player.id !== myId);
-    if (friendInfo.length === 0) {
-      return null;
-    } else {
-      return friendInfo[0].id;
-    }
-  };
 
   useEffect(() => {
     // connect to ws server
@@ -84,12 +107,14 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   }, [maybeRoomId]);
 
   const [middleBoxDimensions, middleBoxRef] = useDimensions<HTMLDivElement>();
+  const friendId = getFriendId(roomState, playerId);
+  const partsSelection = getPartsSelection(roomState);
 
   return (
     <PlayerContext.Provider
       value={{
         me: playerId,
-        friend: getFriendId(roomState, playerId),
+        friend: friendId,
       }}
     >
       <Box className={classes.root}>
@@ -100,7 +125,13 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
 
         {/* available space for the rest of the content */}
         <div ref={middleBoxRef} className={classes.box}>
-          {`Width: ${middleBoxDimensions.width}, height = ${middleBoxDimensions.height}`}
+          <PartSelection
+            primo={partsSelection.primo}
+            secondo={partsSelection.secondo}
+            didSelect={(part: Part) => {
+              selectPart(part);
+            }}
+          />
         </div>
 
         {/* piano */}
