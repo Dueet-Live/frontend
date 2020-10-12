@@ -1,4 +1,4 @@
-import { makeStyles } from '@material-ui/core';
+import { Box, makeStyles } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { RoomInfo } from '../types/RoomInfo';
@@ -19,9 +19,13 @@ import { PlayerContext } from './PlayerContext';
 import RoomHeader from './RoomHeader';
 
 const useStyles = makeStyles(theme => ({
-  piano: {
-    position: 'absolute',
-    bottom: 0,
+  root: {
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100%',
+  },
+  box: {
+    flewGrow: 10,
   },
 }));
 
@@ -73,32 +77,37 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   }, [maybeRoomId]);
 
   return (
-    <>
-      <PlayerContext.Provider
-        value={{
-          me: playerId,
-          friend: getFriendId(roomState, playerId),
-        }}
-      >
+    <PlayerContext.Provider
+      value={{
+        me: playerId,
+        friend: getFriendId(roomState, playerId),
+      }}
+    >
+      <Box className={classes.root}>
+        {/* header */}
         <RoomHeader />
-        <div className={classes.piano}>
-          <InteractivePiano
-            {...keyboardDimension}
-            keyHeight={keyHeight}
-            didPlayNote={(note, playedBy) => {
-              if (playerId === playedBy) {
-                playNote(note);
-              }
-            }}
-            didStopNote={(note, playedBy) => {
-              if (playerId === playedBy) {
-                stopNote(note);
-              }
-            }}
-          />
-        </div>
-      </PlayerContext.Provider>
-    </>
+
+        {/* available space for the rest of the content */}
+        <Box className={classes.box}></Box>
+
+        {/* piano */}
+
+        <InteractivePiano
+          {...keyboardDimension}
+          keyHeight={keyHeight}
+          didPlayNote={(note, playedBy) => {
+            if (playerId === playedBy) {
+              playNote(note);
+            }
+          }}
+          didStopNote={(note, playedBy) => {
+            if (playerId === playedBy) {
+              stopNote(note);
+            }
+          }}
+        />
+      </Box>
+    </PlayerContext.Provider>
   );
 };
 
