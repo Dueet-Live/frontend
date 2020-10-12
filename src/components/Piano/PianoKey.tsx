@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
 import * as Tone from 'tone';
-import { calculateBlackKeyWidth } from '../../utils/calculateKeyboardDimension';
+import {
+  calculateBlackKeyHeight,
+  calculateBlackKeyWidth,
+} from '../../utils/calculateKeyboardDimension';
 import isAccidentalNote from './utils/isAccidentalNote';
 import AccidentalKey from './AccidentalKey';
 import NaturalKey from './NaturalKey';
-
-type PlayingNote = {
-  note: number;
-  playerId: number;
-};
+import { PlayingNote } from '../../types/PlayingNote';
 
 type Props = {
   note: number;
@@ -18,6 +17,7 @@ type Props = {
   startPlayingNote: () => void;
   stopPlayingNote: () => void;
   keyboardShortcut: string[];
+  useTouchEvents: boolean;
 };
 
 const PianoKey: React.FC<Props> = ({
@@ -28,20 +28,25 @@ const PianoKey: React.FC<Props> = ({
   startPlayingNote,
   stopPlayingNote,
   keyboardShortcut,
+  useTouchEvents: useTouchscreen,
 }) => {
-  const [useTouchEvents, setUseTouchEvents] = useState(false);
+  const [useTouchEvents, setUseTouchEvents] = useState(useTouchscreen);
 
-  const handleMouseDown = () => {
+  const handleMouseDown = (event: MouseEvent) => {
     // console.log(`Mouse down ${note}`);
+    event.preventDefault();
+    event.stopPropagation();
     startPlayingNote();
   };
 
-  const handleMouseUp = () => {
+  const handleMouseUp = (event: MouseEvent) => {
     // console.log(`Mouse up ${note}`);
+    event.stopPropagation();
     stopPlayingNote();
   };
 
   const handleMouseEnter = (event: MouseEvent) => {
+    event.stopPropagation();
     if (event.buttons) {
       // console.log(`Mouse enter ${note}`);
       startPlayingNote();
@@ -49,36 +54,25 @@ const PianoKey: React.FC<Props> = ({
   };
 
   const handleMouseLeave = (event: MouseEvent) => {
+    event.stopPropagation();
     if (event.buttons) {
       // console.log(`Mouse leave ${note}`);
       stopPlayingNote();
     }
   };
 
+  // Event bubbling starts from here (bubble touch event to parent)
   const handleTouchStart = () => {
-    console.log(`Touch start ${note}`);
+    // console.log(`(Child) Touch start ${note}`);
     setUseTouchEvents(true);
-    startPlayingNote();
-  };
-
-  const handleTouchEnd = () => {
-    console.log(`Touch end ${note}`);
-    stopPlayingNote();
-  };
-
-  const handleTouchCancel = () => {
-    console.log(`Touch cancel ${note}`);
-    stopPlayingNote();
   };
 
   const eventHandlers = {
-    onMouseDown: !useTouchEvents ? handleMouseDown : undefined,
-    onMouseUp: !useTouchEvents ? handleMouseUp : undefined,
-    onMouseEnter: !useTouchEvents ? handleMouseEnter : undefined,
-    onMouseLeave: !useTouchEvents ? handleMouseLeave : undefined,
+    onMouseDown: handleMouseDown,
+    onMouseUp: handleMouseUp,
+    onMouseEnter: handleMouseEnter,
+    onMouseLeave: handleMouseLeave,
     onTouchStart: handleTouchStart,
-    onTouchEnd: useTouchEvents ? handleTouchEnd : undefined,
-    onTouchCancel: useTouchEvents ? handleTouchCancel : undefined,
   };
 
   const isNoteAccidental = isAccidentalNote(note);
@@ -94,14 +88,15 @@ const PianoKey: React.FC<Props> = ({
 
   return (
     <KeyComponent
+      note={note}
       playingNote={playingNote}
       topText={note % 12 === 0 ? Tone.Frequency(note, 'midi').toNote() : ''}
       bottomText={getBottomText()}
       keyWidth={isNoteAccidental ? calculateBlackKeyWidth(keyWidth) : keyWidth}
       keyHeight={
-        isNoteAccidental ? calculateBlackKeyWidth(keyHeight) : keyHeight
+        isNoteAccidental ? calculateBlackKeyHeight(keyHeight) : keyHeight
       }
-      eventHandlers={eventHandlers}
+      eventHandlers={!useTouchEvents ? eventHandlers : {}}
     />
   );
 };
