@@ -18,10 +18,10 @@ const Solo: React.FC = () => {
       range={range}
       keyWidth={keyWidth}
       didPlayNote={(note, playerId) => {
-        console.log(`Start playing: ${note} by ${playerId}`);
+        // console.log(`Start playing: ${note} by ${playerId}`);
       }}
       didStopNote={(note, playerId) => {
-        console.log(`Stop playing: ${note} by ${playerId}`);
+        // console.log(`Stop playing: ${note} by ${playerId}`);
       }}
     />
   );

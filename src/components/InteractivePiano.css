@@ -4,6 +4,8 @@
   /* border-top: 10px solid #904ae9; */
   position: relative;
   margin: auto;
+  touch-action: none;
+  user-select: none;
 }
 
 .interactive-piano__piano-container::after {
@@ -15,19 +17,27 @@
   top: 0;
 }
 
+.interactive-piano__keyboard-container {
+  display: flex;
+  flex: 1;
+  z-index: 1; 
+}
+
 .interactive-piano__accidental-key__wrapper {
   position: relative;
   width: 0;
 }
 
 .interactive-piano__accidental-key {
+  /* Webkit / Chrome Specific CSS to remove tap highlight color */
+  -webkit-tap-highlight-color: transparent;
+  /* Firefox Specific CSS to remove button differences and focus ring */
+  background-image: none;
   position: absolute;
   transform: translateX(-50%);
   cursor: pointer;
   background: #444;
   border-radius: 0px 0px 3px 3px;
-  border: 3px solid #444;
-  border-top: none;
   box-sizing: border-box;
   padding: 5px;
   outline: none;
@@ -45,11 +55,14 @@
 }
 
 .interactive-piano__natural-key {
+  /* Webkit / Chrome Specific CSS to remove tap highlight color */
+  -webkit-tap-highlight-color: transparent;
+  /* Firefox Specific CSS to remove button differences and focus ring */
+  background-image: none;
   cursor: pointer;
   background: #fafafa;
-  margin: 0 2px;
   border-radius: 0 0 3px 3px;
-  border: none;
+  border-color: rgba(73, 73, 73, 0.2);
   padding: 10px;
   outline: none;
   box-sizing: border-box;
@@ -76,11 +89,20 @@
 }
 
 .interactive-piano__text--top-text {
+  pointer-events: none;
   color: rgb(136, 134, 134);
   margin-bottom: 3px; 
 }
 
+.interactive-piano__text--bottom-text {
+  pointer-events: none;
+}
+
 .interactive-piano__octave-shift-key {
+  /* Webkit / Chrome Specific CSS to remove tap highlight color */
+  -webkit-tap-highlight-color: transparent;
+  /* Firefox Specific CSS to remove button differences and focus ring */
+  background-image: none;
   cursor: pointer;
   background: #BAAED1;
   width: 30px;
@@ -89,6 +111,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 2; 
 }
 
 .interactive-piano__octave-shift-key:first-of-type {

@@ -81,16 +81,16 @@ export function addListeners(
 }
 
 export function addNotePlayListener(
-  handleNotePlayByOtherPlayer: (note: number) => void,
-  handleNoteStopByOtherPlayer: (note: number) => void
+  handleNotePlayByFriend: (note: number) => void,
+  handleNoteStopByFriend: (note: number) => void
 ) {
   socket.on(NOTE_PLAYED, ({ note, event }: NotePlayedMessage) => {
-    console.log(`received ${event}: ${note}`);
+    console.log(`Received ${event} event for note ${note}`);
     if (event === 'keydown') {
-      handleNotePlayByOtherPlayer(note);
+      handleNotePlayByFriend(note);
     }
     if (event === 'keyup') {
-      handleNoteStopByOtherPlayer(note);
+      handleNoteStopByFriend(note);
     }
   });
 }
