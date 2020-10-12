@@ -31,7 +31,7 @@ const shortcuts = [
   ['['],
 ];
 
-// CASUAL MODE
+// DEFAULT MODE
 // Always center the mappings
 export function getKeyboardMapping(
   startNote: number, // the leftmost note on screen
@@ -61,7 +61,7 @@ export function getKeyboardMapping(
   return map;
 }
 
-// GAME MODE (desktop view)
+// GAME MODE (desktop view only)
 // Assume the start note and first mapped note are both C here
 export function getKeyboardMappingWithSpecificStart(
   firstMappedNote: number,

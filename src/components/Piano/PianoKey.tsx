@@ -33,14 +33,14 @@ const PianoKey: React.FC<Props> = ({
   const [useTouchEvents, setUseTouchEvents] = useState(useTouchscreen);
 
   const handleMouseDown = (event: MouseEvent) => {
-    console.log(`Mouse down ${note}`);
+    // console.log(`Mouse down ${note}`);
     event.preventDefault();
     event.stopPropagation();
     startPlayingNote();
   };
 
   const handleMouseUp = (event: MouseEvent) => {
-    console.log(`Mouse up ${note}`);
+    // console.log(`Mouse up ${note}`);
     event.stopPropagation();
     stopPlayingNote();
   };
@@ -48,7 +48,7 @@ const PianoKey: React.FC<Props> = ({
   const handleMouseEnter = (event: MouseEvent) => {
     event.stopPropagation();
     if (event.buttons) {
-      console.log(`Mouse enter ${note}`);
+      // console.log(`Mouse enter ${note}`);
       startPlayingNote();
     }
   };
@@ -56,14 +56,14 @@ const PianoKey: React.FC<Props> = ({
   const handleMouseLeave = (event: MouseEvent) => {
     event.stopPropagation();
     if (event.buttons) {
-      console.log(`Mouse leave ${note}`);
+      // console.log(`Mouse leave ${note}`);
       stopPlayingNote();
     }
   };
 
   // Event bubbling starts from here (bubble touch event to parent)
   const handleTouchStart = () => {
-    console.log(`(Child) Touch start ${note}`);
+    // console.log(`(Child) Touch start ${note}`);
     setUseTouchEvents(true);
   };
 

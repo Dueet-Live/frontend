@@ -138,6 +138,31 @@ export function calculateGamePianoDimension(
   }
 }
 
+export function getOffsetMap(
+  startNote: number,
+  range: number,
+  keyWidth: number
+) {
+  let currOffset = 0;
+  let map: { [note: number]: number } = {};
+  map[startNote] = 0;
+  for (let i = 1; i < range; i += 1) {
+    // If previous key is black key
+    if (isAccidentalNote(startNote + i - 1)) {
+      currOffset += calculateBlackKeyWidth(keyWidth) / 2;
+    } else {
+      // If previous is white and current is black
+      if (isAccidentalNote(startNote + i)) {
+        currOffset += keyWidth - calculateBlackKeyWidth(keyWidth) / 2;
+      } else {
+        currOffset += keyWidth;
+      }
+    }
+    map[startNote + i] = currOffset;
+  }
+  return map;
+}
+
 /******************************* HELPERS ******************************/
 function calculateKeyboardWidth(totalWidth: number): number {
   return totalWidth - octaveShiftKeyWidth * 2;

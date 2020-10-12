@@ -1,7 +1,6 @@
 import { makeStyles } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { PlayerInfo } from '../types/PlayerInfo';
 import { RoomInfo } from '../types/RoomInfo';
 import {
   calculateDefaultPianoDimension,
@@ -38,7 +37,8 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   const { width, height } = useWindowDimensions();
   const keyboardDimension = calculateDefaultPianoDimension(width);
   const keyHeight = calculateKeyHeight(height);
-  const getFriendId = (players: PlayerInfo[], myId: number) => {
+  const getFriendId = (roomState: RoomInfo, myId: number) => {
+    const players = roomState.players;
     if (!players) {
       return null;
     }
@@ -77,7 +77,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
       <PlayerContext.Provider
         value={{
           me: playerId,
-          friend: getFriendId(roomState.players, playerId),
+          friend: getFriendId(roomState, playerId),
         }}
       >
         <RoomHeader />
