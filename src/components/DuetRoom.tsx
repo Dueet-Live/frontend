@@ -108,6 +108,11 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   }, [maybeRoomId]);
 
   const [middleBoxDimensions, middleBoxRef] = useDimensions<HTMLDivElement>();
+  // This is how to access the box dimensions.
+  // It changes dynamically when the window resizes.
+  /* TODO: remove this when doing waterfall */
+  console.log(middleBoxDimensions);
+
   const friendId = getFriendId(roomState, playerId);
   const partsSelection = getPartsSelection(roomState);
 
@@ -132,8 +137,6 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
 
           {/* available space for the rest of the content */}
           <div ref={middleBoxRef} className={classes.box}>
-            {/* TODO: remove this when doing waterfall */}
-            {JSON.stringify(middleBoxDimensions)}
             <PartSelection
               primo={partsSelection.primo}
               secondo={partsSelection.secondo}
