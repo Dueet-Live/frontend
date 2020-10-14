@@ -1,4 +1,4 @@
-import { Box, makeStyles } from '@material-ui/core';
+import { Box, makeStyles, Typography } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Part } from '../types/Messages';
@@ -7,6 +7,7 @@ import {
   calculateDefaultPianoDimension,
   calculateKeyHeight,
 } from '../utils/calculateKeyboardDimension';
+import { getFriendId, getPartsSelection } from '../utils/roomInfo';
 import socket, {
   addListeners,
   choosePart,
@@ -47,38 +48,6 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const getFriendId = (roomState: RoomInfo, myId: number) => {
-  const players = roomState.players;
-  if (!players) {
-    return null;
-  }
-  const friendInfo = players.filter(player => player.id !== myId);
-  if (friendInfo.length === 0) {
-    return null;
-  } else {
-    return friendInfo[0].id;
-  }
-};
-
-const getPartsSelection = (roomState: RoomInfo) => {
-  const primo: number[] = [];
-  const secondo: number[] = [];
-
-  const players = roomState.players;
-  if (!players) {
-    return { primo, secondo };
-  }
-
-  for (const player of roomState.players) {
-    if (player.assignedPart === 'primo') {
-      primo.push(player.id);
-    } else if (player.assignedPart === 'secondo') {
-      secondo.push(player.id);
-    }
-  }
-  return { primo, secondo };
-};
-
 const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   maybeRoomId,
   isCreate,
@@ -87,8 +56,13 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   const history = useHistory();
 
   // TODO need to ensure that roomstate is reset after playing a song
-  const [roomState, setRoomState] = useState({} as RoomInfo);
+  const [roomState, setRoomState] = useState({
+    players: [],
+    id: '',
+  } as RoomInfo);
   const [playerId, setPlayerId] = useState(-1);
+  const [timeToStart, setTimeToStart] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   const { width, height } = useWindowDimensions();
   const keyboardDimension = calculateDefaultPianoDimension(width);
@@ -98,7 +72,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
     // connect to ws server
     socket.open();
 
-    addListeners(setPlayerId, setRoomState, history);
+    addListeners(setPlayerId, setRoomState, setTimeToStart, history);
 
     return () => {
       socket.close();
@@ -116,6 +90,21 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [maybeRoomId]);
 
+  useEffect(() => {
+    if (timeToStart <= 0) {
+      return;
+    }
+
+    setTimeout(() => {
+      if (timeToStart > 0) {
+        setTimeToStart(timeToStart - 1);
+      }
+      if (timeToStart === 1) {
+        setIsPlaying(true);
+      }
+    }, 1000);
+  }, [timeToStart]);
+
   const [middleBoxDimensions, middleBoxRef] = useDimensions<HTMLDivElement>();
   // This is how to access the box dimensions.
   // It changes dynamically when the window resizes.
@@ -125,9 +114,37 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   const friendId = getFriendId(roomState, playerId);
   const partsSelection = getPartsSelection(roomState);
 
+  // if timeToStart is not 0,
+  //   hide readybutton, partselection, and parts of room header, show number
+  //   show number countdown
+  // if timeToStart is 0 and playing, show waterfall, music, etc.
+  // if timeToStart is 0 and not playing, show the current stuff
+  const middleBox = () => {
+    return isPlaying ? (
+      <>Waterfall</>
+    ) : timeToStart !== 0 ? (
+      <Typography variant="h1" align="center" color="primary">
+        {timeToStart}
+      </Typography>
+    ) : (
+      <>
+        <ReadyButton className={classes.readyButton} />
+        <PartSelection
+          primo={partsSelection.primo}
+          secondo={partsSelection.secondo}
+          didSelect={(part: Part) => {
+            choosePart(part);
+          }}
+        />
+      </>
+    );
+  };
+
   return (
     <RoomContext.Provider
       value={{
+        timeToStart: timeToStart,
+        isPlaying: isPlaying,
         roomInfo: roomState,
         setRoomInfo: setRoomState,
       }}
@@ -146,14 +163,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
 
           {/* available space for the rest of the content */}
           <div ref={middleBoxRef} className={classes.box}>
-            <ReadyButton className={classes.readyButton} />
-            <PartSelection
-              primo={partsSelection.primo}
-              secondo={partsSelection.secondo}
-              didSelect={(part: Part) => {
-                choosePart(part);
-              }}
-            />
+            {middleBox()}
           </div>
 
           {/* piano */}

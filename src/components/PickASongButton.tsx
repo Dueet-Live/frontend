@@ -13,9 +13,11 @@ import { ArrowBack, Close, MusicNoteOutlined } from '@material-ui/icons';
 import React, { useContext, useState } from 'react';
 import PickASongIcon from '../icons/PickASongIcon';
 import { RoomInfo } from '../types/RoomInfo';
+import { getReady } from '../utils/roomInfo';
 import { choosePiece } from '../utils/socket';
 import songList from '../utils/songs';
 import GenreCard from './GenreCard';
+import { PlayerContext } from './PlayerContext';
 import { RoomContext } from './RoomContext';
 import SongCard from './SongCard';
 
@@ -86,10 +88,11 @@ const PickASongButton: React.FC<{ isSolo?: boolean }> = ({ isSolo }) => {
   const classes = useStyles();
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('xs'));
-  const {
-    roomInfo: { piece },
-    setRoomInfo,
-  } = useContext(RoomContext);
+  const { roomInfo, setRoomInfo } = useContext(RoomContext);
+
+  const { me } = useContext(PlayerContext);
+  const { me: iAmReady } = getReady(roomInfo, me);
+  const { piece } = roomInfo;
 
   const handleOpen = () => {
     setOpen(true);
@@ -145,7 +148,11 @@ const PickASongButton: React.FC<{ isSolo?: boolean }> = ({ isSolo }) => {
 
   return (
     <>
-      <Button className={classes.pickASongButton} onClick={handleOpen}>
+      <Button
+        className={classes.pickASongButton}
+        onClick={handleOpen}
+        disabled={iAmReady}
+      >
         {piece === undefined ? (
           <>
             <PickASongIcon className={classes.icon} />

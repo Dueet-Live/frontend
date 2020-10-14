@@ -1,35 +1,45 @@
 import { Button, ButtonProps } from '@material-ui/core';
 import React, { useContext } from 'react';
+import { getPartsSelection, getReady } from '../utils/roomInfo';
 import { updateReady } from '../utils/socket';
 import { PlayerContext } from './PlayerContext';
 import { RoomContext } from './RoomContext';
 
 const ReadyButton: React.FC<ButtonProps> = props => {
-  const {
-    roomInfo: { players, piece },
-  } = useContext(RoomContext);
+  const { roomInfo } = useContext(RoomContext);
   const { me, friend } = useContext(PlayerContext);
 
-  // room is not set up yet. do not show
-  if (me === -1 || friend === null || piece === undefined) return <></>;
+  const { piece } = roomInfo;
 
-  const isReady = players.find(player => player.id === me)!.ready;
-  const friendReady = players.find(player => player.id === friend)!.ready;
+  // room not setup yet
+  if (me === -1 || friend === null) return <></>;
+
+  const { primo, secondo } = getPartsSelection(roomInfo);
+
+  const ready = getReady(roomInfo, me);
 
   const handleReady = (isReady: boolean) => {
     updateReady(isReady);
   };
+
+  // disable ready if
+  const disabled =
+    friend === null ||
+    piece === undefined ||
+    (primo.length === 0 && !ready.me) ||
+    (secondo.length === 0 && !ready.me) ||
+    (ready.me && ready.friend);
 
   return (
     <Button
       variant="outlined"
       color="primary"
       style={{ width: '110px' }}
-      disabled={isReady && friendReady}
-      onClick={() => handleReady(!isReady)}
+      disabled={disabled}
+      onClick={() => handleReady(!ready.me)}
       {...props}
     >
-      {isReady ? 'Not Ready' : 'Ready'}
+      {ready.me ? 'Not Ready' : 'Ready'}
     </Button>
   );
 };

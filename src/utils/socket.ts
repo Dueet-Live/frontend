@@ -32,6 +32,7 @@ const socket = io(process.env.REACT_APP_WS_URL!, {
 export function addListeners(
   setPlayerId: (id: number) => void,
   setRoomState: (roomInfo: RoomInfo) => void,
+  setTimeToStart: (inSeconds: number) => void,
   history: History<unknown>
 ) {
   /*************** Create room ***************/
@@ -84,12 +85,9 @@ export function addListeners(
     setRoomState(roomInfo);
   });
 
-  socket.on(
-    START_GAME_NOTIFICATION,
-    ({ inSeconds }: { inSeconds: boolean }) => {
-      console.log(inSeconds);
-    }
-  );
+  socket.on(START_GAME_NOTIFICATION, ({ inSeconds }: { inSeconds: number }) => {
+    setTimeToStart(inSeconds);
+  });
 }
 
 export function addNotePlayListener(
