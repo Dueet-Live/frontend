@@ -20,6 +20,7 @@ import useWindowDimensions from '../utils/useWindowDimensions';
 import InteractivePiano from './InteractivePiano';
 import { PartSelection } from './PartSelection';
 import { PlayerContext } from './PlayerContext';
+import ReadyButton from './ReadyButton';
 import { RoomContext } from './RoomContext';
 import RoomHeader from './RoomHeader';
 
@@ -31,12 +32,18 @@ const useStyles = makeStyles(theme => ({
   },
   box: {
     flexGrow: 100,
+    position: 'relative',
   },
   header: {
     flexGrow: 0,
   },
   piano: {
     flexGrow: 0,
+  },
+  readyButton: {
+    position: 'absolute',
+    left: theme.spacing(2),
+    top: theme.spacing(6),
   },
 }));
 
@@ -78,6 +85,8 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
 }) => {
   const classes = useStyles();
   const history = useHistory();
+
+  // TODO need to ensure that roomstate is reset after playing a song
   const [roomState, setRoomState] = useState({} as RoomInfo);
   const [playerId, setPlayerId] = useState(-1);
 
@@ -137,6 +146,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
 
           {/* available space for the rest of the content */}
           <div ref={middleBoxRef} className={classes.box}>
+            <ReadyButton className={classes.readyButton} />
             <PartSelection
               primo={partsSelection.primo}
               secondo={partsSelection.secondo}

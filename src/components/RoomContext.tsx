@@ -6,6 +6,7 @@ type RoomContextProps = {
   setRoomInfo: (usingPrevState: (prevState: RoomInfo) => RoomInfo) => void;
 };
 
+// this will likely be used for solo instead of duet
 export const RoomContext = React.createContext<RoomContextProps>({
   roomInfo: {
     id: '',

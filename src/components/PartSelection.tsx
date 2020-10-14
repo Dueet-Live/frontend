@@ -14,7 +14,8 @@ const useStyles = makeStyles(theme => ({
     justifyContent: 'center',
   },
   paper: {
-    margin: theme.spacing(1),
+    marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(1),
     width: theme.spacing(10),
     height: theme.spacing(10),
     display: 'flex',
