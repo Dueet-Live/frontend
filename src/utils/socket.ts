@@ -1,6 +1,7 @@
 import { History } from 'history';
 import io from 'socket.io-client';
 import {
+  CHOOSE_PART_REQUEST,
   CHOOSE_PIECE_REQUEST,
   CREATE_ROOM_REQUEST,
   CREATE_ROOM_RESPONSE,
@@ -13,6 +14,7 @@ import {
   MALFORMED_MESSAGE_RESPONSE,
   NotePlayedMessage,
   NOTE_PLAYED,
+  Part,
   RoomCreatedResponse,
   ROOM_INFO_UPDATED_NOTIFICATION,
   UnknownErrorResponse,
@@ -117,6 +119,10 @@ export function stopNote(note: number) {
   // console.log(`Send ${note} stop`)
   socket.emit(NOTE_PLAYED, { note, event: 'keyup' });
 }
+
+export const choosePart = (id: Part) => {
+  socket.emit(CHOOSE_PART_REQUEST, { id });
+};
 
 export function choosePiece(id: string) {
   socket.emit(CHOOSE_PIECE_REQUEST, { id });

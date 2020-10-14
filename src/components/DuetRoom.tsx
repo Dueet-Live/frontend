@@ -1,6 +1,7 @@
-import { makeStyles } from '@material-ui/core';
+import { Box, makeStyles } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
+import { Part } from '../types/Messages';
 import { RoomInfo } from '../types/RoomInfo';
 import {
   calculateDefaultPianoDimension,
@@ -8,23 +9,68 @@ import {
 } from '../utils/calculateKeyboardDimension';
 import socket, {
   addListeners,
+  choosePart,
   createRoom,
   joinRoom,
   playNote,
   stopNote,
 } from '../utils/socket';
+import { useDimensions } from '../utils/useDimensions';
 import useWindowDimensions from '../utils/useWindowDimensions';
 import InteractivePiano from './InteractivePiano';
+import { PartSelection } from './PartSelection';
 import { PlayerContext } from './PlayerContext';
 import { RoomContext } from './RoomContext';
 import RoomHeader from './RoomHeader';
 
 const useStyles = makeStyles(theme => ({
+  root: {
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100%',
+  },
+  box: {
+    flexGrow: 100,
+  },
+  header: {
+    flexGrow: 0,
+  },
   piano: {
-    position: 'absolute',
-    bottom: 0,
+    flexGrow: 0,
   },
 }));
+
+const getFriendId = (roomState: RoomInfo, myId: number) => {
+  const players = roomState.players;
+  if (!players) {
+    return null;
+  }
+  const friendInfo = players.filter(player => player.id !== myId);
+  if (friendInfo.length === 0) {
+    return null;
+  } else {
+    return friendInfo[0].id;
+  }
+};
+
+const getPartsSelection = (roomState: RoomInfo) => {
+  const primo: number[] = [];
+  const secondo: number[] = [];
+
+  const players = roomState.players;
+  if (!players) {
+    return { primo, secondo };
+  }
+
+  for (const player of roomState.players) {
+    if (player.assignedPart === 'primo') {
+      primo.push(player.id);
+    } else if (player.assignedPart === 'secondo') {
+      secondo.push(player.id);
+    }
+  }
+  return { primo, secondo };
+};
 
 const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   maybeRoomId,
@@ -38,18 +84,6 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   const { width, height } = useWindowDimensions();
   const keyboardDimension = calculateDefaultPianoDimension(width);
   const keyHeight = calculateKeyHeight(height);
-  const getFriendId = (roomState: RoomInfo, myId: number) => {
-    const players = roomState.players;
-    if (!players) {
-      return null;
-    }
-    const friendInfo = players.filter(player => player.id !== myId);
-    if (friendInfo.length === 0) {
-      return null;
-    } else {
-      return friendInfo[0].id;
-    }
-  };
 
   useEffect(() => {
     // connect to ws server
@@ -73,21 +107,46 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [maybeRoomId]);
 
+  const [middleBoxDimensions, middleBoxRef] = useDimensions<HTMLDivElement>();
+  // This is how to access the box dimensions.
+  // It changes dynamically when the window resizes.
+  /* TODO: remove this when doing waterfall */
+  console.log(middleBoxDimensions);
+
+  const friendId = getFriendId(roomState, playerId);
+  const partsSelection = getPartsSelection(roomState);
+
   return (
-    <>
-      <RoomContext.Provider
+    <RoomContext.Provider
+      value={{
+        roomInfo: roomState,
+        setRoomInfo: setRoomState,
+      }}
+    >
+      <PlayerContext.Provider
         value={{
-          roomInfo: roomState,
-          setRoomInfo: setRoomState,
+          me: playerId,
+          friend: friendId,
         }}
       >
-        <PlayerContext.Provider
-          value={{
-            me: playerId,
-            friend: getFriendId(roomState, playerId),
-          }}
-        >
-          <RoomHeader />
+        <Box className={classes.root}>
+          {/* header */}
+          <div className={classes.header}>
+            <RoomHeader />
+          </div>
+
+          {/* available space for the rest of the content */}
+          <div ref={middleBoxRef} className={classes.box}>
+            <PartSelection
+              primo={partsSelection.primo}
+              secondo={partsSelection.secondo}
+              didSelect={(part: Part) => {
+                choosePart(part);
+              }}
+            />
+          </div>
+
+          {/* piano */}
           <div className={classes.piano}>
             <InteractivePiano
               {...keyboardDimension}
@@ -104,9 +163,9 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
               }}
             />
           </div>
-        </PlayerContext.Provider>
-      </RoomContext.Provider>
-    </>
+        </Box>
+      </PlayerContext.Provider>
+    </RoomContext.Provider>
   );
 };
 

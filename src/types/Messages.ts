@@ -49,8 +49,9 @@ export type ChoosePieceRequest = {
 
 // Request
 export const CHOOSE_PART_REQUEST = 'choosePartRequest';
+export type Part = 'primo' | 'secondo';
 export type ChoosePartRequest = {
-  id: 'primo' | 'secondo';
+  id: Part;
 };
 
 /****************** Ready *****************/
