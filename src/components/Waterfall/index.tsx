@@ -55,6 +55,9 @@ export const Waterfall = ({
     if (context === null) {
       return;
     }
+    if (canvas.height <= 0 || canvas.width <= 0) {
+      return;
+    }
 
     const speed = canvas.height / lookAheadTime;
 
@@ -64,7 +67,6 @@ export const Waterfall = ({
         prevFrameTime.current = timestamp;
         isPaused.current = false;
       }
-
       const endWindowTime = timestamp + lookAheadTime;
 
       // check if we need to add more notes
@@ -120,7 +122,6 @@ export const Waterfall = ({
   }, []);
 
   useEffect(() => {
-    console.log(`width: ${dimension.width} and height: ${dimension.height}`);
     fallingNotes.current = fallingNotes.current.map(
       (fallingNote: FallingNote) =>
         fallingNote.createWithUpdatedDimensionAndProgress(
@@ -136,9 +137,11 @@ export const Waterfall = ({
   });
 
   return (
-    <canvas ref={canvasRef} width={dimension.width} height={dimension.height} style={{backgroundColor: 'red'}}>
-      Unable to render the required visuals on this browser ): Perhaps, switch
-      to another browser?
-    </canvas>
+    <>
+      <canvas ref={canvasRef} height={dimension.height} width={dimension.width}>
+        Unable to render the required visuals on this browser ): Perhaps, switch
+        to another browser?
+      </canvas>
+    </>
   );
 };

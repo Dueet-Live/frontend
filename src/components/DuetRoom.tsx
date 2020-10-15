@@ -5,6 +5,7 @@ import { Part } from '../types/Messages';
 import { RoomInfo } from '../types/RoomInfo';
 import {
   calculateDefaultPianoDimension,
+  calculateGamePianoDimension,
   calculateKeyHeight,
 } from '../utils/calculateKeyboardDimension';
 import { getFriendId, getPartsSelection } from '../utils/roomInfo';
@@ -24,6 +25,9 @@ import { PlayerContext } from './PlayerContext';
 import ReadyButton from './ReadyButton';
 import { RoomContext } from './RoomContext';
 import RoomHeader from './RoomHeader';
+import { Waterfall } from './Waterfall';
+import { SamplePiece } from './Waterfall/sample';
+import { Note } from './Waterfall/types';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -66,7 +70,13 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   const [isPlaying, setIsPlaying] = useState(false);
 
   const { width, height } = useWindowDimensions();
-  const keyboardDimension = calculateDefaultPianoDimension(width);
+  const TEST_START_NOTE = 60;
+  const keyboardDimension = calculateGamePianoDimension(
+    width,
+    TEST_START_NOTE,
+    TEST_START_NOTE
+  );
+  // const keyboardDimension = calculateDefaultPianoDimension(width);
   const keyHeight = calculateKeyHeight(height);
 
   useEffect(() => {
@@ -130,7 +140,8 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
         </Typography>
       );
     }
-
+    const piece = JSON.parse(SamplePiece);
+    const notes: Array<Note> = piece.notes; // TODO: get the right notes
     return (
       <>
         <ReadyButton className={classes.readyButton} />
@@ -141,6 +152,14 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
             choosePart(part);
           }}
         />
+        {/*}
+        <Waterfall
+          {...keyboardDimension}
+          dimension={middleBoxDimensions}
+          bpm={120}
+          beatsPerBar={4}
+          notes={notes}
+        />*/}
       </>
     );
   };
