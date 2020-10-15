@@ -69,10 +69,14 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   const [timeToStart, setTimeToStart] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
 
+  const [middleBoxDimensions, middleBoxRef] = useDimensions<HTMLDivElement>();
+  console.log(
+    `DuetRoom width ${middleBoxDimensions.width} and height ${middleBoxDimensions.height}`
+  );
   const { width, height } = useWindowDimensions();
   const TEST_START_NOTE = 60;
   const keyboardDimension = calculateGamePianoDimension(
-    width,
+    middleBoxDimensions.width,
     TEST_START_NOTE,
     TEST_START_NOTE
   );
@@ -84,7 +88,6 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
     socket.open();
 
     addListeners(setPlayerId, setRoomState, setTimeToStart, history);
-    console.log(`DuetRoom width ${middleBoxDimensions.width} and height ${middleBoxDimensions.height}`)
     return () => {
       socket.close();
     };
@@ -116,12 +119,6 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
     }, 1000);
   }, [timeToStart]);
 
-  const [middleBoxDimensions, middleBoxRef] = useDimensions<HTMLDivElement>();
-  // This is how to access the box dimensions.
-  // It changes dynamically when the window resizes.
-  /* TODO: remove this when doing waterfall */
-  console.log(middleBoxDimensions);
-
   const friendId = getFriendId(roomState, playerId);
   const partsSelection = getPartsSelection(roomState);
 
@@ -144,16 +141,15 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
     const notes: Array<Note> = piece.notes; // TODO: get the right notes
     return (
       <>
-        {/*}
-        <ReadyButton className={classes.readyButton} />
+        {/* <ReadyButton className={classes.readyButton} />
         <PartSelection
           primo={partsSelection.primo}
           secondo={partsSelection.secondo}
           didSelect={(part: Part) => {
             choosePart(part);
           }}
-        />
-        */}
+        /> */}
+
         <Waterfall
           {...keyboardDimension}
           dimension={middleBoxDimensions}

@@ -1,11 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   calculateBlackKeyWidth,
-  calculateKeyHeight,
   getOffsetMap,
 } from '../../utils/calculateKeyboardDimension';
 import { Dimensions } from '../../utils/useDimensions';
-import useWindowDimensions from '../../utils/useWindowDimensions';
 import { FallingNote } from './FallingNote';
 import { KeyboardDimension, KeyOffsetInfo, Note } from './types';
 import {
@@ -15,13 +13,10 @@ import {
   drawFallingNote,
 } from './utils';
 
-type Props = {
+type Props = KeyboardDimension & {
   bpm: number;
   beatsPerBar: number; // TODO: add info about whether beat = half/quarter/eigth note etc.
   notes: Array<Note>;
-  start: number;
-  range: number;
-  keyWidth: number;
   dimension: Dimensions;
 };
 
