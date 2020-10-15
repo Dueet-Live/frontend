@@ -121,27 +121,27 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
     `DuetRoom width ${middleBoxDimensions.width} and height ${middleBoxDimensions.height}`
   );
   const { height } = useWindowDimensions();
-  const TEST_SLOW_START_NOTE = 72;
+  const TEST_SMALL_START_NOTE = 72;
   const TEST_REGULAR_START_NOTE = 72;
   const keyboardDimension =
     isPlaying || timeToStart !== 0
       ? calculateGamePianoDimension(
-          middleBoxDimensions.width,
-          TEST_SLOW_START_NOTE,
-          TEST_REGULAR_START_NOTE
-        )
+        middleBoxDimensions.width,
+        TEST_SMALL_START_NOTE,
+        TEST_REGULAR_START_NOTE
+      )
       : calculateDefaultPianoDimension(middleBoxDimensions.width);
   const keyHeight = calculateKeyHeight(height);
 
-  // Get keyboard mapping (for game only)
+  // Get keyboard mapping
   const theme = useTheme();
   const isDesktopView = useMediaQuery(theme.breakpoints.up('md'));
-  const keyboardMap = isDesktopView
+  const keyboardMap = (isPlaying || timeToStart !== 0) && isDesktopView
     ? getKeyboardMappingWithSpecificStart(
-        TEST_REGULAR_START_NOTE,
-        keyboardDimension['start'],
-        keyboardDimension['range']
-      )
+      TEST_REGULAR_START_NOTE,
+      keyboardDimension['start'],
+      keyboardDimension['range']
+    )
     : undefined;
 
   // if timeToStart is not 0,

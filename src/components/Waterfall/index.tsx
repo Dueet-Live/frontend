@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import {
   calculateBlackKeyWidth,
   getOffsetMap,
@@ -44,7 +44,7 @@ export const Waterfall = ({
     blackKeyWidth: calculateBlackKeyWidth(keyWidth),
   } as KeyOffsetInfo;
 
-  const startAnimation = (): void => {
+  const startAnimation = useCallback(() => {
     const canvas = canvasRef.current!;
     const context = canvas.getContext('2d');
     if (context === null) {
@@ -105,7 +105,7 @@ export const Waterfall = ({
     };
 
     animationId.current = window.requestAnimationFrame(animate);
-  };
+  }, [keyOffsetInfo, lookAheadTime]);
 
   useEffect(() => {
     notesInMs.current = delayStartTime(notesInMs.current, lookAheadTime); // 'count in one bar'
@@ -114,7 +114,7 @@ export const Waterfall = ({
       cancelAnimationFrame(animationId.current);
       animationId.current = 0;
     };
-  }, []);
+  }, [lookAheadTime, startAnimation]);
 
   useEffect(() => {
     fallingNotes.current = fallingNotes.current.map(
@@ -129,11 +129,12 @@ export const Waterfall = ({
       cancelAnimationFrame(animationId.current);
       animationId.current = 0;
     };
-  });
+  }, [keyOffsetInfo, startAnimation]);
 
   return (
     <>
-      <canvas ref={canvasRef} height={dimension.height} width={dimension.width}>
+      {/* Dirty hack */}
+      <canvas ref={canvasRef} height={dimension.height - 5} width={dimension.width}>
         Unable to render the required visuals on this browser ): Perhaps, switch
         to another browser?
       </canvas>
