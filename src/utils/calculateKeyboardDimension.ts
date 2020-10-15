@@ -141,8 +141,7 @@ export function calculateGamePianoDimension(
 export function getOffsetMap(
   startNote: number,
   range: number,
-  whiteKeyWidth: number,
-  blackKeyWidth: number
+  keyWidth: number
 ) {
   let currOffset = octaveShiftKeyWidth;
   let map: { [note: number]: number } = {};
@@ -150,13 +149,13 @@ export function getOffsetMap(
   for (let i = 1; i < range; i += 1) {
     // If previous key is black key
     if (isAccidentalNote(startNote + i - 1)) {
-      currOffset += blackKeyWidth / 2;
+      currOffset += calculateBlackKeyWidth(keyWidth) / 2;
     } else {
       // If previous is white and current is black
       if (isAccidentalNote(startNote + i)) {
-        currOffset += whiteKeyWidth - blackKeyWidth / 2;
+        currOffset += keyWidth - calculateBlackKeyWidth(keyWidth) / 2;
       } else {
-        currOffset += whiteKeyWidth;
+        currOffset += keyWidth;
       }
     }
     map[startNote + i] = currOffset;
