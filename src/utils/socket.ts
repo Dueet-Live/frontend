@@ -15,8 +15,10 @@ import {
   NotePlayedMessage,
   NOTE_PLAYED,
   Part,
+  READY_REQUEST,
   RoomCreatedResponse,
   ROOM_INFO_UPDATED_NOTIFICATION,
+  START_GAME_NOTIFICATION,
   UnknownErrorResponse,
   UNKNOWN_MESSAGE_RESPONSE,
 } from '../types/Messages';
@@ -30,6 +32,7 @@ const socket = io(process.env.REACT_APP_WS_URL!, {
 export function addListeners(
   setPlayerId: (id: number) => void,
   setRoomState: (roomInfo: RoomInfo) => void,
+  setTimeToStart: (inSeconds: number) => void,
   history: History<unknown>
 ) {
   /*************** Create room ***************/
@@ -81,6 +84,10 @@ export function addListeners(
   socket.on(ROOM_INFO_UPDATED_NOTIFICATION, (roomInfo: RoomInfo) => {
     setRoomState(roomInfo);
   });
+
+  socket.on(START_GAME_NOTIFICATION, ({ inSeconds }: { inSeconds: number }) => {
+    setTimeToStart(inSeconds);
+  });
 }
 
 export function addNotePlayListener(
@@ -126,6 +133,10 @@ export const choosePart = (id: Part) => {
 
 export function choosePiece(id: string) {
   socket.emit(CHOOSE_PIECE_REQUEST, { id });
+}
+
+export function updateReady(isReady: boolean) {
+  socket.emit(READY_REQUEST, { ready: isReady });
 }
 
 export default socket;
