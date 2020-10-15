@@ -42,6 +42,7 @@ const useStyles = makeStyles(theme => ({
     flexGrow: 0,
   },
   readyButton: {
+    // TODO remove absolute spacing (and find better positioning)
     position: 'absolute',
     left: theme.spacing(2),
     top: theme.spacing(6),
@@ -120,13 +121,17 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   // if timeToStart is 0 and playing, show waterfall, music, etc.
   // if timeToStart is 0 and not playing, show the current stuff
   const middleBox = () => {
-    return isPlaying ? (
-      <>Waterfall</>
-    ) : timeToStart !== 0 ? (
-      <Typography variant="h1" align="center" color="primary">
-        {timeToStart}
-      </Typography>
-    ) : (
+    if (isPlaying) return <>Waterfall</>;
+
+    if (timeToStart !== 0) {
+      return (
+        <Typography variant="h1" align="center" color="primary">
+          {timeToStart}
+        </Typography>
+      );
+    }
+
+    return (
       <>
         <ReadyButton className={classes.readyButton} />
         <PartSelection
