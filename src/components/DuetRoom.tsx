@@ -117,32 +117,34 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
 
   // Calculate keyboard dimension
   const [middleBoxDimensions, middleBoxRef] = useDimensions<HTMLDivElement>();
-  console.log(
-    `DuetRoom width ${middleBoxDimensions.width} and height ${middleBoxDimensions.height}`
-  );
   const { height } = useWindowDimensions();
   const TEST_SMALL_START_NOTE = 72;
   const TEST_REGULAR_START_NOTE = 72;
   const keyboardDimension =
     isPlaying || timeToStart !== 0
       ? calculateGamePianoDimension(
-        middleBoxDimensions.width,
-        TEST_SMALL_START_NOTE,
-        TEST_REGULAR_START_NOTE
-      )
+          middleBoxDimensions.width,
+          TEST_SMALL_START_NOTE,
+          TEST_REGULAR_START_NOTE
+        )
       : calculateDefaultPianoDimension(middleBoxDimensions.width);
   const keyHeight = calculateKeyHeight(height);
 
   // Get keyboard mapping
   const theme = useTheme();
   const isDesktopView = useMediaQuery(theme.breakpoints.up('md'));
-  const keyboardMap = (isPlaying || timeToStart !== 0) && isDesktopView
-    ? getKeyboardMappingWithSpecificStart(
-      TEST_REGULAR_START_NOTE,
-      keyboardDimension['start'],
-      keyboardDimension['range']
-    )
-    : undefined;
+  const keyboardMap =
+    (isPlaying || timeToStart !== 0) && isDesktopView
+      ? getKeyboardMappingWithSpecificStart(
+          TEST_REGULAR_START_NOTE,
+          keyboardDimension['start'],
+          keyboardDimension['range']
+        )
+      : undefined;
+
+  // Piece information
+  const piece = JSON.parse(SamplePiece);
+  const notes: Array<Note> = piece.notes; // TODO: get the right notes
 
   // if timeToStart is not 0,
   //   hide readybutton, partselection, and parts of room header, show number
@@ -150,9 +152,6 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   // if timeToStart is 0 and playing, show waterfall, music, etc.
   // if timeToStart is 0 and not playing, show the current stuff
   const middleBox = () => {
-    const piece = JSON.parse(SamplePiece);
-    const notes: Array<Note> = piece.notes; // TODO: get the right notes
-
     if (isPlaying)
       return (
         <Waterfall
