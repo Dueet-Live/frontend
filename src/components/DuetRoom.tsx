@@ -84,7 +84,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
     socket.open();
 
     addListeners(setPlayerId, setRoomState, setTimeToStart, history);
-
+    console.log(`DuetRoom width ${middleBoxDimensions.width} and height ${middleBoxDimensions.height}`)
     return () => {
       socket.close();
     };
@@ -144,6 +144,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
     const notes: Array<Note> = piece.notes; // TODO: get the right notes
     return (
       <>
+        {/*}
         <ReadyButton className={classes.readyButton} />
         <PartSelection
           primo={partsSelection.primo}
@@ -152,14 +153,14 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
             choosePart(part);
           }}
         />
-        {/*}
+        */}
         <Waterfall
           {...keyboardDimension}
           dimension={middleBoxDimensions}
           bpm={120}
           beatsPerBar={4}
           notes={notes}
-        />*/}
+        />
       </>
     );
   };
