@@ -4,6 +4,8 @@ import {
   DialogTitle,
   DialogTitleProps,
   IconButton,
+  List,
+  ListItem,
   makeStyles,
   Typography,
   useMediaQuery,
@@ -41,6 +43,17 @@ const useStyles = makeStyles(theme => ({
   root: {
     margin: 0,
     padding: theme.spacing(2),
+  },
+  genreContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    padding: 10,
+  },
+  songContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    padding: 10,
+    overflowY: 'auto',
   },
 }));
 
@@ -108,13 +121,13 @@ const PickASongButton: React.FC<{ isSolo?: boolean }> = ({ isSolo }) => {
         <DialogTitleWithButtons onClose={handleClose}>
           Choose a Genre
         </DialogTitleWithButtons>
-        {Object.keys(songList).map(genre => (
-          <GenreCard
-            key={genre}
-            genre={genre}
-            onClick={() => setGenre(genre)}
-          />
-        ))}
+        <List className={classes.genreContainer}>
+          {Object.keys(songList).map(genre => (
+            <ListItem key={genre}>
+              <GenreCard genre={genre} onClick={() => setGenre(genre)} />
+            </ListItem>
+          ))}
+        </List>
       </>
     );
   };
@@ -128,20 +141,23 @@ const PickASongButton: React.FC<{ isSolo?: boolean }> = ({ isSolo }) => {
         >
           Choose a Song
         </DialogTitleWithButtons>
-        {songList[genre].map(songInfo => (
-          <SongCard
-            key={songInfo.id}
-            songInfo={songInfo}
-            onClick={() => {
-              choosePiece(songInfo.id);
-              setRoomInfo((prevState: RoomInfo) => ({
-                ...prevState,
-                piece: songInfo.id,
-              }));
-              handleClose();
-            }}
-          />
-        ))}
+        <List className={classes.songContainer}>
+          {songList[genre].map(songInfo => (
+            <ListItem key={songInfo.id}>
+              <SongCard
+                songInfo={songInfo}
+                onClick={() => {
+                  choosePiece(songInfo.id);
+                  setRoomInfo((prevState: RoomInfo) => ({
+                    ...prevState,
+                    piece: songInfo.id,
+                  }));
+                  handleClose();
+                }}
+              />
+            </ListItem>
+          ))}
+        </List>
       </>
     );
   };

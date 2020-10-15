@@ -4,9 +4,47 @@ import { SongInfo } from '../types/SongInfo';
 
 // might want to change the format next time
 const songList: { [genre: string]: SongInfo[] } = {
-  classical: [
+  pop: [
     {
       id: '1',
+      title: 'Dance of the Sugar Plum Fairy',
+    },
+    {
+      id: '2',
+      title: 'Dance of the Sugar Plum Fairy',
+    },
+    {
+      id: '3',
+      title: 'Dance of the Sugar Plum Fairy',
+    },
+    {
+      id: '4',
+      title: 'Dance of the Sugar Plum Fairy',
+    },
+    {
+      id: '5',
+      title: 'Dance of the Sugar Plum Fairy',
+    },
+    {
+      id: '6',
+      title: 'Dance of the Sugar Plum Fairy',
+    },
+  ],
+  classical: [
+    {
+      id: '7',
+      title: 'Dance of the Sugar Plum Fairy',
+    },
+  ],
+  jazz: [
+    {
+      id: '8',
+      title: 'Dance of the Sugar Plum Fairy',
+    },
+  ],
+  christmas: [
+    {
+      id: '9',
       title: 'Dance of the Sugar Plum Fairy',
     },
   ],
