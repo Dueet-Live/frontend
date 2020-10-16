@@ -75,12 +75,11 @@ export const Waterfall: React.FC<Props> = ({
         prevFrameTime.current = timestamp;
         isPaused.current = false;
       }
-      const endWindowTime = timestamp + lookAheadTime;
 
       // check if we need to add more notes
       while (
         firstHiddenNoteIndex.current < notesInMs.current.length &&
-        notesInMs.current[firstHiddenNoteIndex.current].time <= endWindowTime
+        notesInMs.current[firstHiddenNoteIndex.current].time <= timestamp
       ) {
         const note = notesInMs.current[firstHiddenNoteIndex.current];
         fallingNotes.current.push(
@@ -121,7 +120,6 @@ export const Waterfall: React.FC<Props> = ({
   }, [keyOffsetInfo, lookAheadTime]);
 
   useEffect(() => {
-    notesInMs.current = delayStartTime(notesInMs.current, lookAheadTime); // 'count in one bar'
     startAnimation();
     return () => {
       cancelAnimationFrame(animationId.current);

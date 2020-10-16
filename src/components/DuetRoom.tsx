@@ -33,7 +33,7 @@ import ReadyButton from './ReadyButton';
 import { RoomContext } from './RoomContext';
 import RoomHeader from './RoomHeader';
 import { Waterfall } from './Waterfall';
-import { SamplePiece } from './Waterfall/sample';
+import { SamplePiece, TestPiece } from './Waterfall/sample';
 import { Note } from './Waterfall/types';
 
 const useStyles = makeStyles(theme => ({
@@ -143,7 +143,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
       : undefined;
 
   // Piece information
-  const piece = JSON.parse(SamplePiece);
+  const piece = JSON.parse(TestPiece);
   const notes: Array<Note> = piece.notes; // TODO: get the right notes
 
   // if timeToStart is not 0,
@@ -159,7 +159,6 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
           dimension={middleBoxDimensions}
           bpm={120}
           beatsPerBar={4}
-          // eslint-disable-next-line @typescript-eslint/no-use-before-define
           notes={notes}
         />
       );
@@ -171,11 +170,9 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
         </Typography>
       );
     }
-    const piece = JSON.parse(SamplePiece);
-    const notes: Array<Note> = piece.notes; // TODO: get the right notes
+
     return (
       <>
-        {/*}
         <ReadyButton className={classes.readyButton} />
         <PartSelection
           primo={partsSelection.primo}
@@ -183,14 +180,6 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
           didSelect={(part: Part) => {
             choosePart(part);
           }}
-        />
-        */}
-        <Waterfall
-          {...keyboardDimension}
-          dimension={middleBoxDimensions}
-          bpm={120}
-          beatsPerBar={4}
-          notes={notes}
         />
       </>
     );
