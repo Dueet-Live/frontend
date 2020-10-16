@@ -43,7 +43,9 @@ const useStyles = makeStyles(theme => ({
     height: '100%',
   },
   box: {
-    flexGrow: 100,
+    flexGrow: 1,
+    flexShrink: 1,
+    minHeight: '0px',
     position: 'relative',
   },
   header: {

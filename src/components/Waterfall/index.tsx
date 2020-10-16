@@ -144,7 +144,6 @@ export const Waterfall: React.FC<Props> = ({
 
   return (
     <>
-      {/* Dirty hack */}
       <canvas
         ref={canvasRef}
         className={classes.canvas}
