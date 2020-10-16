@@ -2,7 +2,7 @@ import React, { useCallback, useContext, useEffect, useState } from 'react';
 import PianoKey from './PianoKey';
 import { PlayerContext } from '../PlayerContext';
 import getNotesBetween from './utils/getNotesBetween';
-import getKeyboardShortcutForNote from './utils/getKeyboardShortcutsForNote';
+import { getKeyboardShortcutForNote } from '../../utils/getKeyboardShorcutsMapping';
 import '../InteractivePiano.css';
 import { PlayingNote } from '../../types/PlayingNote';
 import InstrumentAudio from './InstrumentAudio';
@@ -38,7 +38,7 @@ const Piano: React.FC<Props> = ({
   const { me, friend } = useContext(PlayerContext);
   const [playingNotes, setPlayingNotes] = useState<PlayingNote[]>([]);
 
-  // Handle touchscreen input
+  // Used for touchscreen input
   const [useTouchEvents, setUseTouchEvents] = useState(false);
   const [touchedNotes, setTouchedNotes] = useState(new Set<number>());
 

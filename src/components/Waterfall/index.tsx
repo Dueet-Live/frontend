@@ -1,11 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
+import makeStyles from '@material-ui/core/styles/makeStyles';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import {
   calculateBlackKeyWidth,
-  calculateKeyHeight,
   getOffsetMap,
 } from '../../utils/calculateKeyboardDimension';
 import { Dimensions } from '../../utils/useDimensions';
-import useWindowDimensions from '../../utils/useWindowDimensions';
 import { FallingNote } from './FallingNote';
 import { KeyboardDimension, KeyOffsetInfo, Note } from './types';
 import {
@@ -15,17 +14,20 @@ import {
   drawFallingNote,
 } from './utils';
 
-type Props = {
+type Props = KeyboardDimension & {
   bpm: number;
   beatsPerBar: number; // TODO: add info about whether beat = half/quarter/eigth note etc.
   notes: Array<Note>;
-  start: number;
-  range: number;
-  keyWidth: number;
   dimension: Dimensions;
 };
 
-export const Waterfall = ({
+const useStyles = makeStyles(theme => ({
+  canvas: {
+    display: 'block',
+  },
+}));
+
+export const Waterfall: React.FC<Props> = ({
   start,
   range,
   keyWidth,
@@ -33,7 +35,9 @@ export const Waterfall = ({
   bpm,
   beatsPerBar,
   notes,
-}: Props) => {
+}) => {
+  const classes = useStyles();
+
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const notesInMs = useRef<Array<Note>>(convertTimeInfoToMilliseconds(notes));
   const animationId = useRef(0);
@@ -43,13 +47,17 @@ export const Waterfall = ({
   const fallingNotes = useRef<Array<FallingNote>>([]);
 
   const lookAheadTime = calculateLookAheadTime(bpm, beatsPerBar);
-  const keyOffsetInfo = {
-    leftMarginMap: getOffsetMap(start, range, keyWidth),
-    whiteKeyWidth: keyWidth,
-    blackKeyWidth: calculateBlackKeyWidth(keyWidth),
-  } as KeyOffsetInfo;
+  const keyOffsetInfo = useMemo(
+    () =>
+      ({
+        leftMarginMap: getOffsetMap(start, range, keyWidth),
+        whiteKeyWidth: keyWidth,
+        blackKeyWidth: calculateBlackKeyWidth(keyWidth),
+      } as KeyOffsetInfo),
+    [keyWidth, range, start]
+  );
 
-  const startAnimation = (): void => {
+  const startAnimation = useCallback(() => {
     const canvas = canvasRef.current!;
     const context = canvas.getContext('2d');
     if (context === null) {
@@ -110,7 +118,7 @@ export const Waterfall = ({
     };
 
     animationId.current = window.requestAnimationFrame(animate);
-  };
+  }, [keyOffsetInfo, lookAheadTime]);
 
   useEffect(() => {
     notesInMs.current = delayStartTime(notesInMs.current, lookAheadTime); // 'count in one bar'
@@ -119,7 +127,7 @@ export const Waterfall = ({
       cancelAnimationFrame(animationId.current);
       animationId.current = 0;
     };
-  }, []);
+  }, [lookAheadTime, startAnimation]);
 
   useEffect(() => {
     fallingNotes.current = fallingNotes.current.map(
@@ -134,11 +142,17 @@ export const Waterfall = ({
       cancelAnimationFrame(animationId.current);
       animationId.current = 0;
     };
-  });
+  }, [keyOffsetInfo, startAnimation]);
 
   return (
     <>
-      <canvas ref={canvasRef} height={dimension.height} width={dimension.width}>
+      {/* Dirty hack */}
+      <canvas
+        ref={canvasRef}
+        className={classes.canvas}
+        height={dimension.height}
+        width={dimension.width}
+      >
         Unable to render the required visuals on this browser ): Perhaps, switch
         to another browser?
       </canvas>
