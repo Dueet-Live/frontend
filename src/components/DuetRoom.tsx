@@ -33,7 +33,7 @@ import ReadyButton from './ReadyButton';
 import { RoomContext } from './RoomContext';
 import RoomHeader from './RoomHeader';
 import { Waterfall } from './Waterfall';
-import { TestPiece } from './Waterfall/sample';
+import { SamplePiece } from './Waterfall/sample';
 import { Note } from './Waterfall/types';
 
 const useStyles = makeStyles(theme => ({
@@ -145,7 +145,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
       : undefined;
 
   // Piece information
-  const piece = JSON.parse(TestPiece);
+  const piece = JSON.parse(SamplePiece);
   const notes: Array<Note> = piece.notes; // TODO: get the right notes
 
   // if timeToStart is not 0,
