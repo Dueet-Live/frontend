@@ -33,7 +33,7 @@ import ReadyButton from './ReadyButton';
 import { RoomContext } from './RoomContext';
 import RoomHeader from './RoomHeader';
 import { Waterfall } from './Waterfall';
-import { SamplePiece, TestPiece } from './Waterfall/sample';
+import { TestPiece } from './Waterfall/sample';
 import { Note } from './Waterfall/types';
 
 const useStyles = makeStyles(theme => ({
