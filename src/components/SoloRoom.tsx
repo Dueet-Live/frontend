@@ -6,9 +6,7 @@ import {
   useTheme,
 } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
 import songsAPI from '../api/songs';
-import { Part } from '../types/messages';
 import { RoomInfo } from '../types/roomInfo';
 import {
   calculateDefaultPianoDimension,
@@ -16,25 +14,15 @@ import {
   calculateKeyHeight,
 } from '../utils/calculateKeyboardDimension';
 import { getKeyboardMappingWithSpecificStart } from '../utils/getKeyboardShorcutsMapping';
-import { getFriendId, getMyPart, getPartsSelection } from '../utils/roomInfo';
-import socket, {
-  addListeners,
-  choosePart,
-  createRoom,
-  joinRoom,
-  playNote,
-  removeRoomStateListeners,
-  stopNote,
-} from '../utils/socket';
 import { useDimensions } from '../utils/useDimensions';
 import useWindowDimensions from '../utils/useWindowDimensions';
-import DuetReadyButton from './DuetReadyButton';
 import InteractivePiano from './InteractivePiano';
-import { PartSelection } from './PartSelection';
-import { PlayerContext } from './PlayerContext';
 import { RoomContext } from './RoomContext';
 import RoomHeader from './RoomHeader';
+import SoloReadyButton from './SoloReadyButton';
 import { Waterfall } from './Waterfall';
+
+const noOp = () => {};
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -55,55 +43,26 @@ const useStyles = makeStyles(theme => ({
     flexGrow: 0,
   },
   readyButton: {
-    // TODO remove absolute spacing (and find better positioning)
-    position: 'absolute',
-    left: theme.spacing(2),
-    top: theme.spacing(6),
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '100%',
   },
 }));
 
-const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
-  maybeRoomId,
-  isCreate,
-}) => {
+const SoloRoom: React.FC = () => {
   const classes = useStyles();
-  const history = useHistory();
 
   // TODO need to ensure that roomstate is reset after playing a song
   const [roomState, setRoomState] = useState({
     players: [],
     id: '',
   } as RoomInfo);
-  const [playerId, setPlayerId] = useState(-1);
-
-  // TODO probably want to refactor these into a single object?
   const [timeToStart, setTimeToStart] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [chosenSongMIDI, setChosenSongMIDI] = useState<any>({});
 
   const { piece } = roomState;
-
-  useEffect(() => {
-    // connect to ws server
-    socket.open();
-
-    addListeners(setPlayerId, setRoomState, setTimeToStart, history);
-    return () => {
-      removeRoomStateListeners();
-      socket.close();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    if (maybeRoomId === null) {
-      createRoom();
-      setPlayerId(-1);
-    } else if (!isCreate) {
-      joinRoom(maybeRoomId);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [maybeRoomId]);
 
   useEffect(() => {
     if (timeToStart <= 0) {
@@ -138,21 +97,17 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
     fetchSongMIDI();
   }, [piece]);
 
-  const friendId = getFriendId(roomState, playerId);
-  const partsSelection = getPartsSelection(roomState);
-  const myPart = getMyPart(roomState, playerId);
-
   // Calculate keyboard dimension
   const tracks = chosenSongMIDI.tracks;
   const [middleBoxDimensions, middleBoxRef] = useDimensions<HTMLDivElement>();
   const { height } = useWindowDimensions();
   const SMALL_START_NOTE = !(isPlaying && tracks)
     ? 72
-    : tracks[myPart === 'primo' ? 0 : 1].smallStartNote;
+    : tracks[0].smallStartNote;
 
   const REGULAR_START_NOTE = !(isPlaying && tracks)
     ? 72
-    : tracks[myPart === 'primo' ? 0 : 1].regularStartNote;
+    : tracks[0].regularStartNote;
 
   const keyboardDimension =
     isPlaying || timeToStart !== 0
@@ -182,21 +137,16 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   // if timeToStart is 0 and playing, show waterfall, music, etc.
   // if timeToStart is 0 and not playing, show the current stuff
   const middleBox = () => {
-    if (isPlaying && tracks) {
-      // at this point, myPart is definitely either primo or secondo, otherwise
-      // game should not have started.
-      const notes = tracks[myPart === 'primo' ? 0 : 1].notes;
-
+    if (isPlaying && tracks)
       return (
         <Waterfall
           {...keyboardDimension}
           dimension={middleBoxDimensions}
           bpm={120}
           beatsPerBar={4}
-          notes={notes}
+          notes={tracks[0].notes}
         />
       );
-    }
 
     if (timeToStart !== 0) {
       return (
@@ -207,19 +157,12 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
     }
 
     return (
-      <>
-        <DuetReadyButton
-          className={classes.readyButton}
+      <div className={classes.readyButton}>
+        <SoloReadyButton
+          handleStart={() => setTimeToStart(3)}
           isPieceDownloaded={!!tracks}
         />
-        <PartSelection
-          primo={partsSelection.primo}
-          secondo={partsSelection.secondo}
-          didSelect={(part: Part) => {
-            choosePart(part);
-          }}
-        />
-      </>
+      </div>
     );
   };
 
@@ -232,45 +175,30 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
         setRoomInfo: setRoomState,
       }}
     >
-      <PlayerContext.Provider
-        value={{
-          me: playerId,
-          friend: friendId,
-        }}
-      >
-        <Box className={classes.root}>
-          {/* header */}
-          <div className={classes.header}>
-            <RoomHeader />
-          </div>
+      <Box className={classes.root}>
+        {/* header */}
+        <div className={classes.header}>
+          <RoomHeader isSolo />
+        </div>
 
-          {/* available space for the rest of the content */}
-          <div ref={middleBoxRef} className={classes.box}>
-            {middleBox()}
-          </div>
+        {/* available space for the rest of the content */}
+        <div ref={middleBoxRef} className={classes.box}>
+          {middleBox()}
+        </div>
 
-          {/* piano */}
-          <div className={classes.piano}>
-            <InteractivePiano
-              {...keyboardDimension}
-              keyHeight={keyHeight}
-              keyboardMap={keyboardMap}
-              didPlayNote={(note, playedBy) => {
-                if (playerId === playedBy) {
-                  playNote(note);
-                }
-              }}
-              didStopNote={(note, playedBy) => {
-                if (playerId === playedBy) {
-                  stopNote(note);
-                }
-              }}
-            />
-          </div>
-        </Box>
-      </PlayerContext.Provider>
+        {/* piano */}
+        <div className={classes.piano}>
+          <InteractivePiano
+            {...keyboardDimension}
+            keyHeight={keyHeight}
+            keyboardMap={keyboardMap}
+            didPlayNote={noOp}
+            didStopNote={noOp}
+          />
+        </div>
+      </Box>
     </RoomContext.Provider>
   );
 };
 
-export default DuetRoom;
+export default SoloRoom;
