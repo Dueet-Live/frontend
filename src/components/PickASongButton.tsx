@@ -14,7 +14,7 @@ import {
 import { ArrowBack, Close, MusicNoteOutlined } from '@material-ui/icons';
 import React, { useContext, useState } from 'react';
 import PickASongIcon from '../icons/PickASongIcon';
-import { RoomInfo } from '../types/RoomInfo';
+import { RoomInfo } from '../types/roomInfo';
 import { getReady } from '../utils/roomInfo';
 import { choosePiece } from '../utils/socket';
 import songList from '../utils/songs';

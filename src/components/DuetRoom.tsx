@@ -7,8 +7,8 @@ import {
 } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { Part } from '../types/Messages';
-import { RoomInfo } from '../types/RoomInfo';
+import { Part } from '../types/messages';
+import { RoomInfo } from '../types/roomInfo';
 import {
   calculateDefaultPianoDimension,
   calculateGamePianoDimension,

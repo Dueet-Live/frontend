@@ -1,7 +1,7 @@
 import { Box, Button, makeStyles, Paper, Typography } from '@material-ui/core';
 import React, { useContext } from 'react';
 import PlayerIcon from '../icons/PlayerIcon';
-import { Part } from '../types/Messages';
+import { Part } from '../types/messages';
 import { getReady } from '../utils/roomInfo';
 import { PlayerContext } from './PlayerContext';
 import { RoomContext } from './RoomContext';

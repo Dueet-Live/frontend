@@ -21,8 +21,8 @@ import {
   START_GAME_NOTIFICATION,
   UnknownErrorResponse,
   UNKNOWN_MESSAGE_RESPONSE,
-} from '../types/Messages';
-import { RoomInfo } from '../types/RoomInfo';
+} from '../types/messages';
+import { RoomInfo } from '../types/roomInfo';
 
 const socket = io(process.env.REACT_APP_WS_URL!, {
   transports: ['websocket', 'polling'],

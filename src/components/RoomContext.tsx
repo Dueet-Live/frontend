@@ -1,5 +1,5 @@
 import React from 'react';
-import { RoomInfo } from '../types/RoomInfo';
+import { RoomInfo } from '../types/roomInfo';
 
 type RoomContextProps = {
   timeToStart: number;
