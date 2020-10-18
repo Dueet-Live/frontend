@@ -1,6 +1,7 @@
 import { createMuiTheme, CssBaseline, ThemeProvider } from '@material-ui/core';
 import React from 'react';
 import AppRouter from './components/AppRouter';
+import NotificationShell from './components/NotificationShell';
 
 const theme = createMuiTheme({
   palette: {
@@ -23,7 +24,9 @@ const App: React.FC = () => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <AppRouter />
+      <NotificationShell>
+        <AppRouter />
+      </NotificationShell>
     </ThemeProvider>
   );
 };
