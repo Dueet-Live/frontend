@@ -7,6 +7,7 @@ import {
 } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
+import songsAPI from '../api/songs';
 import { Part } from '../types/messages';
 import { RoomInfo } from '../types/roomInfo';
 import {
@@ -33,7 +34,6 @@ import ReadyButton from './ReadyButton';
 import { RoomContext } from './RoomContext';
 import RoomHeader from './RoomHeader';
 import { Waterfall } from './Waterfall';
-import { SamplePiece } from './Waterfall/sample';
 import { Note } from './Waterfall/types';
 
 const useStyles = makeStyles(theme => ({
@@ -75,8 +75,13 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
     id: '',
   } as RoomInfo);
   const [playerId, setPlayerId] = useState(-1);
+
+  // TODO probably want to refactor these into a single object?
   const [timeToStart, setTimeToStart] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [chosenSongMIDI, setChosenSongMIDI] = useState<string>('{}');
+
+  const { piece } = roomState;
 
   useEffect(() => {
     // connect to ws server
@@ -114,6 +119,23 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
     }, 1000);
   }, [timeToStart]);
 
+  useEffect(() => {
+    if (piece === undefined) return;
+
+    async function fetchSongMIDI() {
+      try {
+        const song = await songsAPI.getSongWithContent(piece!);
+
+        setChosenSongMIDI(song.content);
+      } catch (err) {
+        // TODO set a notification that it failed to retrieve song
+        // from server
+      }
+    }
+
+    fetchSongMIDI();
+  }, [piece]);
+
   const friendId = getFriendId(roomState, playerId);
   const partsSelection = getPartsSelection(roomState);
 
@@ -145,8 +167,8 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
       : undefined;
 
   // Piece information
-  const piece = JSON.parse(SamplePiece);
-  const notes: Array<Note> = piece.notes; // TODO: get the right notes
+  const pieceMIDI = JSON.parse(chosenSongMIDI);
+  const notes: Array<Note> = pieceMIDI.notes; // TODO: get the right notes
 
   // if timeToStart is not 0,
   //   hide readybutton, partselection, and parts of room header, show number
@@ -154,7 +176,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   // if timeToStart is 0 and playing, show waterfall, music, etc.
   // if timeToStart is 0 and not playing, show the current stuff
   const middleBox = () => {
-    if (isPlaying)
+    if (isPlaying && notes)
       return (
         <Waterfall
           {...keyboardDimension}

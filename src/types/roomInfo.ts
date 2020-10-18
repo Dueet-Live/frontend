@@ -2,6 +2,6 @@ import { PlayerInfo } from './playerInfo';
 
 export type RoomInfo = {
   id: string;
-  piece?: string;
+  piece?: number;
   players: PlayerInfo[];
 };

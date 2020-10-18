@@ -1,6 +1,6 @@
 import { Button, makeStyles } from '@material-ui/core';
 import React from 'react';
-import { SongInfo } from '../types/songInfo';
+import { Song } from '../types/song';
 
 const useStyles = makeStyles({
   root: {
@@ -10,14 +10,14 @@ const useStyles = makeStyles({
 });
 
 const SongCard: React.FC<{
-  songInfo: SongInfo;
+  song: Song;
   onClick: () => void;
-}> = ({ songInfo, onClick }) => {
+}> = ({ song, onClick }) => {
   const classes = useStyles();
 
   return (
     <Button fullWidth onClick={onClick} className={classes.root}>
-      {songInfo.title}
+      {song.name}
     </Button>
   );
 };

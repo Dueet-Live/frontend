@@ -131,7 +131,7 @@ export const choosePart = (id: Part) => {
   socket.emit(CHOOSE_PART_REQUEST, { id });
 };
 
-export function choosePiece(id: string) {
+export function choosePiece(id: number) {
   socket.emit(CHOOSE_PIECE_REQUEST, { id });
 }
 
