@@ -12,13 +12,14 @@ import {
   useTheme,
 } from '@material-ui/core';
 import { ArrowBack, Close, MusicNoteOutlined } from '@material-ui/icons';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import PickASongIcon from '../icons/PickASongIcon';
 import { RoomInfo } from '../types/roomInfo';
-import { Genre, Song } from '../types/song';
-import { getGenres, getSong, getSongs } from '../utils/fromStorage';
 import { getReady } from '../utils/roomInfo';
 import { choosePiece } from '../utils/socket';
+import useGenres from '../utils/useGenres';
+import useSong from '../utils/useSong';
+import useSongs from '../utils/useSongs';
 import GenreCard from './GenreCard';
 import { PlayerContext } from './PlayerContext';
 import { RoomContext } from './RoomContext';
@@ -98,9 +99,6 @@ const DialogTitleWithButtons: React.FC<DialogTitleWithButtonsProps> = ({
 const PickASongButton: React.FC<{ isSolo?: boolean }> = ({ isSolo }) => {
   const [open, setOpen] = useState(false);
   const [genre, setGenre] = useState('');
-  const [genres, setGenres] = useState<Genre[]>([]);
-  const [songs, setSongs] = useState<Song[]>([]);
-  const [chosenSong, setChosenSong] = useState<Song | null>(null);
 
   const classes = useStyles();
   const theme = useTheme();
@@ -111,41 +109,9 @@ const PickASongButton: React.FC<{ isSolo?: boolean }> = ({ isSolo }) => {
   const { me: iAmReady } = getReady(roomInfo, me);
   const { piece } = roomInfo;
 
-  useEffect(() => {
-    async function syncStorage() {
-      try {
-        const genres = await getGenres();
-        const songs = await getSongs(isSolo ? 'solo' : 'duet');
-        setGenres(genres);
-        setSongs(songs);
-      } catch (err) {
-        // TODO what if localforage fails?
-        console.log(err);
-      }
-    }
-
-    syncStorage();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    if (piece === undefined) return;
-
-    async function syncSong() {
-      if (piece === undefined) return;
-
-      try {
-        const song = await getSong(piece);
-
-        setChosenSong(song);
-      } catch (err) {
-        // TODO what if localforage fails?
-        console.log(err);
-      }
-    }
-
-    syncSong();
-  }, [piece]);
+  const genres = useGenres();
+  const songs = useSongs(isSolo ? 'solo' : 'duet');
+  const chosenSong = useSong(piece);
 
   const handleOpen = () => {
     setOpen(true);

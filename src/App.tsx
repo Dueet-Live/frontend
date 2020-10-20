@@ -5,7 +5,7 @@ import genresAPI from './api/genres';
 import songsAPI from './api/songs';
 import AppRouter from './components/AppRouter';
 import NotificationShell from './components/NotificationShell';
-import { GENRES, SONGS } from './utils/fromStorage';
+import { GENRES, SONGS } from './utils/extendedLocalForage';
 
 const theme = createMuiTheme({
   palette: {
