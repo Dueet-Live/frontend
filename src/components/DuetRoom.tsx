@@ -23,6 +23,7 @@ import socket, {
   createRoom,
   joinRoom,
   playNote,
+  removeRoomStateListeners,
   stopNote,
 } from '../utils/socket';
 import { useDimensions } from '../utils/useDimensions';
@@ -88,6 +89,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
 
     addListeners(setPlayerId, setRoomState, setTimeToStart, history);
     return () => {
+      removeRoomStateListeners();
       socket.close();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

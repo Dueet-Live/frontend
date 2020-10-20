@@ -89,6 +89,14 @@ export function addListeners(
     setTimeToStart(inSeconds);
   });
 }
+export function removeRoomStateListeners() {
+  socket.removeEventListener(CREATE_ROOM_RESPONSE);
+  socket.removeEventListener(MALFORMED_MESSAGE_RESPONSE);
+  socket.removeEventListener(UNKNOWN_MESSAGE_RESPONSE);
+  socket.removeEventListener(JOIN_ROOM_RESPONSE);
+  socket.removeEventListener(ROOM_INFO_UPDATED_NOTIFICATION);
+  socket.removeEventListener(START_GAME_NOTIFICATION);
+}
 
 export function addNotePlayListener(
   handleNotePlayByFriend: (note: number) => void,
