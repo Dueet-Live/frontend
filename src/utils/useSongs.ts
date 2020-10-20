@@ -9,8 +9,7 @@ export default function useSongs(type: 'solo' | 'duet') {
     let songSubscription: Subscription;
 
     async function setupHook() {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const _ = await localforage.ready();
+      await localforage.ready();
       const songObservable = localforage.getItemObservable(SONGS);
       songSubscription = songObservable.subscribe({
         next: (songs: unknown) => {

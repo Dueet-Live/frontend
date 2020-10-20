@@ -9,8 +9,7 @@ export default function useGenres() {
     let genreSubscription: Subscription;
 
     async function setupHook() {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const _ = await localforage.ready();
+      await localforage.ready();
       const genreObservable = localforage.getItemObservable(GENRES);
       genreSubscription = genreObservable.subscribe({
         next: (genres: unknown) => {
