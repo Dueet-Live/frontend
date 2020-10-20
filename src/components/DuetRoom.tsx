@@ -122,8 +122,9 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
     if (piece === undefined) return;
 
     async function fetchSongMIDI() {
+      if (piece === undefined) return;
       try {
-        const song = await songsAPI.getSongWithContent(piece!);
+        const song = await songsAPI.getSongWithContent(piece);
 
         setChosenSongMIDI(JSON.parse(song.content));
       } catch (err) {
