@@ -26,9 +26,7 @@ export async function getSongs(type: 'solo' | 'duet', genre?: string) {
   );
 }
 
-export async function getSong(id: number | undefined) {
-  if (id === undefined) return null;
-
+export async function getSong(id: number) {
   const songs: Song[] | null = await localforage.getItem(SONGS);
 
   if (songs === null) {

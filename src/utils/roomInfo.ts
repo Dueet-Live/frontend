@@ -32,6 +32,19 @@ export function getPartsSelection(roomState: RoomInfo) {
   return { primo, secondo };
 }
 
+export function getMyPart(roomState: RoomInfo, myId: number) {
+  const players = roomState.players;
+  if (!players) return null;
+
+  for (const player of players) {
+    if (player.id === myId) {
+      return player.assignedPart;
+    }
+  }
+  // this should never happen
+  return null;
+}
+
 export function getReady(roomState: RoomInfo, myId: number) {
   const players = roomState.players;
   if (!players) {

@@ -129,9 +129,11 @@ const PickASongButton: React.FC<{ isSolo?: boolean }> = ({ isSolo }) => {
   }, []);
 
   useEffect(() => {
+    if (piece === undefined) return;
+
     async function syncSong() {
       try {
-        const song = await getSong(piece);
+        const song = await getSong(piece!);
 
         setChosenSong(song);
       } catch (err) {

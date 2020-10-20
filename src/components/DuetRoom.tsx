@@ -16,7 +16,7 @@ import {
   calculateKeyHeight,
 } from '../utils/calculateKeyboardDimension';
 import { getKeyboardMappingWithSpecificStart } from '../utils/getKeyboardShorcutsMapping';
-import { getFriendId, getPartsSelection } from '../utils/roomInfo';
+import { getFriendId, getMyPart, getPartsSelection } from '../utils/roomInfo';
 import socket, {
   addListeners,
   choosePart,
@@ -34,7 +34,6 @@ import ReadyButton from './ReadyButton';
 import { RoomContext } from './RoomContext';
 import RoomHeader from './RoomHeader';
 import { Waterfall } from './Waterfall';
-import { Note } from './Waterfall/types';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -79,7 +78,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   // TODO probably want to refactor these into a single object?
   const [timeToStart, setTimeToStart] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [chosenSongMIDI, setChosenSongMIDI] = useState<string>('{}');
+  const [chosenSongMIDI, setChosenSongMIDI] = useState<any>({});
 
   const { piece } = roomState;
 
@@ -126,7 +125,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
       try {
         const song = await songsAPI.getSongWithContent(piece!);
 
-        setChosenSongMIDI(song.content);
+        setChosenSongMIDI(JSON.parse(song.content));
       } catch (err) {
         // TODO set a notification that it failed to retrieve song
         // from server
@@ -138,6 +137,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
 
   const friendId = getFriendId(roomState, playerId);
   const partsSelection = getPartsSelection(roomState);
+  const myPart = getMyPart(roomState, playerId);
 
   // Calculate keyboard dimension
   const [middleBoxDimensions, middleBoxRef] = useDimensions<HTMLDivElement>();
@@ -167,8 +167,6 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
       : undefined;
 
   // Piece information
-  const pieceMIDI = JSON.parse(chosenSongMIDI);
-  const notes: Array<Note> = pieceMIDI.notes; // TODO: get the right notes
 
   // if timeToStart is not 0,
   //   hide readybutton, partselection, and parts of room header, show number
@@ -176,7 +174,14 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   // if timeToStart is 0 and playing, show waterfall, music, etc.
   // if timeToStart is 0 and not playing, show the current stuff
   const middleBox = () => {
-    if (isPlaying && notes)
+    const tracks = chosenSongMIDI.tracks;
+
+    if (isPlaying && tracks) {
+      // at this point, myPart is definitely either primo or secondo, otherwise
+      // game should not have started.
+      // TODO change to 1 when the hardcoded TEST starting notes are changed
+      const notes = tracks[myPart === 'primo' ? 0 : 0].notes;
+
       return (
         <Waterfall
           {...keyboardDimension}
@@ -186,6 +191,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
           notes={notes}
         />
       );
+    }
 
     if (timeToStart !== 0) {
       return (
