@@ -203,7 +203,10 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
 
     return (
       <>
-        <ReadyButton className={classes.readyButton} />
+        <ReadyButton
+          className={classes.readyButton}
+          isPieceDownloaded={!!tracks}
+        />
         <PartSelection
           primo={partsSelection.primo}
           secondo={partsSelection.secondo}

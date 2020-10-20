@@ -35,7 +35,7 @@ const App: React.FC = () => {
         await localforage.setItem(GENRES, genres);
         await localforage.setItem(SONGS, songs);
       } catch (err) {
-        // handle error
+        // TODO handle error
         console.log(err);
       }
     }

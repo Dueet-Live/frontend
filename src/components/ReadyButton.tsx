@@ -5,7 +5,11 @@ import { updateReady } from '../utils/socket';
 import { PlayerContext } from './PlayerContext';
 import { RoomContext } from './RoomContext';
 
-const ReadyButton: React.FC<ButtonProps> = props => {
+type Props = ButtonProps & {
+  isPieceDownloaded: boolean;
+};
+
+const ReadyButton: React.FC<Props> = ({ isPieceDownloaded, ...props }) => {
   const { roomInfo } = useContext(RoomContext);
   const { me, friend } = useContext(PlayerContext);
 
@@ -28,7 +32,8 @@ const ReadyButton: React.FC<ButtonProps> = props => {
     piece === undefined ||
     (primo.length === 0 && !ready.me) ||
     (secondo.length === 0 && !ready.me) ||
-    (ready.me && ready.friend);
+    (ready.me && ready.friend) ||
+    !isPieceDownloaded;
 
   return (
     <Button
