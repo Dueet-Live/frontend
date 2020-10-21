@@ -143,16 +143,23 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   const myPart = getMyPart(roomState, playerId);
 
   // Calculate keyboard dimension
+  const tracks = chosenSongMIDI.tracks;
   const [middleBoxDimensions, middleBoxRef] = useDimensions<HTMLDivElement>();
   const { height } = useWindowDimensions();
-  const TEST_SMALL_START_NOTE = 72;
-  const TEST_REGULAR_START_NOTE = 72;
+  const SMALL_START_NOTE = !(isPlaying && tracks)
+    ? 72
+    : tracks[myPart === 'primo' ? 0 : 1].smallStartNote;
+
+  const REGULAR_START_NOTE = !(isPlaying && tracks)
+    ? 72
+    : tracks[myPart === 'primo' ? 0 : 1].regularStartNote;
+
   const keyboardDimension =
     isPlaying || timeToStart !== 0
       ? calculateGamePianoDimension(
           middleBoxDimensions.width,
-          TEST_SMALL_START_NOTE,
-          TEST_REGULAR_START_NOTE
+          SMALL_START_NOTE,
+          REGULAR_START_NOTE
         )
       : calculateDefaultPianoDimension(middleBoxDimensions.width);
   const keyHeight = calculateKeyHeight(height);
@@ -163,13 +170,11 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   const keyboardMap =
     (isPlaying || timeToStart !== 0) && isDesktopView
       ? getKeyboardMappingWithSpecificStart(
-          TEST_REGULAR_START_NOTE,
+          REGULAR_START_NOTE,
           keyboardDimension['start'],
           keyboardDimension['range']
         )
       : undefined;
-
-  // Piece information
 
   // if timeToStart is not 0,
   //   hide readybutton, partselection, and parts of room header, show number
@@ -177,13 +182,10 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   // if timeToStart is 0 and playing, show waterfall, music, etc.
   // if timeToStart is 0 and not playing, show the current stuff
   const middleBox = () => {
-    const tracks = chosenSongMIDI.tracks;
-
     if (isPlaying && tracks) {
       // at this point, myPart is definitely either primo or secondo, otherwise
       // game should not have started.
-      // TODO change to 1 when the hardcoded TEST starting notes are changed
-      const notes = tracks[myPart === 'primo' ? 0 : 0].notes;
+      const notes = tracks[myPart === 'primo' ? 0 : 1].notes;
 
       return (
         <Waterfall
