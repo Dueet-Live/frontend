@@ -13,6 +13,7 @@ const Solo: React.FC = () => {
   const keyHeight = calculateKeyHeight(height);
   const piano = (
     <InteractivePiano
+      includeOctaveShift
       {...keyboardDimension}
       keyHeight={keyHeight}
       didPlayNote={(note, playerId) => {
