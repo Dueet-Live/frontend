@@ -7,6 +7,7 @@ import './InteractivePiano.css';
 import { useTheme, useMediaQuery } from '@material-ui/core';
 
 type Props = {
+  includeOctaveShift: boolean;
   start: number;
   range: number;
   keyWidth: number;
@@ -17,6 +18,7 @@ type Props = {
 };
 
 const InteractivePiano: React.FC<Props> = ({
+  includeOctaveShift = true,
   start,
   range,
   keyWidth,
@@ -45,8 +47,8 @@ const InteractivePiano: React.FC<Props> = ({
 
   const shiftUpOctave = () => {
     let newEndNote = Math.min(endNote + 12, highestMidiNote);
-    if (newEndNote !== highestMidiNote && newEndNote % 12 !== 11) {
-      newEndNote -= (newEndNote % 12) + 1;
+    if (newEndNote !== highestMidiNote && newEndNote % 12 !== 0) {
+      newEndNote -= newEndNote % 12;
     }
     const diff = newEndNote - endNote;
     setStartNote(startNote + diff);
@@ -60,12 +62,15 @@ const InteractivePiano: React.FC<Props> = ({
 
   return (
     <PianoContainer>
-      <OctaveShiftKey
-        type="left"
-        keyHeight={keyHeight}
-        onClick={shiftDownOctave}
-        disabled={startNote === lowestMidiNote}
-      />
+      {includeOctaveShift && (
+        <OctaveShiftKey
+          type="left"
+          keyHeight={keyHeight}
+          onClick={shiftDownOctave}
+          disabled={startNote === lowestMidiNote}
+        />
+      )}
+
       <Piano
         startNote={startNote}
         endNote={endNote}
@@ -75,12 +80,14 @@ const InteractivePiano: React.FC<Props> = ({
         didPlayNote={didPlayNote}
         didStopNote={didStopNote}
       />
-      <OctaveShiftKey
-        type="right"
-        keyHeight={keyHeight}
-        onClick={shiftUpOctave}
-        disabled={endNote === highestMidiNote}
-      />
+      {includeOctaveShift && (
+        <OctaveShiftKey
+          type="right"
+          keyHeight={keyHeight}
+          onClick={shiftUpOctave}
+          disabled={endNote === highestMidiNote}
+        />
+      )}
     </PianoContainer>
   );
 };

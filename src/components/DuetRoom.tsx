@@ -143,32 +143,32 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   const myPart = getMyPart(roomState, playerId);
 
   // Calculate keyboard dimension
+  const isGameMode = isPlaying || timeToStart > 0;
   const tracks = chosenSongMIDI.tracks;
   const [middleBoxDimensions, middleBoxRef] = useDimensions<HTMLDivElement>();
   const { height } = useWindowDimensions();
-  const SMALL_START_NOTE = !(isPlaying && tracks)
+  const SMALL_START_NOTE = !(isGameMode && tracks)
     ? 72
     : tracks[myPart === 'primo' ? 0 : 1].smallStartNote;
 
-  const REGULAR_START_NOTE = !(isPlaying && tracks)
+  const REGULAR_START_NOTE = !(isGameMode && tracks)
     ? 72
     : tracks[myPart === 'primo' ? 0 : 1].regularStartNote;
 
-  const keyboardDimension =
-    isPlaying || timeToStart !== 0
-      ? calculateGamePianoDimension(
-          middleBoxDimensions.width,
-          SMALL_START_NOTE,
-          REGULAR_START_NOTE
-        )
-      : calculateDefaultPianoDimension(middleBoxDimensions.width);
+  const keyboardDimension = isGameMode
+    ? calculateGamePianoDimension(
+        middleBoxDimensions.width,
+        SMALL_START_NOTE,
+        REGULAR_START_NOTE
+      )
+    : calculateDefaultPianoDimension(middleBoxDimensions.width);
   const keyHeight = calculateKeyHeight(height);
 
-  // Get keyboard mapping
+  // Get custom keyboard mapping for game
   const theme = useTheme();
   const isDesktopView = useMediaQuery(theme.breakpoints.up('md'));
   const keyboardMap =
-    (isPlaying || timeToStart !== 0) && isDesktopView
+    isGameMode && isDesktopView
       ? getKeyboardMappingWithSpecificStart(
           REGULAR_START_NOTE,
           keyboardDimension['start'],
@@ -241,7 +241,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
         <Box className={classes.root}>
           {/* header */}
           <div className={classes.header}>
-            <DuetRoomHeader isPlaying={isPlaying || timeToStart > 0} />
+            <DuetRoomHeader isPlaying={isGameMode} />
           </div>
 
           {/* available space for the rest of the content */}
@@ -252,6 +252,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
           {/* piano */}
           <div className={classes.piano}>
             <InteractivePiano
+              includeOctaveShift={!isGameMode}
               {...keyboardDimension}
               keyHeight={keyHeight}
               keyboardMap={keyboardMap}
