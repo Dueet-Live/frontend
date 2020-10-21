@@ -18,8 +18,8 @@ import { useDimensions } from '../utils/useDimensions';
 import useWindowDimensions from '../utils/useWindowDimensions';
 import InteractivePiano from './InteractivePiano';
 import { RoomContext } from './RoomContext';
-import RoomHeader from './RoomHeader';
 import SoloReadyButton from './SoloReadyButton';
+import SoloRoomHeader from './SoloRoomHeader';
 import { Waterfall } from './Waterfall';
 
 const noOp = () => {};
@@ -177,7 +177,7 @@ const SoloRoom: React.FC = () => {
       <Box className={classes.root}>
         {/* header */}
         <div className={classes.header}>
-          <RoomHeader isSolo isPlaying={isPlaying || timeToStart > 0} />
+          <SoloRoomHeader isPlaying={isPlaying || timeToStart > 0} />
         </div>
 
         {/* available space for the rest of the content */}

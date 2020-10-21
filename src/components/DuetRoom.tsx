@@ -29,11 +29,11 @@ import socket, {
 import { useDimensions } from '../utils/useDimensions';
 import useWindowDimensions from '../utils/useWindowDimensions';
 import DuetReadyButton from './DuetReadyButton';
+import DuetRoomHeader from './DuetRoomHeader';
 import InteractivePiano from './InteractivePiano';
 import { PartSelection } from './PartSelection';
 import { PlayerContext } from './PlayerContext';
 import { RoomContext } from './RoomContext';
-import RoomHeader from './RoomHeader';
 import { Waterfall } from './Waterfall';
 
 const useStyles = makeStyles(theme => ({
@@ -241,7 +241,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
         <Box className={classes.root}>
           {/* header */}
           <div className={classes.header}>
-            <RoomHeader isPlaying={isPlaying || timeToStart > 0} />
+            <DuetRoomHeader isPlaying={isPlaying || timeToStart > 0} />
           </div>
 
           {/* available space for the rest of the content */}

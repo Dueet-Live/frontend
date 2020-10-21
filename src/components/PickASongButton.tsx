@@ -96,10 +96,7 @@ const DialogTitleWithButtons: React.FC<DialogTitleWithButtonsProps> = ({
   );
 };
 
-const PickASongButton: React.FC<{ isPlaying: boolean; isSolo?: boolean }> = ({
-  isPlaying,
-  isSolo,
-}) => {
+const PickASongButton: React.FC<{ isPlaying: boolean }> = ({ isPlaying }) => {
   const [open, setOpen] = useState(false);
   const [genre, setGenre] = useState('');
 
@@ -113,7 +110,7 @@ const PickASongButton: React.FC<{ isPlaying: boolean; isSolo?: boolean }> = ({
   const { piece } = roomInfo;
 
   const genres = useGenres();
-  const songs = useSongs(isSolo ? 'solo' : 'duet');
+  const songs = useSongs('duet');
   const chosenSong = useSong(piece);
 
   const handleOpen = () => {
@@ -187,7 +184,7 @@ const PickASongButton: React.FC<{ isPlaying: boolean; isSolo?: boolean }> = ({
         {chosenSong === null ? (
           <>
             <PickASongIcon className={classes.icon} />
-            <Typography variant="body1">Pick a song</Typography>
+            <Typography variant="body1">No song selected</Typography>
           </>
         ) : (
           <>

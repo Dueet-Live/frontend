@@ -1,10 +1,8 @@
 import {
-  AppBar,
   Box,
   IconButton,
   Link,
   makeStyles,
-  Toolbar,
   Typography,
 } from '@material-ui/core';
 import { ArrowBack } from '@material-ui/icons';
@@ -14,14 +12,9 @@ import PlayerIcon from '../icons/PlayerIcon';
 import SettingsIcon from '../icons/SettingsIcon';
 import PickASongButton from './PickASongButton';
 import { PlayerContext } from './PlayerContext';
+import RoomHeader from './shared/RoomHeader';
 
 const useStyles = makeStyles(theme => ({
-  root: {
-    flexGrow: 1,
-  },
-  appBar: {
-    backgroundColor: '#FFF',
-  },
   icon: {
     marginRight: theme.spacing(1),
   },
@@ -37,17 +30,12 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const RoomHeader: React.FC<{ isSolo?: boolean; isPlaying: boolean }> = ({
-  isSolo,
-  isPlaying,
-}) => {
+const DuetRoomHeader: React.FC<{ isPlaying: boolean }> = ({ isPlaying }) => {
   const classes = useStyles();
   const history = useHistory();
   const { me, friend } = useContext(PlayerContext);
 
   const roomDetails = () => {
-    if (isSolo) return <></>;
-
     if (me === -1) {
       // TODO: add a border like how it looks in the mockup
       return (
@@ -81,29 +69,24 @@ const RoomHeader: React.FC<{ isSolo?: boolean; isPlaying: boolean }> = ({
   };
 
   return (
-    <div className={classes.root}>
-      <AppBar position="absolute" className={classes.appBar}>
-        <Toolbar>
-          <IconButton
-            edge="start"
-            className={classes.icon}
-            size="small"
-            onClick={() => history.push('/')}
-          >
-            <ArrowBack />
-          </IconButton>
-          {/* TODO Make this button responsive. It should truncate when too long */}
-          <PickASongButton isSolo={isSolo} isPlaying={isPlaying} />
-          <Box component="span" className={classes.empty} />
-          {roomDetails()}
-          <IconButton edge="end" size="small" className={classes.settingIcon}>
-            <SettingsIcon />
-          </IconButton>
-        </Toolbar>
-      </AppBar>
-      <Toolbar /> {/* To take up space */}
-    </div>
+    <RoomHeader>
+      <IconButton
+        edge="start"
+        className={classes.icon}
+        size="small"
+        onClick={() => history.push('/')}
+      >
+        <ArrowBack />
+      </IconButton>
+      {/* TODO Make this button responsive. It should truncate when too long */}
+      <PickASongButton isPlaying={isPlaying} />
+      <Box component="span" className={classes.empty} />
+      {roomDetails()}
+      <IconButton edge="end" size="small" className={classes.settingIcon}>
+        <SettingsIcon />
+      </IconButton>
+    </RoomHeader>
   );
 };
 
-export default RoomHeader;
+export default DuetRoomHeader;
