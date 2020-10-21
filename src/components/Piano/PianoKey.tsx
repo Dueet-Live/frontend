@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import * as Tone from 'tone';
+import { PlayingNote } from '../../types/playingNote';
 import {
   calculateBlackKeyHeight,
   calculateBlackKeyWidth,
 } from '../../utils/calculateKeyboardDimension';
-import isAccidentalNote from './utils/isAccidentalNote';
 import AccidentalKey from './AccidentalKey';
 import NaturalKey from './NaturalKey';
-import { PlayingNote } from '../../types/PlayingNote';
+import isAccidentalNote from './utils/isAccidentalNote';
 
 type Props = {
   note: number;

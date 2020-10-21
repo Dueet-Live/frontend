@@ -1,15 +1,15 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
-import PianoKey from './PianoKey';
-import { PlayerContext } from '../PlayerContext';
-import getNotesBetween from './utils/getNotesBetween';
+import { PlayingNote } from '../../types/playingNote';
 import { getKeyboardShortcutForNote } from '../../utils/getKeyboardShorcutsMapping';
-import '../InteractivePiano.css';
-import { PlayingNote } from '../../types/PlayingNote';
-import InstrumentAudio from './InstrumentAudio';
 import {
   addNotePlayListener,
   removeNotePlayListener,
 } from '../../utils/socket';
+import '../InteractivePiano.css';
+import { PlayerContext } from '../PlayerContext';
+import InstrumentAudio from './InstrumentAudio';
+import PianoKey from './PianoKey';
+import getNotesBetween from './utils/getNotesBetween';
 
 type Props = {
   startNote: number;

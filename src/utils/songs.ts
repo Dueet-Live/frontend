@@ -1,6 +1,6 @@
 // Temporary file, will be removed when the backend is setup
 
-import { SongInfo } from '../types/SongInfo';
+import { SongInfo } from '../types/songInfo';
 
 // might want to change the format next time
 const songList: { [genre: string]: SongInfo[] } = {

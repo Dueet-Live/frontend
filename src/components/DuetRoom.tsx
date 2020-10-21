@@ -7,21 +7,23 @@ import {
 } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { Part } from '../types/Messages';
-import { RoomInfo } from '../types/RoomInfo';
+import songsAPI from '../api/songs';
+import { Part } from '../types/messages';
+import { RoomInfo } from '../types/roomInfo';
 import {
   calculateDefaultPianoDimension,
   calculateGamePianoDimension,
   calculateKeyHeight,
 } from '../utils/calculateKeyboardDimension';
 import { getKeyboardMappingWithSpecificStart } from '../utils/getKeyboardShorcutsMapping';
-import { getFriendId, getPartsSelection } from '../utils/roomInfo';
+import { getFriendId, getMyPart, getPartsSelection } from '../utils/roomInfo';
 import socket, {
   addListeners,
   choosePart,
   createRoom,
   joinRoom,
   playNote,
+  removeRoomStateListeners,
   stopNote,
 } from '../utils/socket';
 import { useDimensions } from '../utils/useDimensions';
@@ -33,8 +35,6 @@ import ReadyButton from './ReadyButton';
 import { RoomContext } from './RoomContext';
 import RoomHeader from './RoomHeader';
 import { Waterfall } from './Waterfall';
-import { SamplePiece } from './Waterfall/sample';
-import { Note } from './Waterfall/types';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -75,8 +75,13 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
     id: '',
   } as RoomInfo);
   const [playerId, setPlayerId] = useState(-1);
+
+  // TODO probably want to refactor these into a single object?
   const [timeToStart, setTimeToStart] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [chosenSongMIDI, setChosenSongMIDI] = useState<any>({});
+
+  const { piece } = roomState;
 
   useEffect(() => {
     // connect to ws server
@@ -84,6 +89,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
 
     addListeners(setPlayerId, setRoomState, setTimeToStart, history);
     return () => {
+      removeRoomStateListeners();
       socket.close();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -114,20 +120,46 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
     }, 1000);
   }, [timeToStart]);
 
+  useEffect(() => {
+    if (piece === undefined) return;
+
+    async function fetchSongMIDI() {
+      if (piece === undefined) return;
+      try {
+        const song = await songsAPI.getSongWithContent(piece);
+
+        setChosenSongMIDI(JSON.parse(song.content));
+      } catch (err) {
+        // TODO set a notification that it failed to retrieve song
+        // from server
+      }
+    }
+
+    fetchSongMIDI();
+  }, [piece]);
+
   const friendId = getFriendId(roomState, playerId);
   const partsSelection = getPartsSelection(roomState);
+  const myPart = getMyPart(roomState, playerId);
 
   // Calculate keyboard dimension
+  const tracks = chosenSongMIDI.tracks;
   const [middleBoxDimensions, middleBoxRef] = useDimensions<HTMLDivElement>();
   const { height } = useWindowDimensions();
-  const TEST_SMALL_START_NOTE = 72;
-  const TEST_REGULAR_START_NOTE = 72;
+  const SMALL_START_NOTE = !(isPlaying && tracks)
+    ? 72
+    : tracks[myPart === 'primo' ? 0 : 1].smallStartNote;
+
+  const REGULAR_START_NOTE = !(isPlaying && tracks)
+    ? 72
+    : tracks[myPart === 'primo' ? 0 : 1].regularStartNote;
+
   const keyboardDimension =
     isPlaying || timeToStart !== 0
       ? calculateGamePianoDimension(
           middleBoxDimensions.width,
-          TEST_SMALL_START_NOTE,
-          TEST_REGULAR_START_NOTE
+          SMALL_START_NOTE,
+          REGULAR_START_NOTE
         )
       : calculateDefaultPianoDimension(middleBoxDimensions.width);
   const keyHeight = calculateKeyHeight(height);
@@ -138,15 +170,11 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   const keyboardMap =
     (isPlaying || timeToStart !== 0) && isDesktopView
       ? getKeyboardMappingWithSpecificStart(
-          TEST_REGULAR_START_NOTE,
+          REGULAR_START_NOTE,
           keyboardDimension['start'],
           keyboardDimension['range']
         )
       : undefined;
-
-  // Piece information
-  const piece = JSON.parse(SamplePiece);
-  const notes: Array<Note> = piece.notes; // TODO: get the right notes
 
   // if timeToStart is not 0,
   //   hide readybutton, partselection, and parts of room header, show number
@@ -154,7 +182,11 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   // if timeToStart is 0 and playing, show waterfall, music, etc.
   // if timeToStart is 0 and not playing, show the current stuff
   const middleBox = () => {
-    if (isPlaying)
+    if (isPlaying && tracks) {
+      // at this point, myPart is definitely either primo or secondo, otherwise
+      // game should not have started.
+      const notes = tracks[myPart === 'primo' ? 0 : 1].notes;
+
       return (
         <Waterfall
           {...keyboardDimension}
@@ -164,6 +196,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
           notes={notes}
         />
       );
+    }
 
     if (timeToStart !== 0) {
       return (
@@ -175,7 +208,10 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
 
     return (
       <>
-        <ReadyButton className={classes.readyButton} />
+        <ReadyButton
+          className={classes.readyButton}
+          isPieceDownloaded={!!tracks}
+        />
         <PartSelection
           primo={partsSelection.primo}
           secondo={partsSelection.secondo}

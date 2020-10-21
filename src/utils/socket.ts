@@ -21,8 +21,8 @@ import {
   START_GAME_NOTIFICATION,
   UnknownErrorResponse,
   UNKNOWN_MESSAGE_RESPONSE,
-} from '../types/Messages';
-import { RoomInfo } from '../types/RoomInfo';
+} from '../types/messages';
+import { RoomInfo } from '../types/roomInfo';
 
 const socket = io(process.env.REACT_APP_WS_URL!, {
   transports: ['websocket', 'polling'],
@@ -89,6 +89,14 @@ export function addListeners(
     setTimeToStart(inSeconds);
   });
 }
+export function removeRoomStateListeners() {
+  socket.removeEventListener(CREATE_ROOM_RESPONSE);
+  socket.removeEventListener(MALFORMED_MESSAGE_RESPONSE);
+  socket.removeEventListener(UNKNOWN_MESSAGE_RESPONSE);
+  socket.removeEventListener(JOIN_ROOM_RESPONSE);
+  socket.removeEventListener(ROOM_INFO_UPDATED_NOTIFICATION);
+  socket.removeEventListener(START_GAME_NOTIFICATION);
+}
 
 export function addNotePlayListener(
   handleNotePlayByFriend: (note: number) => void,
@@ -131,7 +139,7 @@ export const choosePart = (id: Part) => {
   socket.emit(CHOOSE_PART_REQUEST, { id });
 };
 
-export function choosePiece(id: string) {
+export function choosePiece(id: number) {
   socket.emit(CHOOSE_PIECE_REQUEST, { id });
 }
 

@@ -14,10 +14,12 @@ import {
 import { ArrowBack, Close, MusicNoteOutlined } from '@material-ui/icons';
 import React, { useContext, useState } from 'react';
 import PickASongIcon from '../icons/PickASongIcon';
-import { RoomInfo } from '../types/RoomInfo';
+import { RoomInfo } from '../types/roomInfo';
 import { getReady } from '../utils/roomInfo';
 import { choosePiece } from '../utils/socket';
-import songList from '../utils/songs';
+import useGenres from '../utils/useGenres';
+import useSong from '../utils/useSong';
+import useSongs from '../utils/useSongs';
 import GenreCard from './GenreCard';
 import { PlayerContext } from './PlayerContext';
 import { RoomContext } from './RoomContext';
@@ -96,8 +98,8 @@ const DialogTitleWithButtons: React.FC<DialogTitleWithButtonsProps> = ({
 
 const PickASongButton: React.FC<{ isSolo?: boolean }> = ({ isSolo }) => {
   const [open, setOpen] = useState(false);
-
   const [genre, setGenre] = useState('');
+
   const classes = useStyles();
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('xs'));
@@ -106,6 +108,10 @@ const PickASongButton: React.FC<{ isSolo?: boolean }> = ({ isSolo }) => {
   const { me } = useContext(PlayerContext);
   const { me: iAmReady } = getReady(roomInfo, me);
   const { piece } = roomInfo;
+
+  const genres = useGenres();
+  const songs = useSongs(isSolo ? 'solo' : 'duet');
+  const chosenSong = useSong(piece);
 
   const handleOpen = () => {
     setOpen(true);
@@ -122,9 +128,12 @@ const PickASongButton: React.FC<{ isSolo?: boolean }> = ({ isSolo }) => {
           Choose a Genre
         </DialogTitleWithButtons>
         <List className={classes.genreContainer}>
-          {Object.keys(songList).map(genre => (
-            <ListItem key={genre}>
-              <GenreCard genre={genre} onClick={() => setGenre(genre)} />
+          {genres.map(genre => (
+            <ListItem key={genre.id}>
+              <GenreCard
+                genre={genre.name}
+                onClick={() => setGenre(genre.name)}
+              />
             </ListItem>
           ))}
         </List>
@@ -142,21 +151,24 @@ const PickASongButton: React.FC<{ isSolo?: boolean }> = ({ isSolo }) => {
           Choose a Song
         </DialogTitleWithButtons>
         <List className={classes.songContainer}>
-          {songList[genre].map(songInfo => (
-            <ListItem key={songInfo.id}>
-              <SongCard
-                songInfo={songInfo}
-                onClick={() => {
-                  choosePiece(songInfo.id);
-                  setRoomInfo((prevState: RoomInfo) => ({
-                    ...prevState,
-                    piece: songInfo.id,
-                  }));
-                  handleClose();
-                }}
-              />
-            </ListItem>
-          ))}
+          {songs
+            .filter(song => song.genre.name === genre)
+            .map(song => (
+              <ListItem key={song.id}>
+                <SongCard
+                  song={song}
+                  onClick={() => {
+                    choosePiece(song.id);
+                    // pre-empt, and for SoloRoom
+                    setRoomInfo((prevState: RoomInfo) => ({
+                      ...prevState,
+                      piece: song.id,
+                    }));
+                    handleClose();
+                  }}
+                />
+              </ListItem>
+            ))}
         </List>
       </>
     );
@@ -169,7 +181,7 @@ const PickASongButton: React.FC<{ isSolo?: boolean }> = ({ isSolo }) => {
         onClick={handleOpen}
         disabled={iAmReady}
       >
-        {piece === undefined ? (
+        {chosenSong === null ? (
           <>
             <PickASongIcon className={classes.icon} />
             <Typography variant="body1">Pick a song</Typography>
@@ -177,10 +189,7 @@ const PickASongButton: React.FC<{ isSolo?: boolean }> = ({ isSolo }) => {
         ) : (
           <>
             <MusicNoteOutlined className={classes.icon} />
-            {/* TODO REMOVE HARDCODING */}
-            <Typography variant="body1">
-              Dance of the Sugar Plum Fairy
-            </Typography>
+            <Typography variant="body1">{chosenSong.name}</Typography>
           </>
         )}
       </Button>
