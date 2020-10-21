@@ -11,6 +11,7 @@ import { useHistory } from 'react-router-dom';
 import { RoomView, RoomContext } from '../../contexts/RoomContext';
 import SettingsIcon from '../../icons/SettingsIcon';
 import useSong from '../../utils/useSong';
+import ProgressBar from '../ProgressBar';
 import RoomHeader from '../shared/RoomHeader';
 
 const useStyles = makeStyles(theme => ({
@@ -20,7 +21,6 @@ const useStyles = makeStyles(theme => ({
   settingIcon: {
     marginLeft: theme.spacing(1),
   },
-
   link: {
     color: '#0000EE',
   },
@@ -31,6 +31,10 @@ const useStyles = makeStyles(theme => ({
     position: 'absolute',
     left: '50%',
     transform: 'translate(-50%)',
+  },
+  progressBar: {
+    flexGrow: 1,
+    marginRight: theme.spacing(1),
   },
 }));
 
@@ -112,6 +116,9 @@ const SoloRoomHeader: React.FC<Props> = ({
       {backButton()}
       {centerComponents()}
       <Box component="span" className={classes.empty} />
+      <div className={classes.progressBar}>
+        {view === 'solo.play' && <ProgressBar duration={126} started={false} />}
+      </div>
       <IconButton edge="end" size="small" className={classes.settingIcon}>
         <SettingsIcon />
       </IconButton>

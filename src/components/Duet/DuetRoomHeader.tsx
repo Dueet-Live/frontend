@@ -15,6 +15,7 @@ import PlayerIcon from '../../icons/PlayerIcon';
 import SettingsIcon from '../../icons/SettingsIcon';
 import { updateReady } from '../../utils/socket';
 import useSong from '../../utils/useSong';
+import ProgressBar from '../ProgressBar';
 import RoomHeader from '../shared/RoomHeader';
 
 const useStyles = makeStyles(theme => ({
@@ -24,12 +25,12 @@ const useStyles = makeStyles(theme => ({
   settingIcon: {
     marginLeft: theme.spacing(1),
   },
-
   link: {
     color: '#0000EE',
   },
-  empty: {
+  progressBar: {
     flexGrow: 1,
+    marginRight: theme.spacing(1),
   },
   roomId: {
     marginRight: theme.spacing(1),
@@ -138,7 +139,10 @@ const DuetRoomHeader: React.FC<Props> = ({ view, setView }) => {
     <RoomHeader>
       {backButton()}
       {centerComponents()}
-      <Box component="span" className={classes.empty} />
+      {/* TODO: Change to actual timing */}
+      <div className={classes.progressBar}>
+        {view === 'solo.play' && <ProgressBar duration={126} started={false} />}
+      </div>
       {roomDetails()}
       <IconButton edge="end" size="small" className={classes.settingIcon}>
         <SettingsIcon />
