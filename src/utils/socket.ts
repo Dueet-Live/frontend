@@ -5,7 +5,6 @@ import {
   CHOOSE_PIECE_REQUEST,
   CREATE_ROOM_REQUEST,
   CREATE_ROOM_RESPONSE,
-  JoinRoomFailureResponse,
   JoinRoomResponse,
   JoinRoomSuccessResponse,
   JOIN_ROOM_REQUEST,
@@ -41,7 +40,7 @@ export function addListeners(
     ({ roomInfo, playerId }: RoomCreatedResponse) => {
       setRoomState(roomInfo);
       setPlayerId(playerId);
-      history.push(`/duet?id=${roomInfo.id}`);
+      history.push(`/duet/play?id=${roomInfo.id}`);
     }
   );
 
@@ -52,7 +51,7 @@ export function addListeners(
       // TODO decide what to do depending on error. For now we just throw them
       // to create
       // TODO snackbar
-      console.log(message + '... creating new room');
+      console.log(`received ${MALFORMED_MESSAGE_RESPONSE}`, message);
       history.push('/duet');
     }
   );
@@ -60,17 +59,16 @@ export function addListeners(
     // TODO decide what to do depending on error. For now we just throw them
     // to create
     // TODO snackbar
-    console.log(error + '... creating new room');
+    console.log(`received ${UNKNOWN_MESSAGE_RESPONSE}`, error);
     history.push('/duet');
   });
 
   /********************* Join room ****************/
   socket.on(JOIN_ROOM_RESPONSE, (res: JoinRoomResponse) => {
     if (!res.success) {
-      // failed to join room, so create a room instead
+      // failed to join room, redirect back to duet page
       // TODO snackbar
-      const { code, message } = res as JoinRoomFailureResponse;
-      console.log(code + ': ' + message + '... creating new room');
+      console.log('failed to join room', res);
       history.push('/duet');
       return;
     }

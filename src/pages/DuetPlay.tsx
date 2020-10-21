@@ -2,14 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import DuetRoom from '../components/DuetRoom';
 
-const Duet: React.FC = () => {
+const DuetPlay: React.FC = () => {
   const location = useLocation();
   const maybeRoomId = new URLSearchParams(location.search).get('id');
 
+  // If `id` is not present when this component is mounted, `isCreate` is set to true and not changed
+  // to false even if we have an id later.
   // Used to prevent DuetRoom from sending a join room request
   // isCreate is only set to true when maybeRoomId is set to null at some time
-  // this takes advantage of how the only way to join a room is by opening
-  // a link (full page reload), whereas there is no restriction to creating a room.
   const [isCreate, setIsCreate] = useState(maybeRoomId === null);
 
   useEffect(() => {
@@ -21,4 +21,4 @@ const Duet: React.FC = () => {
   return <DuetRoom maybeRoomId={maybeRoomId} isCreate={isCreate} />;
 };
 
-export default Duet;
+export default DuetPlay;
