@@ -122,14 +122,13 @@ const SoloRoom: React.FC = () => {
   // Get keyboard mapping
   const theme = useTheme();
   const isDesktopView = useMediaQuery(theme.breakpoints.up('md'));
-  const keyboardMap =
-    (isPlaying || timeToStart !== 0) && isDesktopView
-      ? getKeyboardMappingWithSpecificStart(
-          REGULAR_START_NOTE,
-          keyboardDimension['start'],
-          keyboardDimension['range']
-        )
-      : undefined;
+  const keyboardMap = isDesktopView
+    ? getKeyboardMappingWithSpecificStart(
+        REGULAR_START_NOTE,
+        keyboardDimension['start'],
+        keyboardDimension['range']
+      )
+    : undefined;
 
   // if timeToStart is not 0,
   //   hide readybutton, partselection, and parts of room header, show number
@@ -178,7 +177,7 @@ const SoloRoom: React.FC = () => {
       <Box className={classes.root}>
         {/* header */}
         <div className={classes.header}>
-          <RoomHeader isSolo />
+          <RoomHeader isSolo isPlaying={isPlaying || timeToStart > 0} />
         </div>
 
         {/* available space for the rest of the content */}

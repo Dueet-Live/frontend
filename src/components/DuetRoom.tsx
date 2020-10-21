@@ -241,7 +241,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
         <Box className={classes.root}>
           {/* header */}
           <div className={classes.header}>
-            <RoomHeader />
+            <RoomHeader isPlaying={isPlaying || timeToStart > 0} />
           </div>
 
           {/* available space for the rest of the content */}

@@ -37,7 +37,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const RoomHeader: React.FC<{ isSolo?: boolean; isPlaying?: boolean }> = ({
+const RoomHeader: React.FC<{ isSolo?: boolean; isPlaying: boolean }> = ({
   isSolo,
   isPlaying,
 }) => {
@@ -93,7 +93,7 @@ const RoomHeader: React.FC<{ isSolo?: boolean; isPlaying?: boolean }> = ({
             <ArrowBack />
           </IconButton>
           {/* TODO Make this button responsive. It should truncate when too long */}
-          <PickASongButton isSolo={isSolo} />
+          <PickASongButton isSolo={isSolo} isPlaying={isPlaying} />
           <Box component="span" className={classes.empty} />
           {roomDetails()}
           <IconButton edge="end" size="small" className={classes.settingIcon}>

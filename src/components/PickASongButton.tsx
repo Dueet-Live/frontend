@@ -96,7 +96,10 @@ const DialogTitleWithButtons: React.FC<DialogTitleWithButtonsProps> = ({
   );
 };
 
-const PickASongButton: React.FC<{ isSolo?: boolean }> = ({ isSolo }) => {
+const PickASongButton: React.FC<{ isPlaying: boolean; isSolo?: boolean }> = ({
+  isPlaying,
+  isSolo,
+}) => {
   const [open, setOpen] = useState(false);
   const [genre, setGenre] = useState('');
 
@@ -179,7 +182,7 @@ const PickASongButton: React.FC<{ isSolo?: boolean }> = ({ isSolo }) => {
       <Button
         className={classes.pickASongButton}
         onClick={handleOpen}
-        disabled={iAmReady}
+        disabled={isPlaying || iAmReady}
       >
         {chosenSong === null ? (
           <>
