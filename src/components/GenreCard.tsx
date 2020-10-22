@@ -5,16 +5,15 @@ import React from 'react';
 
 const useStyles = makeStyles(theme => ({
   root: {
-    maxWidth: 110,
+    height: '100%',
   },
-  media: {
-    height: 190,
-  },
+  media: { height: '100%' },
   overlay: {
     opacity: '0.8',
     '&:hover, &:active, &:focus': {
       opacity: '1.0',
     },
+    height: '100%',
   },
   overlayText: {
     position: 'absolute',

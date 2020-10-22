@@ -50,12 +50,14 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     flexDirection: 'row',
     padding: 10,
+    height: 200,
   },
   songContainer: {
     display: 'flex',
     flexDirection: 'column',
     padding: 10,
     overflowY: 'auto',
+    height: 200,
   },
 }));
 
@@ -96,7 +98,7 @@ const DialogTitleWithButtons: React.FC<DialogTitleWithButtonsProps> = ({
   );
 };
 
-const PickASongButton: React.FC<{ isSolo?: boolean }> = ({ isSolo }) => {
+const PickASongButton: React.FC<{ isPlaying: boolean }> = ({ isPlaying }) => {
   const [open, setOpen] = useState(false);
   const [genre, setGenre] = useState('');
 
@@ -110,7 +112,7 @@ const PickASongButton: React.FC<{ isSolo?: boolean }> = ({ isSolo }) => {
   const { piece } = roomInfo;
 
   const genres = useGenres();
-  const songs = useSongs(isSolo ? 'solo' : 'duet');
+  const songs = useSongs('duet');
   const chosenSong = useSong(piece);
 
   const handleOpen = () => {
@@ -179,12 +181,12 @@ const PickASongButton: React.FC<{ isSolo?: boolean }> = ({ isSolo }) => {
       <Button
         className={classes.pickASongButton}
         onClick={handleOpen}
-        disabled={iAmReady}
+        disabled={isPlaying || iAmReady}
       >
         {chosenSong === null ? (
           <>
             <PickASongIcon className={classes.icon} />
-            <Typography variant="body1">Pick a song</Typography>
+            <Typography variant="body1">No song selected</Typography>
           </>
         ) : (
           <>
