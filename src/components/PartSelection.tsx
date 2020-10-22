@@ -3,8 +3,8 @@ import React, { useContext } from 'react';
 import PlayerIcon from '../icons/PlayerIcon';
 import { Part } from '../types/messages';
 import { getReady } from '../utils/roomInfo';
-import { PlayerContext } from './PlayerContext';
-import { RoomContext } from './RoomContext';
+import { PlayerContext } from '../contexts/PlayerContext';
+import { RoomContext } from '../contexts/RoomContext';
 
 const useStyles = makeStyles(theme => ({
   root: {

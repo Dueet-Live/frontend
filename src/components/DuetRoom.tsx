@@ -30,11 +30,11 @@ import { useDimensions } from '../utils/useDimensions';
 import useWindowDimensions from '../utils/useWindowDimensions';
 import DuetReadyButton from './DuetReadyButton';
 import DuetRoomHeader from './DuetRoomHeader';
-import InteractivePiano from './InteractivePiano';
 import { PartSelection } from './PartSelection';
-import { PlayerContext } from './PlayerContext';
-import { RoomContext } from './RoomContext';
+import { PlayerContext } from '../contexts/PlayerContext';
+import { RoomContext } from '../contexts/RoomContext';
 import { Waterfall } from './Waterfall';
+import InteractivePiano from './Piano/InteractivePiano';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -226,8 +226,6 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   return (
     <RoomContext.Provider
       value={{
-        timeToStart: timeToStart,
-        isPlaying: isPlaying,
         roomInfo: roomState,
         setRoomInfo: setRoomState,
       }}

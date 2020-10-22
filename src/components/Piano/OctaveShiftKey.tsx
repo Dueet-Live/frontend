@@ -1,6 +1,6 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core';
-import '../InteractivePiano.css';
+import './InteractivePiano.css';
 import ChevronLeftIcon from '../../icons/ChevronRightIcon';
 import ChevronRightIcon from '../../icons/ChevronLeftIcon';
 

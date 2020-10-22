@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
+import { PlayerContext } from '../../contexts/PlayerContext';
 import { PlayingNote } from '../../types/playingNote';
-import '../InteractivePiano.css';
-import { PlayerContext } from '../PlayerContext';
+import './InteractivePiano.css';
 
 type Props = {
   note: number;

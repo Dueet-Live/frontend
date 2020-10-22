@@ -21,8 +21,8 @@ import useGenres from '../utils/useGenres';
 import useSong from '../utils/useSong';
 import useSongs from '../utils/useSongs';
 import GenreCard from './GenreCard';
-import { PlayerContext } from './PlayerContext';
-import { RoomContext } from './RoomContext';
+import { PlayerContext } from '../contexts/PlayerContext';
+import { RoomContext } from '../contexts/RoomContext';
 import SongCard from './SongCard';
 
 const useStyles = makeStyles(theme => ({
