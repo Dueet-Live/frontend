@@ -226,8 +226,6 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   return (
     <RoomContext.Provider
       value={{
-        timeToStart: timeToStart,
-        isPlaying: isPlaying,
         roomInfo: roomState,
         setRoomInfo: setRoomState,
       }}

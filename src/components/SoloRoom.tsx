@@ -39,29 +39,12 @@ const SoloRoom: React.FC = () => {
     players: [],
     id: '',
   } as RoomInfo);
-  const [timeToStart, setTimeToStart] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [chosenSongMIDI, setChosenSongMIDI] = useState<any>({});
   const [view, setView] = useState<RoomView>('solo.select');
   const [songSelectionGenre, setSongSelectionGenre] = useState('');
 
   const { piece } = roomState;
   const chosenSong = useSong(piece);
-
-  useEffect(() => {
-    if (timeToStart <= 0) {
-      return;
-    }
-
-    setTimeout(() => {
-      if (timeToStart > 0) {
-        setTimeToStart(timeToStart - 1);
-      }
-      if (timeToStart === 1) {
-        setIsPlaying(true);
-      }
-    }, 1000);
-  }, [timeToStart]);
 
   useEffect(() => {
     if (piece === undefined) return;
@@ -91,7 +74,6 @@ const SoloRoom: React.FC = () => {
           setGenre={setSongSelectionGenre}
           isPieceDownloaded={!!tracks}
           handleStart={() => {
-            setTimeToStart(3);
             setView('solo.play');
           }}
           tryPiano={() => setView('solo.try')}
@@ -118,8 +100,6 @@ const SoloRoom: React.FC = () => {
   return (
     <RoomContext.Provider
       value={{
-        timeToStart: timeToStart,
-        isPlaying: isPlaying,
         roomInfo: roomState,
         setRoomInfo: setRoomState,
       }}
@@ -133,8 +113,6 @@ const SoloRoom: React.FC = () => {
             selectedGenre={songSelectionGenre}
             setGenre={setSongSelectionGenre}
             quitSong={() => {
-              setIsPlaying(false);
-              setTimeToStart(0);
               setView('solo.select');
               // TODO update server that user has quit
             }}

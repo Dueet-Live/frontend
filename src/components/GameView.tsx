@@ -4,7 +4,7 @@ import {
   useMediaQuery,
   useTheme,
 } from '@material-ui/core';
-import React, { useContext } from 'react';
+import React, { useEffect, useState } from 'react';
 import { noOp } from 'tone/build/esm/core/util/Interface';
 import {
   calculateGamePianoDimension,
@@ -13,7 +13,6 @@ import {
 import { getKeyboardMappingWithSpecificStart } from '../utils/getKeyboardShorcutsMapping';
 import { useDimensions } from '../utils/useDimensions';
 import useWindowDimensions from '../utils/useWindowDimensions';
-import { RoomContext } from '../contexts/RoomContext';
 import { Waterfall } from './Waterfall';
 import InteractivePiano from './Piano/InteractivePiano';
 
@@ -40,8 +39,23 @@ type Props = {
 
 const GameView: React.FC<Props> = ({ tracks }) => {
   const classes = useStyles();
+  const [timeToStart, setTimeToStart] = useState(3);
 
-  const { timeToStart } = useContext(RoomContext);
+  useEffect(() => {
+    if (timeToStart <= 0) {
+      return;
+    }
+
+    const handler = setTimeout(() => {
+      if (timeToStart > 0) {
+        setTimeToStart(timeToStart - 1);
+      }
+    }, 1000);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [timeToStart]);
 
   // Calculate keyboard dimension
   const [middleBoxDimensions, middleBoxRef] = useDimensions<HTMLDivElement>();
