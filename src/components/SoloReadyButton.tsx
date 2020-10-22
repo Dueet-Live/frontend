@@ -4,21 +4,16 @@ import ReadyButton from './shared/ReadyButton';
 
 type Props = ButtonProps & {
   handleStart: () => void;
-  isPieceDownloaded: boolean;
 };
 
 const SoloReadyButton: React.FC<Props> = ({
   handleStart,
-  isPieceDownloaded,
+  children,
   ...props
 }) => {
   return (
-    <ReadyButton
-      handleReady={handleStart}
-      disabled={!isPieceDownloaded}
-      {...props}
-    >
-      Start
+    <ReadyButton handleReady={handleStart} {...props}>
+      {children}
     </ReadyButton>
   );
 };

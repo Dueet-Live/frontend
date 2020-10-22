@@ -50,12 +50,14 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     flexDirection: 'row',
     padding: 10,
+    height: 200,
   },
   songContainer: {
     display: 'flex',
     flexDirection: 'column',
     padding: 10,
     overflowY: 'auto',
+    height: 200,
   },
 }));
 

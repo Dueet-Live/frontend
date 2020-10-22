@@ -15,11 +15,12 @@ import {
 } from '../utils/calculateKeyboardDimension';
 import { getKeyboardMappingWithSpecificStart } from '../utils/getKeyboardShorcutsMapping';
 import { useDimensions } from '../utils/useDimensions';
+import useSong from '../utils/useSong';
 import useWindowDimensions from '../utils/useWindowDimensions';
 import InteractivePiano from './InteractivePiano';
-import { RoomContext } from './RoomContext';
-import SoloReadyButton from './SoloReadyButton';
+import { RoomContext, RoomView } from './RoomContext';
 import SoloRoomHeader from './SoloRoomHeader';
+import SoloSelectSong from './SoloSelectSong';
 import { Waterfall } from './Waterfall';
 
 const noOp = () => {};
@@ -35,6 +36,8 @@ const useStyles = makeStyles(theme => ({
     flexShrink: 1,
     minHeight: '0px',
     position: 'relative',
+    display: 'flex',
+    flexDirection: 'column',
   },
   header: {
     flexGrow: 0,
@@ -61,8 +64,11 @@ const SoloRoom: React.FC = () => {
   const [timeToStart, setTimeToStart] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [chosenSongMIDI, setChosenSongMIDI] = useState<any>({});
+  const [view, setView] = useState<RoomView>('solo.select');
+  const [songSelectionGenre, setSongSelectionGenre] = useState('');
 
   const { piece } = roomState;
+  const chosenSong = useSong(piece);
 
   useEffect(() => {
     if (timeToStart <= 0) {
@@ -130,12 +136,28 @@ const SoloRoom: React.FC = () => {
       )
     : undefined;
 
-  // if timeToStart is not 0,
-  //   hide readybutton, partselection, and parts of room header, show number
-  //   show number countdown
-  // if timeToStart is 0 and playing, show waterfall, music, etc.
-  // if timeToStart is 0 and not playing, show the current stuff
   const middleBox = () => {
+    if (view === 'solo.select') {
+      return (
+        <SoloSelectSong
+          genre={songSelectionGenre}
+          setGenre={setSongSelectionGenre}
+          isPieceDownloaded={!!tracks}
+          handleStart={() => {
+            setTimeToStart(3);
+            setView('solo.play');
+          }}
+          tryPiano={() => setView('solo.try')}
+          chosenSong={chosenSong}
+        />
+      );
+    }
+
+    // if timeToStart is not 0,
+    //   hide readybutton, partselection, and parts of room header, show number
+    //   show number countdown
+    // if timeToStart is 0 and playing, show waterfall, music, etc.
+    // if timeToStart is 0 and not playing, show the current stuff
     if (isPlaying && tracks)
       return (
         <Waterfall
@@ -147,7 +169,7 @@ const SoloRoom: React.FC = () => {
         />
       );
 
-    if (timeToStart !== 0) {
+    if (view === 'solo.play' && timeToStart !== 0) {
       return (
         <Typography variant="h1" align="center" color="primary">
           {timeToStart}
@@ -155,14 +177,7 @@ const SoloRoom: React.FC = () => {
       );
     }
 
-    return (
-      <div className={classes.readyButton}>
-        <SoloReadyButton
-          handleStart={() => setTimeToStart(3)}
-          isPieceDownloaded={!!tracks}
-        />
-      </div>
-    );
+    return <></>;
   };
 
   return (
@@ -177,24 +192,36 @@ const SoloRoom: React.FC = () => {
       <Box className={classes.root}>
         {/* header */}
         <div className={classes.header}>
-          <SoloRoomHeader isPlaying={isPlaying || timeToStart > 0} />
+          <SoloRoomHeader
+            view={view}
+            setView={setView}
+            selectedGenre={songSelectionGenre}
+            setGenre={setSongSelectionGenre}
+            quitSong={() => {
+              setIsPlaying(false);
+              setTimeToStart(0);
+              setView('solo.select');
+              // TODO update server that user has quit
+            }}
+          />
         </div>
-
         {/* available space for the rest of the content */}
         <div ref={middleBoxRef} className={classes.box}>
           {middleBox()}
         </div>
 
         {/* piano */}
-        <div className={classes.piano}>
-          <InteractivePiano
-            {...keyboardDimension}
-            keyHeight={keyHeight}
-            keyboardMap={keyboardMap}
-            didPlayNote={noOp}
-            didStopNote={noOp}
-          />
-        </div>
+        {view !== 'solo.select' && (
+          <div className={classes.piano}>
+            <InteractivePiano
+              {...keyboardDimension}
+              keyHeight={keyHeight}
+              keyboardMap={keyboardMap}
+              didPlayNote={noOp}
+              didStopNote={noOp}
+            />
+          </div>
+        )}
       </Box>
     </RoomContext.Provider>
   );

@@ -1,6 +1,14 @@
 import React from 'react';
 import { RoomInfo } from '../types/roomInfo';
 
+export type RoomView =
+  | 'solo.select'
+  | 'solo.try'
+  | 'solo.play'
+  | 'duet.lobby'
+  | 'duet.try'
+  | 'duet.play';
+
 type RoomContextProps = {
   timeToStart: number;
   isPlaying: boolean;
