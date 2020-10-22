@@ -104,37 +104,38 @@ const SoloRoom: React.FC = () => {
   }, [piece]);
 
   // Calculate keyboard dimension
+  const isGameMode = isPlaying || timeToStart > 0;
   const tracks = chosenSongMIDI.tracks;
   const [middleBoxDimensions, middleBoxRef] = useDimensions<HTMLDivElement>();
   const { height } = useWindowDimensions();
-  const SMALL_START_NOTE = !(isPlaying && tracks)
+  const SMALL_START_NOTE = !(isGameMode && tracks)
     ? 72
     : tracks[0].smallStartNote;
 
-  const REGULAR_START_NOTE = !(isPlaying && tracks)
+  const REGULAR_START_NOTE = !(isGameMode && tracks)
     ? 72
     : tracks[0].regularStartNote;
 
-  const keyboardDimension =
-    isPlaying || timeToStart !== 0
-      ? calculateGamePianoDimension(
-          middleBoxDimensions.width,
-          SMALL_START_NOTE,
-          REGULAR_START_NOTE
-        )
-      : calculateDefaultPianoDimension(middleBoxDimensions.width);
+  const keyboardDimension = isGameMode
+    ? calculateGamePianoDimension(
+        middleBoxDimensions.width,
+        SMALL_START_NOTE,
+        REGULAR_START_NOTE
+      )
+    : calculateDefaultPianoDimension(middleBoxDimensions.width);
   const keyHeight = calculateKeyHeight(height);
 
-  // Get keyboard mapping
+  // Get custom keyboard mapping for game
   const theme = useTheme();
   const isDesktopView = useMediaQuery(theme.breakpoints.up('md'));
-  const keyboardMap = isDesktopView
-    ? getKeyboardMappingWithSpecificStart(
-        REGULAR_START_NOTE,
-        keyboardDimension['start'],
-        keyboardDimension['range']
-      )
-    : undefined;
+  const keyboardMap =
+    isGameMode && isDesktopView
+      ? getKeyboardMappingWithSpecificStart(
+          REGULAR_START_NOTE,
+          keyboardDimension['start'],
+          keyboardDimension['range']
+        )
+      : undefined;
 
   const middleBox = () => {
     if (view === 'solo.select') {
@@ -214,6 +215,7 @@ const SoloRoom: React.FC = () => {
         {view !== 'solo.select' && (
           <div className={classes.piano}>
             <InteractivePiano
+              includeOctaveShift={!isGameMode}
               {...keyboardDimension}
               keyHeight={keyHeight}
               keyboardMap={keyboardMap}
