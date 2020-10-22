@@ -15,3 +15,10 @@ export type KeyOffsetInfo = {
   whiteKeyWidth: number;
   blackKeyWidth: number;
 };
+
+export type MidiInfo = {
+  bpm: number;
+  beatsPerBar: number;
+  noteDivision: number;
+  notes: Array<Note>;
+};

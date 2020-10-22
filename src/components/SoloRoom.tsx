@@ -92,7 +92,6 @@ const SoloRoom: React.FC = () => {
       if (piece === undefined) return;
       try {
         const song = await songsAPI.getSongWithContent(piece);
-
         setChosenSongMIDI(JSON.parse(song.content));
       } catch (err) {
         // TODO set a notification that it failed to retrieve song
@@ -103,8 +102,15 @@ const SoloRoom: React.FC = () => {
     fetchSongMIDI();
   }, [piece]);
 
-  // Calculate keyboard dimension
+  // song information
   const tracks = chosenSongMIDI.tracks;
+  const bpm = chosenSongMIDI.header?.tempos[0].bpm;
+  const [beatsPerBar, noteDivision] =
+    chosenSongMIDI.header === undefined
+      ? [0, 0]
+      : chosenSongMIDI.header.timeSignatures[0].timeSignature;
+
+  // Calculate keyboard dimension
   const [middleBoxDimensions, middleBoxRef] = useDimensions<HTMLDivElement>();
   const { height } = useWindowDimensions();
   const SMALL_START_NOTE = !(isPlaying && tracks)
@@ -163,8 +169,9 @@ const SoloRoom: React.FC = () => {
         <Waterfall
           {...keyboardDimension}
           dimension={middleBoxDimensions}
-          bpm={120}
-          beatsPerBar={4}
+          bpm={bpm}
+          beatsPerBar={beatsPerBar}
+          noteDivision={noteDivision}
           notes={tracks[0].notes}
         />
       );
@@ -214,7 +221,7 @@ const SoloRoom: React.FC = () => {
         {view !== 'solo.select' && (
           <div className={classes.piano}>
             <InteractivePiano
-              includeOctaveShift
+              includeOctaveShift={false}
               {...keyboardDimension}
               keyHeight={keyHeight}
               keyboardMap={keyboardMap}

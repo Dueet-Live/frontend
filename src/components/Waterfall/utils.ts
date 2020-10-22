@@ -17,15 +17,23 @@ export const convertTimeInfoToMilliseconds = (notes: Array<Note>) => {
   );
 };
 
+const DEFAULT_NOTE_DIVISION = 4;
 /**
  * Calculates the amount of time we should look ahead by in milliseconds.
  *
  * In this case, we try to look ahead by one musical bar.
  */
-export const calculateLookAheadTime = (bpm: number, beatsPerBar: number) => {
-  // TODO: support non-quarter notes (need to define new variable)
+export const calculateLookAheadTime = (
+  bpm: number,
+  beatsPerBar: number,
+  noteDivision: number
+) => {
   const NUM_MILLISECONDS_PER_MIN = 60000;
-  return (NUM_MILLISECONDS_PER_MIN / bpm) * beatsPerBar;
+  return (
+    (NUM_MILLISECONDS_PER_MIN / bpm) *
+    beatsPerBar *
+    (DEFAULT_NOTE_DIVISION / noteDivision)
+  );
 };
 
 /**
