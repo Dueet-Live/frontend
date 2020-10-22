@@ -154,21 +154,20 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
     ? 72
     : tracks[myPart === 'primo' ? 0 : 1].regularStartNote;
 
-  const keyboardDimension =
-    isPlaying || timeToStart !== 0
-      ? calculateGamePianoDimension(
-          middleBoxDimensions.width,
-          SMALL_START_NOTE,
-          REGULAR_START_NOTE
-        )
-      : calculateDefaultPianoDimension(middleBoxDimensions.width);
+  const keyboardDimension = isPlaying
+    ? calculateGamePianoDimension(
+        middleBoxDimensions.width,
+        SMALL_START_NOTE,
+        REGULAR_START_NOTE
+      )
+    : calculateDefaultPianoDimension(middleBoxDimensions.width);
   const keyHeight = calculateKeyHeight(height);
 
   // Get keyboard mapping
   const theme = useTheme();
   const isDesktopView = useMediaQuery(theme.breakpoints.up('md'));
   const keyboardMap =
-    (isPlaying || timeToStart !== 0) && isDesktopView
+    isPlaying && isDesktopView
       ? getKeyboardMappingWithSpecificStart(
           REGULAR_START_NOTE,
           keyboardDimension['start'],
@@ -252,6 +251,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
           {/* piano */}
           <div className={classes.piano}>
             <InteractivePiano
+              includeOctaveShift={!isPlaying}
               {...keyboardDimension}
               keyHeight={keyHeight}
               keyboardMap={keyboardMap}

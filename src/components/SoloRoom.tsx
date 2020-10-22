@@ -214,6 +214,7 @@ const SoloRoom: React.FC = () => {
         {view !== 'solo.select' && (
           <div className={classes.piano}>
             <InteractivePiano
+              includeOctaveShift
               {...keyboardDimension}
               keyHeight={keyHeight}
               keyboardMap={keyboardMap}

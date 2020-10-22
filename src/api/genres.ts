@@ -3,6 +3,7 @@ import base from './base';
 
 const genresAPI = {
   getGenres: async (): Promise<[Genre]> => {
+    console.log('hello');
     return base.getData('/genres');
   },
   getGenresWithSongs: async (genre: string): Promise<[GenreWithSongs]> => {
