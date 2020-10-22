@@ -1,4 +1,11 @@
-import { Fab, List, ListItem, makeStyles, Typography } from '@material-ui/core';
+import {
+  Fab,
+  Grid,
+  List,
+  ListItem,
+  makeStyles,
+  Typography,
+} from '@material-ui/core';
 import React, { useContext } from 'react';
 import PianoIcon from '../icons/PianoIcon';
 import { RoomInfo } from '../types/roomInfo';
@@ -47,6 +54,11 @@ const useStyles = makeStyles(theme => ({
       textTransform: 'capitalize',
     },
   },
+  genreCard: {
+    marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(1),
+    width: '20%',
+  },
   details: {
     padding: theme.spacing(2),
   },
@@ -79,19 +91,29 @@ const SoloSelectSong: React.FC<Props> = ({
   const pickingGenre = () => {
     return (
       <>
-        <Typography variant="h5" color="primary" className={classes.title}>
+        <Typography
+          variant="h5"
+          color="primary"
+          align="center"
+          className={classes.title}
+        >
           Choose a genre
         </Typography>
-        <List className={classes.genreContainer}>
+        <Grid
+          container
+          alignItems="stretch"
+          justify="center"
+          className={classes.genreContainer}
+        >
           {genres.map(genre => (
-            <ListItem key={genre.id}>
+            <Grid item key={genre.id} className={classes.genreCard}>
               <GenreCard
                 genre={genre.name}
                 onClick={() => setGenre(genre.name)}
               />
-            </ListItem>
+            </Grid>
           ))}
-        </List>
+        </Grid>
       </>
     );
   };

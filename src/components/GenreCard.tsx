@@ -5,7 +5,6 @@ import React from 'react';
 
 const useStyles = makeStyles(theme => ({
   root: {
-    maxWidth: 110,
     height: '100%',
   },
   media: { height: '100%' },
