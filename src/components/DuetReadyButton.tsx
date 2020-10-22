@@ -1,15 +1,16 @@
-import { Button, ButtonProps } from '@material-ui/core';
+import { ButtonProps } from '@material-ui/core';
 import React, { useContext } from 'react';
 import { getPartsSelection, getReady } from '../utils/roomInfo';
 import { updateReady } from '../utils/socket';
 import { PlayerContext } from './PlayerContext';
 import { RoomContext } from './RoomContext';
+import ReadyButton from './shared/ReadyButton';
 
 type Props = ButtonProps & {
   isPieceDownloaded: boolean;
 };
 
-const ReadyButton: React.FC<Props> = ({ isPieceDownloaded, ...props }) => {
+const DuetReadyButton: React.FC<Props> = ({ isPieceDownloaded, ...props }) => {
   const { roomInfo } = useContext(RoomContext);
   const { me, friend } = useContext(PlayerContext);
 
@@ -36,17 +37,14 @@ const ReadyButton: React.FC<Props> = ({ isPieceDownloaded, ...props }) => {
     !isPieceDownloaded;
 
   return (
-    <Button
-      variant="outlined"
-      color="primary"
-      style={{ width: '110px' }}
+    <ReadyButton
+      handleReady={() => handleReady(!ready.me)}
       disabled={disabled}
-      onClick={() => handleReady(!ready.me)}
       {...props}
     >
       {ready.me ? 'Not Ready' : 'Ready'}
-    </Button>
+    </ReadyButton>
   );
 };
 
-export default ReadyButton;
+export default DuetReadyButton;
