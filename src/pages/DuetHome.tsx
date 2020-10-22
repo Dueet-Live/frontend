@@ -13,6 +13,11 @@ import RoomHeader from '../components/RoomHeader';
 const useStyles = makeStyles(theme => ({
   outer: {
     height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  content: {
+    flexGrow: 1,
   },
   inner: {
     textAlign: 'center',
@@ -72,74 +77,73 @@ const DuetHome: React.FC = () => {
   };
 
   return (
-    <Grid
-      container
-      alignItems="center"
-      justify="center"
-      xs={12}
-      className={classes.outer}
-    >
-      {/* TODO: don't render pickASong */}
-      <Grid item container xs={12}>
-        <RoomHeader isSolo />
-      </Grid>
-
+    <div className={classes.outer}>
+      <RoomHeader isSolo />
       <Grid
-        item
         container
-        xs={12}
-        spacing={2}
-        className={classes.inner}
         alignItems="center"
         justify="center"
+        xs={12}
+        className={classes.content}
       >
+        {/* TODO: don't render pickASong */}
         <Grid
           item
           container
           xs={12}
           spacing={2}
+          className={classes.inner}
+          alignItems="center"
           justify="center"
-          className={classes.pinGrid}
         >
-          <Grid item xs={12}>
-            <Typography variant="h4">Enter Room PIN</Typography>
+          <Grid
+            item
+            container
+            xs={12}
+            spacing={2}
+            justify="center"
+            className={classes.pinGrid}
+          >
+            <Grid item xs={12}>
+              <Typography variant="h4">Enter Room PIN</Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <PinField
+                placeholder="XXXX"
+                onChange={handleRoomIdInput}
+                value={roomId}
+                autoFocus
+                onKeyPress={handleKeyPress}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Button
+                variant="outlined"
+                color="primary"
+                onClick={joinRoom}
+                disabled={roomId.length !== 4}
+                className={classes.button}
+              >
+                Join
+              </Button>
+            </Grid>
           </Grid>
-          <Grid item xs={12}>
-            <PinField
-              placeholder="XXXX"
-              onChange={handleRoomIdInput}
-              value={roomId}
-              autoFocus
-              onKeyPress={handleKeyPress}
-            />
+          <Grid item xs={12} className={classes.orText}>
+            <Typography variant="body1">or</Typography>
           </Grid>
           <Grid item xs={12}>
             <Button
-              variant="outlined"
+              variant="contained"
               color="primary"
-              onClick={joinRoom}
-              disabled={roomId.length !== 4}
+              onClick={createRoom}
               className={classes.button}
             >
-              Join
+              Create a Room
             </Button>
           </Grid>
         </Grid>
-        <Grid item xs={12} className={classes.orText}>
-          <Typography variant="body1">or</Typography>
-        </Grid>
-        <Grid item xs={12}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={createRoom}
-            className={classes.button}
-          >
-            Create a Room
-          </Button>
-        </Grid>
       </Grid>
-    </Grid>
+    </div>
   );
 };
 
