@@ -72,71 +72,74 @@ const DuetHome: React.FC = () => {
   };
 
   return (
-    <>
+    <Grid
+      container
+      alignItems="center"
+      justify="center"
+      xs={12}
+      className={classes.outer}
+    >
       {/* TODO: don't render pickASong */}
-      <RoomHeader isSolo />
+      <Grid item container xs={12}>
+        <RoomHeader isSolo />
+      </Grid>
+
       <Grid
+        item
         container
+        xs={12}
+        spacing={2}
+        className={classes.inner}
         alignItems="center"
         justify="center"
-        className={classes.outer}
       >
         <Grid
           item
           container
           xs={12}
           spacing={2}
-          className={classes.inner}
           justify="center"
+          className={classes.pinGrid}
         >
-          <Grid
-            item
-            container
-            xs={12}
-            spacing={2}
-            justify="center"
-            className={classes.pinGrid}
-          >
-            <Grid item xs={12}>
-              <Typography variant="h4">Enter Room PIN</Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <PinField
-                placeholder="XXXX"
-                onChange={handleRoomIdInput}
-                value={roomId}
-                autoFocus
-                onKeyPress={handleKeyPress}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <Button
-                variant="outlined"
-                color="primary"
-                onClick={joinRoom}
-                disabled={roomId.length !== 4}
-                className={classes.button}
-              >
-                Join
-              </Button>
-            </Grid>
+          <Grid item xs={12}>
+            <Typography variant="h4">Enter Room PIN</Typography>
           </Grid>
-          <Grid item xs={12} className={classes.orText}>
-            <Typography variant="body1">or</Typography>
+          <Grid item xs={12}>
+            <PinField
+              placeholder="XXXX"
+              onChange={handleRoomIdInput}
+              value={roomId}
+              autoFocus
+              onKeyPress={handleKeyPress}
+            />
           </Grid>
           <Grid item xs={12}>
             <Button
-              variant="contained"
+              variant="outlined"
               color="primary"
-              onClick={createRoom}
+              onClick={joinRoom}
+              disabled={roomId.length !== 4}
               className={classes.button}
             >
-              Create a Room
+              Join
             </Button>
           </Grid>
         </Grid>
+        <Grid item xs={12} className={classes.orText}>
+          <Typography variant="body1">or</Typography>
+        </Grid>
+        <Grid item xs={12}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={createRoom}
+            className={classes.button}
+          >
+            Create a Room
+          </Button>
+        </Grid>
       </Grid>
-    </>
+    </Grid>
   );
 };
 
