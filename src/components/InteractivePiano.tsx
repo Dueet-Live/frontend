@@ -28,14 +28,16 @@ const InteractivePiano: React.FC<Props> = ({
   didStopNote,
 }) => {
   const [startNote, setStartNote] = useState(start);
-  const endNote = startNote + range - 1;
+  const [keyRange, setKeyRange] = useState(start);
+  const endNote = startNote + keyRange - 1;
 
   const lowestMidiNote = 21;
   const highestMidiNote = 108;
 
   useEffect(() => {
     setStartNote(start);
-  }, [start]);
+    setKeyRange(range);
+  }, [start, range]);
 
   const shiftDownOctave = () => {
     let newStartNote = Math.max(startNote - 12, lowestMidiNote);
