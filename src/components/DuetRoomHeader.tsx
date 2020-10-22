@@ -11,7 +11,7 @@ import { useHistory } from 'react-router-dom';
 import PlayerIcon from '../icons/PlayerIcon';
 import SettingsIcon from '../icons/SettingsIcon';
 import PickASongButton from './PickASongButton';
-import { PlayerContext } from './PlayerContext';
+import { PlayerContext } from '../contexts/PlayerContext';
 import RoomHeader from './shared/RoomHeader';
 
 const useStyles = makeStyles(theme => ({

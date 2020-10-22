@@ -14,7 +14,7 @@ import { choosePiece } from '../utils/socket';
 import useGenres from '../utils/useGenres';
 import useSongs from '../utils/useSongs';
 import GenreCard from './GenreCard';
-import { RoomContext } from './RoomContext';
+import { RoomContext } from '../contexts/RoomContext';
 import SoloReadyButton from './SoloReadyButton';
 import SongCard from './SongCard';
 

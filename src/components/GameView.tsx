@@ -13,9 +13,9 @@ import {
 import { getKeyboardMappingWithSpecificStart } from '../utils/getKeyboardShorcutsMapping';
 import { useDimensions } from '../utils/useDimensions';
 import useWindowDimensions from '../utils/useWindowDimensions';
-import InteractivePiano from './InteractivePiano';
-import { RoomContext } from './RoomContext';
+import { RoomContext } from '../contexts/RoomContext';
 import { Waterfall } from './Waterfall';
+import InteractivePiano from './Piano/InteractivePiano';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -41,7 +41,7 @@ type Props = {
 const GameView: React.FC<Props> = ({ tracks }) => {
   const classes = useStyles();
 
-  const { timeToStart, isPlaying } = useContext(RoomContext);
+  const { timeToStart } = useContext(RoomContext);
 
   // Calculate keyboard dimension
   const [middleBoxDimensions, middleBoxRef] = useDimensions<HTMLDivElement>();
@@ -71,12 +71,11 @@ const GameView: React.FC<Props> = ({ tracks }) => {
   return (
     <div className={classes.root}>
       <div ref={middleBoxRef} className={classes.middleBox}>
-        {timeToStart !== 0 && (
+        {timeToStart !== 0 ? (
           <Typography variant="h1" align="center" color="primary">
             {timeToStart}
           </Typography>
-        )}
-        {isPlaying && (
+        ) : (
           <Waterfall
             {...keyboardDimension}
             dimension={middleBoxDimensions}

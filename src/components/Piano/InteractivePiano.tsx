@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import Piano from './Piano/Piano';
-import PianoContainer from './Piano/PianoContainer';
-import OctaveShiftKey from './Piano/OctaveShiftKey';
-import { getKeyboardMapping } from '../utils/getKeyboardShorcutsMapping';
 import './InteractivePiano.css';
 import { useTheme, useMediaQuery } from '@material-ui/core';
+import { getKeyboardMapping } from '../../utils/getKeyboardShorcutsMapping';
+import OctaveShiftKey from './OctaveShiftKey';
+import Piano from './Piano';
+import PianoContainer from './PianoContainer';
 
 type Props = {
   includeOctaveShift: boolean;

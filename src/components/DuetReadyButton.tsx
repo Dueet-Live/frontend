@@ -2,8 +2,8 @@ import { ButtonProps } from '@material-ui/core';
 import React, { useContext } from 'react';
 import { getPartsSelection, getReady } from '../utils/roomInfo';
 import { updateReady } from '../utils/socket';
-import { PlayerContext } from './PlayerContext';
-import { RoomContext } from './RoomContext';
+import { PlayerContext } from '../contexts/PlayerContext';
+import { RoomContext } from '../contexts/RoomContext';
 import ReadyButton from './shared/ReadyButton';
 
 type Props = ButtonProps & {

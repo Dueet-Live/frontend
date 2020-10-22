@@ -3,9 +3,9 @@ import React, { useEffect, useState } from 'react';
 import songsAPI from '../api/songs';
 import { RoomInfo } from '../types/roomInfo';
 import useSong from '../utils/useSong';
-import DefaultPiano from './DefaultPiano';
+import DefaultPiano from './Piano/DefaultPiano';
 import GameView from './GameView';
-import { RoomContext, RoomView } from './RoomContext';
+import { RoomContext, RoomView } from '../contexts/RoomContext';
 import SoloRoomHeader from './SoloRoomHeader';
 import SoloSelectSong from './SoloSelectSong';
 

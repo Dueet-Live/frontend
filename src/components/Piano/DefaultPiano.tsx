@@ -3,8 +3,8 @@ import { noOp } from 'tone/build/esm/core/util/Interface';
 import {
   calculateDefaultPianoDimension,
   calculateKeyHeight,
-} from '../utils/calculateKeyboardDimension';
-import useWindowDimensions from '../utils/useWindowDimensions';
+} from '../../utils/calculateKeyboardDimension';
+import useWindowDimensions from '../../utils/useWindowDimensions';
 import InteractivePiano from './InteractivePiano';
 
 const DefaultPiano: React.FC = () => {
