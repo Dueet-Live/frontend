@@ -18,6 +18,7 @@ const useStyles = makeStyles(theme => ({
   },
   content: {
     flexGrow: 1,
+    padding: theme.spacing(3),
   },
   inner: {
     textAlign: 'center',
@@ -25,16 +26,6 @@ const useStyles = makeStyles(theme => ({
   },
   button: {
     width: '148px',
-  },
-  pinGrid: {
-    borderStyle: 'solid',
-    borderColor: theme.palette.primary.main,
-    borderWidth: 'medium',
-    borderRadius: '1em',
-  },
-  orText: {
-    marginBottom: theme.spacing(2),
-    marginTop: theme.spacing(2),
   },
 }));
 
@@ -44,7 +35,7 @@ const PinField = styled(TextField)({
   width: '13rem',
   '& input': {
     textAlign: 'center',
-    fontSize: '3rem',
+    fontSize: '2rem',
   },
 });
 
@@ -78,6 +69,7 @@ const DuetHome: React.FC = () => {
 
   return (
     <div className={classes.outer}>
+      {/* TODO: don't render pickASong */}
       <RoomHeader isSolo />
       <Grid
         container
@@ -86,27 +78,19 @@ const DuetHome: React.FC = () => {
         xs={12}
         className={classes.content}
       >
-        {/* TODO: don't render pickASong */}
         <Grid
           item
           container
           xs={12}
-          spacing={2}
+          spacing={1}
           className={classes.inner}
           alignItems="center"
           justify="center"
         >
-          <Grid
-            item
-            container
-            xs={12}
-            spacing={2}
-            justify="center"
-            className={classes.pinGrid}
-          >
-            <Grid item xs={12}>
-              <Typography variant="h4">Enter Room PIN</Typography>
-            </Grid>
+          <Grid item container xs={12} spacing={2} justify="center">
+            <div>
+              <Typography variant="h6">Enter Room PIN</Typography>
+            </div>
             <Grid item xs={12}>
               <PinField
                 placeholder="XXXX"
@@ -128,7 +112,7 @@ const DuetHome: React.FC = () => {
               </Button>
             </Grid>
           </Grid>
-          <Grid item xs={12} className={classes.orText}>
+          <Grid item xs={12}>
             <Typography variant="body1">or</Typography>
           </Grid>
           <Grid item xs={12}>
