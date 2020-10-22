@@ -7,7 +7,15 @@ import {
 import useWindowDimensions from '../../utils/useWindowDimensions';
 import InteractivePiano from './InteractivePiano';
 
-const DefaultPiano: React.FC = () => {
+type Props = {
+  handleNotePlay?: (key: number, playerId: number) => void;
+  handleNoteStop?: (key: number, playerId: number) => void;
+};
+
+const DefaultPiano: React.FC<Props> = ({
+  handleNotePlay = noOp,
+  handleNoteStop = noOp,
+}) => {
   const { width, height } = useWindowDimensions();
   const keyboardDimension = calculateDefaultPianoDimension(width);
   const keyHeight = calculateKeyHeight(height);
@@ -17,8 +25,8 @@ const DefaultPiano: React.FC = () => {
       includeOctaveShift={true}
       {...keyboardDimension}
       keyHeight={keyHeight}
-      didPlayNote={noOp}
-      didStopNote={noOp}
+      didPlayNote={handleNotePlay}
+      didStopNote={handleNoteStop}
     />
   );
 };

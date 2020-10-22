@@ -4,12 +4,15 @@ import { PlayingNote } from '../../types/playingNote';
 import { getKeyboardShortcutForNote } from '../../utils/getKeyboardShorcutsMapping';
 import {
   addNotePlayListener,
+  playNote,
   removeNotePlayListener,
+  stopNote,
 } from '../../utils/socket';
 import './InteractivePiano.css';
 import InstrumentAudio from './InstrumentAudio';
 import PianoKey from './PianoKey';
 import getNotesBetween from './utils/getNotesBetween';
+import { noOp } from 'tone/build/esm/core/util/Interface';
 
 type Props = {
   startNote: number;
@@ -17,8 +20,8 @@ type Props = {
   keyWidth: number;
   keyHeight: number;
   keyboardMap: { [key: string]: number };
-  didPlayNote: (note: number, playerId: number) => void;
-  didStopNote: (note: number, playerId: number) => void;
+  didPlayNote?: (note: number, playerId: number) => void;
+  didStopNote?: (note: number, playerId: number) => void;
 };
 
 function isRegularKey(event: KeyboardEvent) {
@@ -31,11 +34,12 @@ const Piano: React.FC<Props> = ({
   keyWidth,
   keyHeight,
   keyboardMap,
-  didPlayNote,
-  didStopNote,
+  didPlayNote = noOp,
+  didStopNote = noOp,
 }) => {
   const notes = getNotesBetween(startNote, endNote);
   const { me, friend } = useContext(PlayerContext);
+  const isDuetMode = friend !== null;
   const [playingNotes, setPlayingNotes] = useState<PlayingNote[]>([]);
 
   // Used for touchscreen input
@@ -45,31 +49,45 @@ const Piano: React.FC<Props> = ({
   /* Handle state change */
   const startPlayingNote = useCallback(
     (note: number, playerId: number) => {
-      didPlayNote(note, playerId);
+      // Relay to server
+      if (isDuetMode && playerId === me) {
+        playNote(note);
+      }
+
       setPlayingNotes(playingNotes => {
         return [...playingNotes, { note, playerId }];
       });
+
+      // Trigger callback
+      didPlayNote(note, playerId);
     },
-    [didPlayNote]
+    [isDuetMode, me, didPlayNote]
   );
 
   const stopPlayingNote = useCallback(
     (note: number, playerId: number) => {
-      didStopNote(note, playerId);
+      // Relay to server
+      if (isDuetMode && playerId === me) {
+        stopNote(note);
+      }
+
       setPlayingNotes(playingNotes => {
         return playingNotes.filter(
           notePlaying =>
             notePlaying.note !== note || notePlaying.playerId !== playerId
         );
       });
+
+      // Trigger callback
+      didStopNote(note, playerId);
     },
-    [didStopNote]
+    [isDuetMode, me, didStopNote]
   );
 
   /* Handle friends' notes */
   const handleNotePlayByFriend = useCallback(
     (note: number) => {
-      if (friend) {
+      if (friend !== null) {
         startPlayingNote(note, friend);
       }
     },
@@ -78,7 +96,7 @@ const Piano: React.FC<Props> = ({
 
   const handleNoteStopByFriend = useCallback(
     (note: number) => {
-      if (friend) {
+      if (friend !== null) {
         stopPlayingNote(note, friend);
       }
     },

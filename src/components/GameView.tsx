@@ -35,11 +35,29 @@ const useStyles = makeStyles(theme => ({
 
 type Props = {
   tracks: any;
+  handleNotePlay?: (key: number, playerId: number) => void;
+  handleNoteStop?: (key: number, playerId: number) => void;
+  handleScoreUpdate?: (newScore: number) => void /* tentative */;
 };
 
-const GameView: React.FC<Props> = ({ tracks }) => {
+const GameView: React.FC<Props> = ({
+  tracks,
+  handleNotePlay = noOp,
+  handleNoteStop = noOp,
+}) => {
   const classes = useStyles();
   const [timeToStart, setTimeToStart] = useState(3);
+
+  const didPlayNote = (note: number, playedBy: number) => {
+    // TODO: update score
+
+    handleNotePlay(note, playedBy);
+  };
+  const didStopNote = (note: number, playedBy: number) => {
+    // TODO: update score
+
+    handleNotePlay(note, playedBy);
+  };
 
   useEffect(() => {
     if (timeToStart <= 0) {
@@ -105,8 +123,8 @@ const GameView: React.FC<Props> = ({ tracks }) => {
           {...keyboardDimension}
           keyHeight={keyHeight}
           keyboardMap={keyboardMap}
-          didPlayNote={noOp}
-          didStopNote={noOp}
+          didPlayNote={didPlayNote}
+          didStopNote={didStopNote}
         />
       </div>
     </div>
