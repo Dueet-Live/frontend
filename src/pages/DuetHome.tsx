@@ -6,9 +6,10 @@ import {
   TextField,
   Typography,
 } from '@material-ui/core';
+import { ArrowBack } from '@material-ui/icons';
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import RoomHeader from '../components/RoomHeader';
+import RoomHeader from '../components/shared/RoomHeader';
 
 const useStyles = makeStyles(theme => ({
   outer: {
@@ -67,10 +68,17 @@ const DuetHome: React.FC = () => {
     history.push('/duet/play');
   };
 
+  const handleBack = () => {
+    history.push('/');
+  };
+
   return (
     <div className={classes.outer}>
-      {/* TODO: don't render pickASong */}
-      <RoomHeader isSolo />
+      <RoomHeader>
+        <Button onClick={handleBack} startIcon={<ArrowBack />}>
+          Back to home
+        </Button>
+      </RoomHeader>
       <Grid
         container
         alignItems="center"
