@@ -1,10 +1,4 @@
-import {
-  Box,
-  makeStyles,
-  Typography,
-  useMediaQuery,
-  useTheme,
-} from '@material-ui/core';
+import { Box, makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
 import songsAPI from '../api/songs';
 import { RoomInfo } from '../types/roomInfo';
@@ -17,6 +11,7 @@ import { getKeyboardMappingWithSpecificStart } from '../utils/getKeyboardShorcut
 import { useDimensions } from '../utils/useDimensions';
 import useSong from '../utils/useSong';
 import useWindowDimensions from '../utils/useWindowDimensions';
+import Countdown from './Countdown';
 import InteractivePiano from './InteractivePiano';
 import { RoomContext, RoomView } from './RoomContext';
 import SoloRoomHeader from './SoloRoomHeader';
@@ -69,21 +64,6 @@ const SoloRoom: React.FC = () => {
 
   const { piece } = roomState;
   const chosenSong = useSong(piece);
-
-  useEffect(() => {
-    if (timeToStart <= 0) {
-      return;
-    }
-
-    setTimeout(() => {
-      if (timeToStart > 0) {
-        setTimeToStart(timeToStart - 1);
-      }
-      if (timeToStart === 1) {
-        setIsPlaying(true);
-      }
-    }, 1000);
-  }, [timeToStart]);
 
   useEffect(() => {
     if (piece === undefined) return;
@@ -146,6 +126,7 @@ const SoloRoom: React.FC = () => {
           isPieceDownloaded={!!tracks}
           handleStart={() => {
             setTimeToStart(3);
+            setIsPlaying(false);
             setView('solo.play');
           }}
           tryPiano={() => setView('solo.try')}
@@ -159,6 +140,16 @@ const SoloRoom: React.FC = () => {
     //   show number countdown
     // if timeToStart is 0 and playing, show waterfall, music, etc.
     // if timeToStart is 0 and not playing, show the current stuff
+
+    if (view === 'solo.play' && timeToStart !== 0) {
+      return (
+        <Countdown
+          setIsPlaying={setIsPlaying}
+          setTimeToStart={setTimeToStart}
+        />
+      );
+    }
+
     if (isPlaying && tracks)
       return (
         <Waterfall
@@ -169,14 +160,6 @@ const SoloRoom: React.FC = () => {
           notes={tracks[0].notes}
         />
       );
-
-    if (view === 'solo.play' && timeToStart !== 0) {
-      return (
-        <Typography variant="h1" align="center" color="primary">
-          {timeToStart}
-        </Typography>
-      );
-    }
 
     return <></>;
   };
