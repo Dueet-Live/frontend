@@ -22,7 +22,8 @@ import PickASongButton from './PickASongButton';
 
 const useStyles = makeStyles(theme => ({
   root: {
-    height: '100%',
+    flex: 1,
+    alignItems: 'stretch',
   },
   content: {
     flexGrow: 1,
@@ -198,7 +199,7 @@ const DuetLobby: React.FC<Props> = ({
         <Grid item xs={5} container justify="center" alignItems="center">
           {partCard('primo', classes.primo, primo)}
           {partCard('secondo', classes.secondo, secondo)}
-          <Typography variant="body1" align="center" className={classes.error}>
+          <Typography variant="body2" align="center" className={classes.error}>
             {error}
           </Typography>
         </Grid>
