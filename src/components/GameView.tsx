@@ -54,7 +54,7 @@ const GameView: React.FC<Props> = ({
 }) => {
   const classes = useStyles();
   const startTime = 3;
-  const [timeToStart, setTimeToStart] = useState(3);
+  const [timeToStart, setTimeToStart] = useState(startTime);
 
   // Scoring
   const didPlayNote = (note: number, playedBy: number) => {
@@ -85,28 +85,20 @@ const GameView: React.FC<Props> = ({
 
   useEffect(() => {
     Tone.Transport.start();
-    const offset = Tone.now();
 
     // Schedule countdown
-    // TODO: refactor
-    Tone.Transport.scheduleOnce(() => {
-      setTimeToStart(2);
-    }, 1 - offset);
-
-    Tone.Transport.scheduleOnce(() => {
-      setTimeToStart(1);
-    }, 2 - offset);
-
-    Tone.Transport.scheduleOnce(() => {
-      setTimeToStart(0);
-    }, 3 - offset);
+    for (let i = 0; i < startTime; i++) {
+      Tone.Transport.scheduleOnce(() => {
+        setTimeToStart(startTime - i - 1);
+      }, i + 1 - Tone.now());
+    }
 
     // Schedule playback
     const instrumentPlayer = new InstrumentPlayer();
     // TODO: change to playback track
     (tracks[0].notes as Note[]).forEach(note => {
       const scheduledTime =
-        note.time + startTime - offset + lookAheadTime / 1000;
+        note.time + startTime - Tone.now() + lookAheadTime / 1000;
       Tone.Transport.schedule(() => {
         instrumentPlayer.startPlayNote(note.midi);
         // console.log("Play", note.midi, Tone.now() - startTime);
