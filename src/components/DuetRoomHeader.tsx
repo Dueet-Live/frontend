@@ -8,10 +8,11 @@ import {
 import { ArrowBack } from '@material-ui/icons';
 import React, { useContext } from 'react';
 import { useHistory } from 'react-router-dom';
+import { PlayerContext } from '../contexts/PlayerContext';
+import { RoomContext } from '../contexts/RoomContext';
 import PlayerIcon from '../icons/PlayerIcon';
 import SettingsIcon from '../icons/SettingsIcon';
 import PickASongButton from './PickASongButton';
-import { PlayerContext } from '../contexts/PlayerContext';
 import RoomHeader from './shared/RoomHeader';
 
 const useStyles = makeStyles(theme => ({
@@ -28,12 +29,16 @@ const useStyles = makeStyles(theme => ({
   empty: {
     flexGrow: 1,
   },
+  roomId: {
+    marginRight: theme.spacing(1),
+  },
 }));
 
 const DuetRoomHeader: React.FC<{ isPlaying: boolean }> = ({ isPlaying }) => {
   const classes = useStyles();
   const history = useHistory();
   const { me, friend } = useContext(PlayerContext);
+  const { roomInfo } = useContext(RoomContext);
 
   const roomDetails = () => {
     if (me === -1) {
@@ -52,17 +57,26 @@ const DuetRoomHeader: React.FC<{ isPlaying: boolean }> = ({ isPlaying }) => {
           <PlayerIcon num={friend} myPlayerId={me} className={classes.icon} />
         )}
         {friend === null && (
-          <Link
-            component="button"
-            variant="body1"
-            className={classes.link}
-            onClick={
-              async () => navigator.clipboard.writeText(window.location.href)
-              // TODO add a notification
-            }
-          >
-            (Copy link)
-          </Link>
+          <>
+            <Typography
+              variant="body1"
+              color="textPrimary"
+              className={classes.roomId}
+            >
+              {`Room ID: ${roomInfo.id}`}
+            </Typography>
+            <Link
+              component="button"
+              variant="body1"
+              className={classes.link}
+              onClick={
+                async () => navigator.clipboard.writeText(window.location.href)
+                // TODO add a notification
+              }
+            >
+              (Copy link)
+            </Link>
+          </>
         )}
       </Box>
     );
