@@ -1,6 +1,7 @@
 import SoundFontPlayer, { InstrumentName, Player } from 'soundfont-player';
 import { AudioContext } from './AudioContext';
 import * as Tone from 'tone';
+import { BaseContext } from 'tone';
 
 /**
  * Define a null object for soundfont-player instruments.
@@ -21,22 +22,29 @@ class NullSoundFontPlayer {
   play() {
     return new NullSoundFontPlayerNoteAudio();
   }
+
+  schedule(when: number, events: any[]) {
+    return new NullSoundFontPlayerNoteAudio();
+  }
 }
 
 export class AudioPlayer {
-  audioContext: AudioContext;
+  audioContext: BaseContext;
   soundFontPlayer: NullSoundFontPlayer | Player;
 
   constructor() {
-    this.audioContext = AudioContext && new AudioContext();
-    Tone.setContext(this.audioContext);
+    this.audioContext = Tone.context;
     this.soundFontPlayer = new NullSoundFontPlayer();
   }
 
   // For a full list of supported instruments, refer to:
   // https://github.com/danigb/soundfont-player/blob/master/instruments.json
   setInstrument(instrumentName: InstrumentName) {
-    SoundFontPlayer.instrument(this.audioContext, instrumentName, { gain: 2 })
+    SoundFontPlayer.instrument(
+      this.audioContext.rawContext as AudioContext,
+      instrumentName,
+      { gain: 5 }
+    )
       .then(soundFontPlayer => {
         this.soundFontPlayer = soundFontPlayer;
       })
@@ -48,5 +56,15 @@ export class AudioPlayer {
   playNote(note: string) {
     // console.log("Play " + note)
     return this.soundFontPlayer.play(note);
+  }
+
+  playNoteWithDuration(
+    note: string,
+    time: number,
+    duration: number,
+    volume: number
+  ) {
+    // console.log("Play " + note)
+    return this.soundFontPlayer.play(note, time, { duration, gain: volume });
   }
 }

@@ -20,11 +20,7 @@ export default class InstrumentPlayer {
     this.instrument.playNotes(notes);
   }
 
-  startPlayNote(note: number) {
-    this.instrument.startPlayNote(note.toString());
-  }
-
-  stopPlayNote(note: number) {
-    this.instrument.stopPlayNote(note.toString());
+  playNote(note: number, time: number, duration: number, volume: number) {
+    return this.instrument.playNote(note.toString(), time, duration, volume);
   }
 }

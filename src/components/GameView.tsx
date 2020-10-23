@@ -20,6 +20,8 @@ import { Note } from './Waterfall/types';
 import InstrumentPlayer from './Piano/utils/InstrumentPlayer';
 import { calculateLookAheadTime } from './Waterfall/utils';
 import useWindowDimensions from '../utils/useWindowDimensions';
+import { Player } from 'tone';
+import { NullSoundFontPlayerNoteAudio } from './Piano/utils/InstrumentPlayer/AudioPlayer';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -53,8 +55,9 @@ const GameView: React.FC<Props> = ({
   handleNoteStop = noOp,
 }) => {
   const classes = useStyles();
-  const startTime = 3;
-  const [timeToStart, setTimeToStart] = useState(startTime);
+  const [startTime, setStartTime] = useState(-1);
+  const countDown = 3;
+  const [timeToStart, setTimeToStart] = useState(countDown);
 
   // Scoring
   const didPlayNote = (note: number, playedBy: number) => {
@@ -84,34 +87,53 @@ const GameView: React.FC<Props> = ({
   const lookAheadTime = calculateLookAheadTime(bpm, beatsPerBar, noteDivision);
 
   useEffect(() => {
+    const startTime = Tone.now() + countDown;
+    setStartTime(startTime);
+    // console.log("Game start", startTime);
+
     Tone.Transport.start();
 
     // Schedule countdown
-    for (let i = 0; i < startTime; i++) {
-      Tone.Transport.scheduleOnce(() => {
-        setTimeToStart(startTime - i - 1);
-      }, i + 1 - Tone.now());
+    for (let i = 0; i < countDown; i++) {
+      Tone.Transport.schedule(() => {
+        setTimeToStart(countDown - 1 - i);
+      }, startTime - (countDown - 1 - i) - Tone.now());
     }
 
     // Schedule playback
     const instrumentPlayer = new InstrumentPlayer();
     // TODO: change to playback track
+    const handlers: (Player | NullSoundFontPlayerNoteAudio)[] = [];
+    (tracks[1].notes.concat(tracks[2].notes) as Note[]).forEach(note => {
+      Tone.Transport.schedule(() => {
+        const event = instrumentPlayer.playNote(
+          note.midi,
+          note.time + startTime + lookAheadTime / 1000,
+          note.duration,
+          2
+        );
+        handlers.push(event);
+      }, note.time + startTime + lookAheadTime / 1000 - Tone.now() - 1);
+    });
     (tracks[0].notes as Note[]).forEach(note => {
-      const scheduledTime =
-        note.time + startTime - Tone.now() + lookAheadTime / 1000;
       Tone.Transport.schedule(() => {
-        instrumentPlayer.startPlayNote(note.midi);
-        // console.log("Play", note.midi, Tone.now() - startTime);
-      }, scheduledTime);
-      Tone.Transport.schedule(() => {
-        instrumentPlayer.stopPlayNote(note.midi);
-        // console.log("Stop", note.midi, Tone.now() - startTime);
-      }, scheduledTime + note.duration);
+        const event = instrumentPlayer.playNote(
+          note.midi,
+          note.time + startTime + lookAheadTime / 1000,
+          note.duration,
+          5
+        );
+        handlers.push(event);
+      }, note.time + startTime + lookAheadTime / 1000 - Tone.now() - 1);
     });
 
     return () => {
       Tone.Transport.cancel();
       Tone.Transport.stop();
+      Tone.Transport.position = 0;
+      handlers.forEach(handler => {
+        handler.stop();
+      });
     };
   }, [tracks, lookAheadTime]);
 

@@ -186,7 +186,7 @@ export function calculateBlackKeyWidth(whiteKeyWidth: number): number {
 
 // Set white-black key height ratio here
 export function calculateBlackKeyHeight(whiteKeyHeight: number): number {
-  return (whiteKeyHeight / 5) * 3;
+  return whiteKeyHeight / 2;
 }
 
 function calculateNumberOfOctaves(range: number): number {
