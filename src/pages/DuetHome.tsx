@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   Grid,
   makeStyles,
@@ -16,6 +17,9 @@ const useStyles = makeStyles(theme => ({
     height: '100%',
     display: 'flex',
     flexDirection: 'column',
+  },
+  header: {
+    flexGrow: 0,
   },
   content: {
     flexGrow: 1,
@@ -85,17 +89,18 @@ const DuetHome: React.FC = () => {
   };
 
   return (
-    <div className={classes.outer}>
-      <RoomHeader>
-        <Button onClick={handleBack} startIcon={<ArrowBack />}>
-          Back to home
-        </Button>
-      </RoomHeader>
+    <Box className={classes.outer}>
+      <Box className={classes.header}>
+        <RoomHeader>
+          <Button onClick={handleBack} startIcon={<ArrowBack />}>
+            Back to home
+          </Button>
+        </RoomHeader>
+      </Box>
       <Grid
         container
         alignItems="center"
         justify="center"
-        xs={12}
         className={classes.content}
       >
         <Grid
@@ -108,9 +113,9 @@ const DuetHome: React.FC = () => {
           justify="center"
         >
           <Grid item container xs={12} spacing={2} justify="center">
-            <div>
+            <Box>
               <Typography variant="h6">Enter Room PIN</Typography>
-            </div>
+            </Box>
             <Grid item xs={12}>
               <PinField
                 placeholder="XXXX"
@@ -148,7 +153,7 @@ const DuetHome: React.FC = () => {
           </Grid>
         </Grid>
       </Grid>
-    </div>
+    </Box>
   );
 };
 
