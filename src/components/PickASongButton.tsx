@@ -13,6 +13,8 @@ import {
 } from '@material-ui/core';
 import { ArrowBack, Close, MusicNoteOutlined } from '@material-ui/icons';
 import React, { useContext, useState } from 'react';
+import { PlayerContext } from '../contexts/PlayerContext';
+import { RoomContext } from '../contexts/RoomContext';
 import PickASongIcon from '../icons/PickASongIcon';
 import { RoomInfo } from '../types/roomInfo';
 import { getReady } from '../utils/roomInfo';
@@ -21,8 +23,6 @@ import useGenres from '../utils/useGenres';
 import useSong from '../utils/useSong';
 import useSongs from '../utils/useSongs';
 import GenreCard from './GenreCard';
-import { PlayerContext } from '../contexts/PlayerContext';
-import { RoomContext } from '../contexts/RoomContext';
 import SongCard from './SongCard';
 
 const useStyles = makeStyles(theme => ({
@@ -98,7 +98,7 @@ const DialogTitleWithButtons: React.FC<DialogTitleWithButtonsProps> = ({
   );
 };
 
-const PickASongButton: React.FC<{ isPlaying: boolean }> = ({ isPlaying }) => {
+const PickASongButton: React.FC = () => {
   const [open, setOpen] = useState(false);
   const [genre, setGenre] = useState('');
 
@@ -181,7 +181,7 @@ const PickASongButton: React.FC<{ isPlaying: boolean }> = ({ isPlaying }) => {
       <Button
         className={classes.pickASongButton}
         onClick={handleOpen}
-        disabled={isPlaying || iAmReady}
+        disabled={iAmReady}
       >
         {chosenSong === null ? (
           <>
