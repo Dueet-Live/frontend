@@ -54,6 +54,18 @@ const DuetHome: React.FC = () => {
     }
   };
 
+  const handleRoomIdPaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const roomLinkRegex = /^.*\?id=(?<roomId>\d{0,4})$/;
+    let paste = e.clipboardData.getData('text');
+    const match = paste.match(roomLinkRegex);
+    const pastedRoomId = match?.groups?.roomId;
+    if (!pastedRoomId) {
+      return;
+    }
+    setRoomId(pastedRoomId);
+  };
+
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && roomIdRegex.test(roomId)) {
       joinRoom();
@@ -106,6 +118,7 @@ const DuetHome: React.FC = () => {
                 value={roomId}
                 autoFocus
                 onKeyPress={handleKeyPress}
+                onPaste={handleRoomIdPaste}
               />
             </Grid>
             <Grid item xs={12}>
