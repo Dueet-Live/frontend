@@ -1,11 +1,11 @@
 import { Box, makeStyles } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
 import songsAPI from '../api/songs';
+import { RoomContext, RoomView } from '../contexts/RoomContext';
 import { RoomInfo } from '../types/roomInfo';
 import useSong from '../utils/useSong';
-import DefaultPiano from './Piano/DefaultPiano';
 import GameView from './GameView';
-import { RoomContext, RoomView } from '../contexts/RoomContext';
+import DefaultPiano from './Piano/DefaultPiano';
 import SoloRoomHeader from './SoloRoomHeader';
 import SoloSelectSong from './SoloSelectSong';
 
@@ -111,10 +111,6 @@ const SoloRoom: React.FC = () => {
             setView={setView}
             selectedGenre={songSelectionGenre}
             setGenre={setSongSelectionGenre}
-            quitSong={() => {
-              setView('solo.select');
-              // TODO update server that user has quit
-            }}
           />
         </div>
         {/* main body */}

@@ -149,7 +149,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
         <Box className={classes.root}>
           {/* header */}
           <div className={classes.header}>
-            <DuetRoomHeader />
+            <DuetRoomHeader view={view} setView={setView} />
           </div>
 
           <div className={classes.body}>{mainBody()}</div>

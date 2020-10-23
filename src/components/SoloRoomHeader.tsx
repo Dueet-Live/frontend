@@ -8,9 +8,9 @@ import {
 import { ArrowBack, MusicNoteOutlined } from '@material-ui/icons';
 import React, { useContext } from 'react';
 import { useHistory } from 'react-router-dom';
+import { RoomContext, RoomView } from '../contexts/RoomContext';
 import SettingsIcon from '../icons/SettingsIcon';
 import useSong from '../utils/useSong';
-import { RoomContext, RoomView } from '../contexts/RoomContext';
 import RoomHeader from './shared/RoomHeader';
 
 const useStyles = makeStyles(theme => ({
@@ -39,7 +39,6 @@ type Props = {
   selectedGenre: string;
   setGenre: (genre: string) => void;
   setView: (roomView: RoomView) => void;
-  quitSong: () => void;
 };
 
 const SoloRoomHeader: React.FC<Props> = ({
@@ -47,7 +46,6 @@ const SoloRoomHeader: React.FC<Props> = ({
   selectedGenre,
   setGenre,
   setView,
-  quitSong,
 }) => {
   const classes = useStyles();
   const history = useHistory();
@@ -71,14 +69,13 @@ const SoloRoomHeader: React.FC<Props> = ({
         }
         break;
       }
-      case 'solo.try': {
-        backText = 'Song Selection';
+      case 'solo.try':
+      case 'solo.play': {
+        if (view === 'solo.try') {
+          backText = 'Song Selection';
+        }
         handleBack = () => setView('solo.select');
         break;
-      }
-      case 'solo.play': {
-        backText = '';
-        handleBack = quitSong;
       }
     }
 

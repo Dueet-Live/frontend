@@ -8,7 +8,7 @@ import {
   RadioGroup,
   Typography,
 } from '@material-ui/core';
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
 import { PlayerContext } from '../contexts/PlayerContext';
 import { RoomContext } from '../contexts/RoomContext';
 import PianoIcon from '../icons/PianoIcon';
@@ -98,7 +98,6 @@ const DuetLobby: React.FC<Props> = ({
   tryPiano,
 }) => {
   const classes = useStyles();
-  const [part, setPart] = useState<'' | Part>('');
   const { me: myPlayerId } = useContext(PlayerContext);
   const { roomInfo } = useContext(RoomContext);
   const { primo, secondo } = getPartsSelection(roomInfo);
@@ -108,7 +107,6 @@ const DuetLobby: React.FC<Props> = ({
     const val = event.target.value;
     if (val === '' || (val !== 'primo' && val !== 'secondo')) return;
 
-    setPart(val);
     choosePart(val);
   };
 
@@ -141,10 +139,10 @@ const DuetLobby: React.FC<Props> = ({
   let error = '';
   if (myPart === null) {
     error = 'Choose a part with the buttons on the left!';
-  } else if (primo.length === 0 || secondo.length === 0) {
-    error = 'Waiting for your friend to pick a part...';
   } else if (primo.length === 2 || secondo.length === 2) {
     error = 'Both of you must play different parts!';
+  } else if (primo.length === 0 || secondo.length === 0) {
+    error = 'Waiting for your friend to pick a part...';
   }
 
   return (
@@ -181,7 +179,7 @@ const DuetLobby: React.FC<Props> = ({
               row
               aria-label="part"
               name="part"
-              value={part}
+              value={myPart}
               onChange={handlePartChange}
             >
               <FormControlLabel
