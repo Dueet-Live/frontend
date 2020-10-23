@@ -143,6 +143,13 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   // Calculate keyboard dimension
   const isGameMode = isPlaying || timeToStart > 0;
   const tracks = chosenSongMIDI.tracks;
+  const bpm = chosenSongMIDI.header?.tempos[0].bpm;
+  const [beatsPerBar, noteDivision] =
+    chosenSongMIDI.header === undefined
+      ? [0, 0]
+      : chosenSongMIDI.header.timeSignatures[0].timeSignature;
+
+  // Calculate keyboard dimension
   const [middleBoxDimensions, middleBoxRef] = useDimensions<HTMLDivElement>();
   const { height } = useWindowDimensions();
   const SMALL_START_NOTE = !(isGameMode && tracks)
@@ -189,9 +196,10 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
         <Waterfall
           {...keyboardDimension}
           dimension={middleBoxDimensions}
-          bpm={120}
-          beatsPerBar={4}
+          bpm={bpm}
+          beatsPerBar={beatsPerBar}
           notes={notes}
+          noteDivision={noteDivision}
         />
       );
     }

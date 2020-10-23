@@ -53,7 +53,6 @@ const SoloRoom: React.FC = () => {
       if (piece === undefined) return;
       try {
         const song = await songsAPI.getSongWithContent(piece);
-
         setChosenSongMIDI(JSON.parse(song.content));
       } catch (err) {
         // TODO set a notification that it failed to retrieve song
@@ -91,7 +90,7 @@ const SoloRoom: React.FC = () => {
     }
 
     if (view === 'solo.play') {
-      return <GameView tracks={tracks} />;
+      return <GameView chosenSongMIDI={chosenSongMIDI} />;
     }
 
     return <></>;

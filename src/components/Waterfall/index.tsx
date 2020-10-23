@@ -6,7 +6,7 @@ import {
 } from '../../utils/calculateKeyboardDimension';
 import { Dimensions } from '../../utils/useDimensions';
 import { FallingNote } from './FallingNote';
-import { KeyboardDimension, KeyOffsetInfo, Note } from './types';
+import { KeyboardDimension, KeyOffsetInfo, MidiInfo, Note } from './types';
 import {
   calculateLookAheadTime,
   convertTimeInfoToMilliseconds,
@@ -14,12 +14,10 @@ import {
   drawFallingNote,
 } from './utils';
 
-type Props = KeyboardDimension & {
-  bpm: number;
-  beatsPerBar: number; // TODO: add info about whether beat = half/quarter/eigth note etc.
-  notes: Array<Note>;
-  dimension: Dimensions;
-};
+type Props = KeyboardDimension &
+  MidiInfo & {
+    dimension: Dimensions;
+  };
 
 const useStyles = makeStyles(theme => ({
   canvas: {
@@ -34,6 +32,7 @@ export const Waterfall: React.FC<Props> = ({
   dimension,
   bpm,
   beatsPerBar,
+  noteDivision,
   notes,
 }) => {
   const classes = useStyles();
@@ -46,7 +45,7 @@ export const Waterfall: React.FC<Props> = ({
   const firstHiddenNoteIndex = useRef(0);
   const fallingNotes = useRef<Array<FallingNote>>([]);
 
-  const lookAheadTime = calculateLookAheadTime(bpm, beatsPerBar);
+  const lookAheadTime = calculateLookAheadTime(bpm, beatsPerBar, noteDivision);
   const keyOffsetInfo = useMemo(
     () =>
       ({

@@ -34,14 +34,14 @@ const useStyles = makeStyles(theme => ({
 }));
 
 type Props = {
-  tracks: any;
+  chosenSongMIDI: any;
   handleNotePlay?: (key: number, playerId: number) => void;
   handleNoteStop?: (key: number, playerId: number) => void;
   handleScoreUpdate?: (newScore: number) => void /* tentative */;
 };
 
 const GameView: React.FC<Props> = ({
-  tracks,
+  chosenSongMIDI,
   handleNotePlay = noOp,
   handleNoteStop = noOp,
 }) => {
@@ -74,6 +74,14 @@ const GameView: React.FC<Props> = ({
       clearTimeout(handler);
     };
   }, [timeToStart]);
+
+  // song information
+  const tracks = chosenSongMIDI.tracks;
+  const bpm = chosenSongMIDI.header?.tempos[0].bpm;
+  const [beatsPerBar, noteDivision] =
+    chosenSongMIDI.header === undefined
+      ? [0, 0]
+      : chosenSongMIDI.header.timeSignatures[0].timeSignature;
 
   // Calculate keyboard dimension
   const [middleBoxDimensions, middleBoxRef] = useDimensions<HTMLDivElement>();
@@ -111,8 +119,9 @@ const GameView: React.FC<Props> = ({
           <Waterfall
             {...keyboardDimension}
             dimension={middleBoxDimensions}
-            bpm={120}
-            beatsPerBar={4}
+            bpm={bpm}
+            beatsPerBar={beatsPerBar}
+            noteDivision={noteDivision}
             notes={tracks[0].notes}
           />
         )}
