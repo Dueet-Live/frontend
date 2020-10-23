@@ -36,6 +36,15 @@ export default class Instrument {
     });
   }
 
+  startPlayNote(note: string) {
+    this.activeNoteMap[note] = this.audioPlayer.playNote(note);
+  }
+
+  stopPlayNote(note: string) {
+    this.activeNoteMap[note].stop();
+    delete this.activeNoteMap[note];
+  }
+
   getActiveNotes() {
     return Object.keys(this.activeNoteMap);
   }

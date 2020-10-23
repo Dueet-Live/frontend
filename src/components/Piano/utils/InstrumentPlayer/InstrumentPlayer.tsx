@@ -8,6 +8,7 @@ export default class InstrumentPlayer {
 
   constructor() {
     this.audioPlayer = new AudioPlayer();
+    this.audioPlayer.setInstrument('acoustic_grand_piano');
     this.instrument = new Instrument(this.audioPlayer);
   }
 
@@ -17,5 +18,13 @@ export default class InstrumentPlayer {
 
   playNotes(notes: string[]) {
     this.instrument.playNotes(notes);
+  }
+
+  startPlayNote(note: number) {
+    this.instrument.startPlayNote(note.toString());
+  }
+
+  stopPlayNote(note: number) {
+    this.instrument.stopPlayNote(note.toString());
   }
 }

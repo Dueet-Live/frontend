@@ -1,3 +1,5 @@
+import { KeyboardDimension } from '../types/keyboardDimension';
+
 const shortcuts = [
   ['Z'],
   ['S'],
@@ -65,10 +67,10 @@ export function getKeyboardMapping(
 // Assume the start note and first mapped note are both C here
 export function getKeyboardMappingWithSpecificStart(
   firstMappedNote: number,
-  startNote: number,
-  range: number
+  keyboardDimension: KeyboardDimension
 ): { [key: string]: number } {
-  const mapRange = Math.min(30, range - (firstMappedNote - startNote));
+  const { start, range } = keyboardDimension;
+  const mapRange = Math.min(30, range - (firstMappedNote - start));
   const map: { [key: string]: number } = {};
   for (let i = 0; i < mapRange; i++) {
     const shortcutKeys = shortcuts[i];

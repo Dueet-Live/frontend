@@ -23,7 +23,7 @@ const DefaultPiano: React.FC<Props> = ({
   return (
     <InteractivePiano
       includeOctaveShift={true}
-      {...keyboardDimension}
+      keyboardDimension={keyboardDimension}
       keyHeight={keyHeight}
       didPlayNote={handleNotePlay}
       didStopNote={handleNoteStop}

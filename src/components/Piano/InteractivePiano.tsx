@@ -5,12 +5,11 @@ import { getKeyboardMapping } from '../../utils/getKeyboardShorcutsMapping';
 import OctaveShiftKey from './OctaveShiftKey';
 import Piano from './Piano';
 import PianoContainer from './PianoContainer';
+import { KeyboardDimension } from '../../types/keyboardDimension';
 
 type Props = {
   includeOctaveShift: boolean;
-  start: number;
-  range: number;
-  keyWidth: number;
+  keyboardDimension: KeyboardDimension;
   keyHeight: number;
   keyboardMap?: { [key: string]: number };
   didPlayNote?: (key: number, playerId: number) => void;
@@ -19,14 +18,13 @@ type Props = {
 
 const InteractivePiano: React.FC<Props> = ({
   includeOctaveShift = true,
-  start,
-  range,
-  keyWidth,
+  keyboardDimension,
   keyHeight,
   keyboardMap,
   didPlayNote,
   didStopNote,
 }) => {
+  const { start, range, keyWidth } = keyboardDimension;
   const [startNote, setStartNote] = useState(start);
   const [keyRange, setKeyRange] = useState(start);
   const endNote = startNote + keyRange - 1;

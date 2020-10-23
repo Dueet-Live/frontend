@@ -1,23 +1,25 @@
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import { KeyboardDimension } from '../../types/keyboardDimension';
 import {
   calculateBlackKeyWidth,
   getOffsetMap,
 } from '../../utils/calculateKeyboardDimension';
 import { Dimensions } from '../../utils/useDimensions';
 import { FallingNote } from './FallingNote';
-import { KeyboardDimension, KeyOffsetInfo, MidiInfo, Note } from './types';
+import { KeyOffsetInfo, MidiInfo, Note } from './types';
 import {
   calculateLookAheadTime,
   convertTimeInfoToMilliseconds,
-  delayStartTime,
   drawFallingNote,
 } from './utils';
+import * as Tone from 'tone';
 
-type Props = KeyboardDimension &
-  MidiInfo & {
-    dimension: Dimensions;
-  };
+type Props = MidiInfo & {
+  keyboardDimension: KeyboardDimension;
+  startTime?: number;
+  dimension: Dimensions;
+};
 
 const useStyles = makeStyles(theme => ({
   canvas: {
@@ -26,9 +28,8 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export const Waterfall: React.FC<Props> = ({
-  start,
-  range,
-  keyWidth,
+  startTime = 0,
+  keyboardDimension,
   dimension,
   bpm,
   beatsPerBar,
@@ -40,21 +41,20 @@ export const Waterfall: React.FC<Props> = ({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const notesInMs = useRef<Array<Note>>(convertTimeInfoToMilliseconds(notes));
   const animationId = useRef(0);
-  const prevFrameTime = useRef(0);
-  const isPaused = useRef(true);
+  const prevFrameTime = useRef(Tone.now());
   const firstHiddenNoteIndex = useRef(0);
   const fallingNotes = useRef<Array<FallingNote>>([]);
 
   const lookAheadTime = calculateLookAheadTime(bpm, beatsPerBar, noteDivision);
-  const keyOffsetInfo = useMemo(
-    () =>
-      ({
-        leftMarginMap: getOffsetMap(start, range, keyWidth),
-        whiteKeyWidth: keyWidth,
-        blackKeyWidth: calculateBlackKeyWidth(keyWidth),
-      } as KeyOffsetInfo),
-    [keyWidth, range, start]
-  );
+
+  const keyOffsetInfo = useMemo(() => {
+    const { start, range, keyWidth } = keyboardDimension;
+    return {
+      leftMarginMap: getOffsetMap(start, range, keyWidth),
+      whiteKeyWidth: keyWidth,
+      blackKeyWidth: calculateBlackKeyWidth(keyWidth),
+    } as KeyOffsetInfo;
+  }, [keyboardDimension]);
 
   const startAnimation = useCallback(() => {
     const canvas = canvasRef.current!;
@@ -68,27 +68,24 @@ export const Waterfall: React.FC<Props> = ({
 
     const speed = canvas.height / lookAheadTime;
 
-    const animate = (timestamp: number) => {
-      if (isPaused.current) {
-        notesInMs.current = delayStartTime(notesInMs.current, timestamp);
-        prevFrameTime.current = timestamp;
-        isPaused.current = false;
-      }
+    const animate = () => {
+      const timestamp = Tone.now() * 1000;
 
       // check if we need to add more notes
       while (
         firstHiddenNoteIndex.current < notesInMs.current.length &&
-        notesInMs.current[firstHiddenNoteIndex.current].time <= timestamp
+        notesInMs.current[firstHiddenNoteIndex.current].time <=
+        timestamp - startTime
       ) {
         const note = notesInMs.current[firstHiddenNoteIndex.current];
-        fallingNotes.current.push(
-          FallingNote.createFromNoteInfo(
-            note,
-            speed,
-            canvas.height,
-            keyOffsetInfo
-          )
+        const newNote = FallingNote.createFromNoteInfo(
+          note,
+          speed,
+          canvas.height,
+          keyOffsetInfo,
+          prevFrameTime.current - startTime
         );
+        fallingNotes.current.push(newNote);
         firstHiddenNoteIndex.current += 1;
       }
 
@@ -116,7 +113,7 @@ export const Waterfall: React.FC<Props> = ({
     };
 
     animationId.current = window.requestAnimationFrame(animate);
-  }, [keyOffsetInfo, lookAheadTime]);
+  }, [keyOffsetInfo, lookAheadTime, startTime]);
 
   useEffect(() => {
     startAnimation();

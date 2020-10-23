@@ -13,9 +13,13 @@ import {
 } from '../utils/calculateKeyboardDimension';
 import { getKeyboardMappingWithSpecificStart } from '../utils/getKeyboardShorcutsMapping';
 import { useDimensions } from '../utils/useDimensions';
-import useWindowDimensions from '../utils/useWindowDimensions';
-import InteractivePiano from './Piano/InteractivePiano';
 import { Waterfall } from './Waterfall';
+import InteractivePiano from './Piano/InteractivePiano';
+import * as Tone from 'tone';
+import { Note } from './Waterfall/types';
+import InstrumentPlayer from './Piano/utils/InstrumentPlayer';
+import { calculateLookAheadTime } from './Waterfall/utils';
+import useWindowDimensions from '../utils/useWindowDimensions';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -49,17 +53,19 @@ const GameView: React.FC<Props> = ({
   handleNoteStop = noOp,
 }) => {
   const classes = useStyles();
+  const startTime = 3;
   const [timeToStart, setTimeToStart] = useState(3);
 
+  // Scoring
   const didPlayNote = (note: number, playedBy: number) => {
     // TODO: update score
-
+    console.log('Play', Tone.now() - startTime);
     handleNotePlay(note, playedBy);
   };
   const didStopNote = (note: number, playedBy: number) => {
     // TODO: update score
-
-    handleNotePlay(note, playedBy);
+    console.log('Stop', Tone.now() - startTime);
+    handleNoteStop(note, playedBy);
   };
 
   // 0 for solo
@@ -69,37 +75,59 @@ const GameView: React.FC<Props> = ({
     trackNum = 1;
   }
 
-  useEffect(() => {
-    if (timeToStart <= 0) {
-      return;
-    }
-
-    const handler = setTimeout(() => {
-      if (timeToStart > 0) {
-        setTimeToStart(timeToStart - 1);
-      }
-    }, 1000);
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [timeToStart]);
-
-  // song information
   const tracks = chosenSongMIDI.tracks;
   const bpm = chosenSongMIDI.header?.tempos[0].bpm;
   const [beatsPerBar, noteDivision] =
     chosenSongMIDI.header === undefined
       ? [0, 0]
       : chosenSongMIDI.header.timeSignatures[0].timeSignature;
+  const lookAheadTime = calculateLookAheadTime(bpm, beatsPerBar, noteDivision);
+
+  useEffect(() => {
+    Tone.Transport.start();
+    const offset = Tone.now();
+
+    // Schedule countdown
+    // TODO: refactor
+    Tone.Transport.scheduleOnce(() => {
+      setTimeToStart(2);
+    }, 1 - offset);
+
+    Tone.Transport.scheduleOnce(() => {
+      setTimeToStart(1);
+    }, 2 - offset);
+
+    Tone.Transport.scheduleOnce(() => {
+      setTimeToStart(0);
+    }, 3 - offset);
+
+    // Schedule playback
+    const instrumentPlayer = new InstrumentPlayer();
+    // TODO: change to playback track
+    (tracks[0].notes as Note[]).forEach(note => {
+      const scheduledTime =
+        note.time + startTime - offset + lookAheadTime / 1000;
+      Tone.Transport.schedule(() => {
+        instrumentPlayer.startPlayNote(note.midi);
+        // console.log("Play", note.midi, Tone.now() - startTime);
+      }, scheduledTime);
+      Tone.Transport.schedule(() => {
+        instrumentPlayer.stopPlayNote(note.midi);
+        // console.log("Stop", note.midi, Tone.now() - startTime);
+      }, scheduledTime + note.duration);
+    });
+
+    return () => {
+      Tone.Transport.cancel();
+      Tone.Transport.stop();
+    };
+  }, [tracks, lookAheadTime]);
 
   // Calculate keyboard dimension
   const [middleBoxDimensions, middleBoxRef] = useDimensions<HTMLDivElement>();
   const { height } = useWindowDimensions();
   const smallStartNote = !tracks ? 72 : tracks[trackNum].smallStartNote;
-
   const regularStartNote = !tracks ? 72 : tracks[trackNum].regularStartNote;
-
   const keyboardDimension = calculateGamePianoDimension(
     middleBoxDimensions.width,
     smallStartNote,
@@ -111,11 +139,7 @@ const GameView: React.FC<Props> = ({
   const theme = useTheme();
   const isDesktopView = useMediaQuery(theme.breakpoints.up('md'));
   const keyboardMap = isDesktopView
-    ? getKeyboardMappingWithSpecificStart(
-        regularStartNote,
-        keyboardDimension['start'],
-        keyboardDimension['range']
-      )
+    ? getKeyboardMappingWithSpecificStart(regularStartNote, keyboardDimension)
     : undefined;
 
   return (
@@ -126,20 +150,21 @@ const GameView: React.FC<Props> = ({
             {timeToStart}
           </Typography>
         ) : (
-          <Waterfall
-            {...keyboardDimension}
-            dimension={middleBoxDimensions}
-            bpm={bpm}
-            beatsPerBar={beatsPerBar}
-            noteDivision={noteDivision}
-            notes={tracks[trackNum].notes}
-          />
-        )}
+            <Waterfall
+              keyboardDimension={keyboardDimension}
+              startTime={startTime * 1000}
+              dimension={middleBoxDimensions}
+              bpm={bpm}
+              beatsPerBar={beatsPerBar}
+              noteDivision={noteDivision}
+              notes={tracks[0].notes}
+            />
+          )}
       </div>
       <div className={classes.piano}>
         <InteractivePiano
           includeOctaveShift={false}
-          {...keyboardDimension}
+          keyboardDimension={keyboardDimension}
           keyHeight={keyHeight}
           keyboardMap={keyboardMap}
           didPlayNote={didPlayNote}

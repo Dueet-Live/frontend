@@ -1,5 +1,6 @@
 import SoundFontPlayer, { InstrumentName, Player } from 'soundfont-player';
 import { AudioContext } from './AudioContext';
+import * as Tone from 'tone';
 
 /**
  * Define a null object for soundfont-player instruments.
@@ -28,6 +29,7 @@ export class AudioPlayer {
 
   constructor() {
     this.audioContext = AudioContext && new AudioContext();
+    Tone.setContext(this.audioContext);
     this.soundFontPlayer = new NullSoundFontPlayer();
   }
 
