@@ -10,7 +10,7 @@ import React, { useContext } from 'react';
 import { useHistory } from 'react-router-dom';
 import SettingsIcon from '../icons/SettingsIcon';
 import useSong from '../utils/useSong';
-import { RoomContext, RoomView } from './RoomContext';
+import { RoomContext, RoomView } from '../contexts/RoomContext';
 import RoomHeader from './shared/RoomHeader';
 
 const useStyles = makeStyles(theme => ({

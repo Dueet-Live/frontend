@@ -1,12 +1,12 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
+import { PlayerContext } from '../../contexts/PlayerContext';
 import { PlayingNote } from '../../types/playingNote';
 import { getKeyboardShortcutForNote } from '../../utils/getKeyboardShorcutsMapping';
 import {
   addNotePlayListener,
   removeNotePlayListener,
 } from '../../utils/socket';
-import '../InteractivePiano.css';
-import { PlayerContext } from '../PlayerContext';
+import './InteractivePiano.css';
 import InstrumentAudio from './InstrumentAudio';
 import PianoKey from './PianoKey';
 import getNotesBetween from './utils/getNotesBetween';

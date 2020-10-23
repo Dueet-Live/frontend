@@ -30,11 +30,11 @@ import { useDimensions } from '../utils/useDimensions';
 import useWindowDimensions from '../utils/useWindowDimensions';
 import DuetReadyButton from './DuetReadyButton';
 import DuetRoomHeader from './DuetRoomHeader';
-import InteractivePiano from './InteractivePiano';
 import { PartSelection } from './PartSelection';
-import { PlayerContext } from './PlayerContext';
-import { RoomContext } from './RoomContext';
+import { PlayerContext } from '../contexts/PlayerContext';
+import { RoomContext } from '../contexts/RoomContext';
 import { Waterfall } from './Waterfall';
+import InteractivePiano from './Piano/InteractivePiano';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -142,7 +142,8 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   const partsSelection = getPartsSelection(roomState);
   const myPart = getMyPart(roomState, playerId);
 
-  // song information
+  // Calculate keyboard dimension
+  const isGameMode = isPlaying || timeToStart > 0;
   const tracks = chosenSongMIDI.tracks;
   const bpm = chosenSongMIDI.header?.tempos[0].bpm;
   const [beatsPerBar, noteDivision] =
@@ -153,15 +154,15 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   // Calculate keyboard dimension
   const [middleBoxDimensions, middleBoxRef] = useDimensions<HTMLDivElement>();
   const { height } = useWindowDimensions();
-  const SMALL_START_NOTE = !(isPlaying && tracks)
+  const SMALL_START_NOTE = !(isGameMode && tracks)
     ? 72
     : tracks[myPart === 'primo' ? 0 : 1].smallStartNote;
 
-  const REGULAR_START_NOTE = !(isPlaying && tracks)
+  const REGULAR_START_NOTE = !(isGameMode && tracks)
     ? 72
     : tracks[myPart === 'primo' ? 0 : 1].regularStartNote;
 
-  const keyboardDimension = isPlaying
+  const keyboardDimension = isGameMode
     ? calculateGamePianoDimension(
         middleBoxDimensions.width,
         SMALL_START_NOTE,
@@ -170,11 +171,11 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
     : calculateDefaultPianoDimension(middleBoxDimensions.width);
   const keyHeight = calculateKeyHeight(height);
 
-  // Get keyboard mapping
+  // Get custom keyboard mapping for game
   const theme = useTheme();
   const isDesktopView = useMediaQuery(theme.breakpoints.up('md'));
   const keyboardMap =
-    isPlaying && isDesktopView
+    isGameMode && isDesktopView
       ? getKeyboardMappingWithSpecificStart(
           REGULAR_START_NOTE,
           keyboardDimension['start'],
@@ -233,8 +234,6 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   return (
     <RoomContext.Provider
       value={{
-        timeToStart: timeToStart,
-        isPlaying: isPlaying,
         roomInfo: roomState,
         setRoomInfo: setRoomState,
       }}
@@ -248,7 +247,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
         <Box className={classes.root}>
           {/* header */}
           <div className={classes.header}>
-            <DuetRoomHeader isPlaying={isPlaying || timeToStart > 0} />
+            <DuetRoomHeader isPlaying={isGameMode} />
           </div>
 
           {/* available space for the rest of the content */}
@@ -259,7 +258,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
           {/* piano */}
           <div className={classes.piano}>
             <InteractivePiano
-              includeOctaveShift={!isPlaying}
+              includeOctaveShift={!isGameMode}
               {...keyboardDimension}
               keyHeight={keyHeight}
               keyboardMap={keyboardMap}

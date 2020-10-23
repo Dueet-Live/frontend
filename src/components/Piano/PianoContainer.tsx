@@ -1,5 +1,5 @@
 import React from 'react';
-import '../InteractivePiano.css';
+import './InteractivePiano.css';
 
 type Props = {
   children: React.ReactNode;

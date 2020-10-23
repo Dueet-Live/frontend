@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import Piano from './Piano/Piano';
-import PianoContainer from './Piano/PianoContainer';
-import OctaveShiftKey from './Piano/OctaveShiftKey';
-import { getKeyboardMapping } from '../utils/getKeyboardShorcutsMapping';
 import './InteractivePiano.css';
 import { useTheme, useMediaQuery } from '@material-ui/core';
+import { getKeyboardMapping } from '../../utils/getKeyboardShorcutsMapping';
+import OctaveShiftKey from './OctaveShiftKey';
+import Piano from './Piano';
+import PianoContainer from './PianoContainer';
 
 type Props = {
   includeOctaveShift: boolean;
@@ -28,14 +28,16 @@ const InteractivePiano: React.FC<Props> = ({
   didStopNote,
 }) => {
   const [startNote, setStartNote] = useState(start);
-  const endNote = startNote + range - 1;
+  const [keyRange, setKeyRange] = useState(start);
+  const endNote = startNote + keyRange - 1;
 
   const lowestMidiNote = 21;
   const highestMidiNote = 108;
 
   useEffect(() => {
     setStartNote(start);
-  }, [start]);
+    setKeyRange(range);
+  }, [start, range]);
 
   const shiftDownOctave = () => {
     let newStartNote = Math.max(startNote - 12, lowestMidiNote);
