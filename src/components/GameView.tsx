@@ -79,6 +79,8 @@ const GameView: React.FC<Props> = ({
   }
 
   const tracks = chosenSongMIDI.tracks;
+  // TODO: consider duet mode
+  const playerNotes = tracks[0].notes;
   const bpm = chosenSongMIDI.header?.tempos[0].bpm;
   const [beatsPerBar, noteDivision] =
     chosenSongMIDI.header === undefined
@@ -89,7 +91,7 @@ const GameView: React.FC<Props> = ({
   useEffect(() => {
     const startTime = Tone.now() + countDown;
     setStartTime(startTime);
-    // console.log("Game start", startTime);
+    console.log('Game start', startTime);
 
     Tone.Transport.start();
 
@@ -102,28 +104,17 @@ const GameView: React.FC<Props> = ({
 
     // Schedule playback
     const instrumentPlayer = new InstrumentPlayer();
-    // TODO: change to playback track
     const handlers: (Player | NullSoundFontPlayerNoteAudio)[] = [];
+    // TODO: consider duet mode
     (tracks[1].notes.concat(tracks[2].notes) as Note[]).forEach(note => {
       Tone.Transport.schedule(() => {
-        const event = instrumentPlayer.playNote(
+        const handler = instrumentPlayer.playNote(
           note.midi,
           note.time + startTime + lookAheadTime / 1000,
           note.duration,
-          2
+          2 // Volume of the playback (currently the default is 5)
         );
-        handlers.push(event);
-      }, note.time + startTime + lookAheadTime / 1000 - Tone.now() - 1);
-    });
-    (tracks[0].notes as Note[]).forEach(note => {
-      Tone.Transport.schedule(() => {
-        const event = instrumentPlayer.playNote(
-          note.midi,
-          note.time + startTime + lookAheadTime / 1000,
-          note.duration,
-          5
-        );
-        handlers.push(event);
+        handlers.push(handler);
       }, note.time + startTime + lookAheadTime / 1000 - Tone.now() - 1);
     });
 
@@ -164,16 +155,16 @@ const GameView: React.FC<Props> = ({
             {timeToStart}
           </Typography>
         ) : (
-            <Waterfall
-              keyboardDimension={keyboardDimension}
-              startTime={startTime * 1000}
-              dimension={middleBoxDimensions}
-              bpm={bpm}
-              beatsPerBar={beatsPerBar}
-              noteDivision={noteDivision}
-              notes={tracks[0].notes}
-            />
-          )}
+          <Waterfall
+            keyboardDimension={keyboardDimension}
+            startTime={startTime * 1000}
+            dimension={middleBoxDimensions}
+            bpm={bpm}
+            beatsPerBar={beatsPerBar}
+            noteDivision={noteDivision}
+            notes={playerNotes}
+          />
+        )}
       </div>
       <div className={classes.piano}>
         <InteractivePiano

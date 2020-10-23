@@ -75,7 +75,7 @@ export const Waterfall: React.FC<Props> = ({
       while (
         firstHiddenNoteIndex.current < notesInMs.current.length &&
         notesInMs.current[firstHiddenNoteIndex.current].time <=
-        timestamp - startTime
+          timestamp - startTime
       ) {
         const note = notesInMs.current[firstHiddenNoteIndex.current];
         const newNote = FallingNote.createFromNoteInfo(
