@@ -12,7 +12,6 @@ import { PlayerContext } from '../contexts/PlayerContext';
 import { RoomContext } from '../contexts/RoomContext';
 import PlayerIcon from '../icons/PlayerIcon';
 import SettingsIcon from '../icons/SettingsIcon';
-import PickASongButton from './PickASongButton';
 import RoomHeader from './shared/RoomHeader';
 
 const useStyles = makeStyles(theme => ({
@@ -34,7 +33,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const DuetRoomHeader: React.FC<{ isPlaying: boolean }> = ({ isPlaying }) => {
+const DuetRoomHeader: React.FC = () => {
   const classes = useStyles();
   const history = useHistory();
   const { me, friend } = useContext(PlayerContext);
@@ -92,8 +91,6 @@ const DuetRoomHeader: React.FC<{ isPlaying: boolean }> = ({ isPlaying }) => {
       >
         <ArrowBack />
       </IconButton>
-      {/* TODO Make this button responsive. It should truncate when too long */}
-      <PickASongButton isPlaying={isPlaying} />
       <Box component="span" className={classes.empty} />
       {roomDetails()}
       <IconButton edge="end" size="small" className={classes.settingIcon}>

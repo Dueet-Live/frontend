@@ -1,5 +1,7 @@
+import { Part } from './messages';
+
 export interface PlayerInfo {
   id: number;
-  assignedPart?: string;
+  assignedPart?: Part;
   ready: boolean;
 }
