@@ -85,9 +85,6 @@ const Home: React.FC = () => {
             color="primary"
             onClick={() => {
               history.push('/solo');
-              if (Tone.context.state !== 'running') {
-                Tone.context.resume();
-              }
             }}
             className={classes.button}
           >

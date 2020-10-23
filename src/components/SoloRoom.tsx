@@ -8,6 +8,7 @@ import GameView from './GameView';
 import DefaultPiano from './Piano/DefaultPiano';
 import SoloRoomHeader from './SoloRoomHeader';
 import SoloSelectSong from './SoloSelectSong';
+import { startAudioContext } from '../utils/tonejsContex';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -74,6 +75,7 @@ const SoloRoom: React.FC = () => {
           isPieceDownloaded={!!tracks}
           handleStart={() => {
             setView('solo.play');
+            startAudioContext(); // AudioContext has to be started with a click event
           }}
           tryPiano={() => setView('solo.try')}
           chosenSong={chosenSong}

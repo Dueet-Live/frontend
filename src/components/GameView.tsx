@@ -117,6 +117,18 @@ const GameView: React.FC<Props> = ({
         handlers.push(handler);
       }, note.time + startTime + lookAheadTime / 1000 - Tone.now() - 1);
     });
+    // TODO: remove
+    (tracks[0].notes as Note[]).forEach(note => {
+      Tone.Transport.schedule(() => {
+        const handler = instrumentPlayer.playNote(
+          note.midi,
+          note.time + startTime + lookAheadTime / 1000,
+          note.duration,
+          5
+        );
+        handlers.push(handler);
+      }, note.time + startTime + lookAheadTime / 1000 - Tone.now() - 1);
+    });
 
     return () => {
       Tone.Transport.cancel();
