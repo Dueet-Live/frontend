@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   Grid,
   makeStyles,
@@ -16,6 +17,9 @@ const useStyles = makeStyles(theme => ({
     height: '100%',
     display: 'flex',
     flexDirection: 'column',
+  },
+  header: {
+    flexGrow: 0,
   },
   content: {
     flexGrow: 1,
@@ -54,6 +58,26 @@ const DuetHome: React.FC = () => {
     }
   };
 
+  const handleRoomIdPaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
+    // If user pasted the ID, let it happen
+    let paste = e.clipboardData.getData('text');
+    if (roomIdRegex.test(paste)) {
+      return;
+    }
+
+    // Otherwise, if user pasted a room link, extract the id from the link
+    e.preventDefault();
+    const roomLinkRegex = /^.*\?id=(?<roomId>\d{0,4})$/;
+    const match = paste.match(roomLinkRegex);
+    const pastedRoomId = match?.groups?.roomId;
+
+    // If it's not a room link, don't paste it
+    if (!pastedRoomId) {
+      return;
+    }
+    setRoomId(pastedRoomId);
+  };
+
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && roomIdRegex.test(roomId)) {
       joinRoom();
@@ -73,17 +97,18 @@ const DuetHome: React.FC = () => {
   };
 
   return (
-    <div className={classes.outer}>
-      <RoomHeader>
-        <Button onClick={handleBack} startIcon={<ArrowBack />}>
-          Back to home
-        </Button>
-      </RoomHeader>
+    <Box className={classes.outer}>
+      <Box className={classes.header}>
+        <RoomHeader>
+          <Button onClick={handleBack} startIcon={<ArrowBack />}>
+            Back to home
+          </Button>
+        </RoomHeader>
+      </Box>
       <Grid
         container
         alignItems="center"
         justify="center"
-        xs={12}
         className={classes.content}
       >
         <Grid
@@ -96,9 +121,9 @@ const DuetHome: React.FC = () => {
           justify="center"
         >
           <Grid item container xs={12} spacing={2} justify="center">
-            <div>
+            <Box>
               <Typography variant="h6">Enter Room PIN</Typography>
-            </div>
+            </Box>
             <Grid item xs={12}>
               <PinField
                 placeholder="XXXX"
@@ -106,6 +131,7 @@ const DuetHome: React.FC = () => {
                 value={roomId}
                 autoFocus
                 onKeyPress={handleKeyPress}
+                onPaste={handleRoomIdPaste}
               />
             </Grid>
             <Grid item xs={12}>
@@ -135,7 +161,7 @@ const DuetHome: React.FC = () => {
           </Grid>
         </Grid>
       </Grid>
-    </div>
+    </Box>
   );
 };
 
