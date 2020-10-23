@@ -59,11 +59,19 @@ const DuetHome: React.FC = () => {
   };
 
   const handleRoomIdPaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
+    // If user pasted the ID, let it happen
+    let paste = e.clipboardData.getData('text');
+    if (roomIdRegex.test(paste)) {
+      return;
+    }
+
+    // Otherwise, if user pasted a room link, extract the id from the link
     e.preventDefault();
     const roomLinkRegex = /^.*\?id=(?<roomId>\d{0,4})$/;
-    let paste = e.clipboardData.getData('text');
     const match = paste.match(roomLinkRegex);
     const pastedRoomId = match?.groups?.roomId;
+
+    // If it's not a room link, don't paste it
     if (!pastedRoomId) {
       return;
     }
