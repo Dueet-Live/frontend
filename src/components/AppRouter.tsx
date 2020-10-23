@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
-import Duet from '../pages/Duet';
+import DuetHome from '../pages/DuetHome';
+import DuetPlay from '../pages/DuetPlay';
 import Home from '../pages/Home';
 import Solo from '../pages/Solo';
 
@@ -15,7 +16,10 @@ const AppRouter: React.FC = () => {
           <Solo />
         </Route>
         <Route exact path="/duet">
-          <Duet />
+          <DuetHome />
+        </Route>
+        <Route exact path="/duet/play">
+          <DuetPlay />
         </Route>
       </Switch>
     </BrowserRouter>

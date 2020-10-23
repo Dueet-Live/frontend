@@ -13,8 +13,8 @@ type Props = {
   keyWidth: number;
   keyHeight: number;
   keyboardMap?: { [key: string]: number };
-  didPlayNote: (key: number, playerId: number) => void;
-  didStopNote: (key: number, playerId: number) => void;
+  didPlayNote?: (key: number, playerId: number) => void;
+  didStopNote?: (key: number, playerId: number) => void;
 };
 
 const InteractivePiano: React.FC<Props> = ({

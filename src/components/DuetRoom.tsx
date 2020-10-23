@@ -22,9 +22,7 @@ import socket, {
   choosePart,
   createRoom,
   joinRoom,
-  playNote,
   removeRoomStateListeners,
-  stopNote,
 } from '../utils/socket';
 import { useDimensions } from '../utils/useDimensions';
 import useWindowDimensions from '../utils/useWindowDimensions';
@@ -262,16 +260,6 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
               {...keyboardDimension}
               keyHeight={keyHeight}
               keyboardMap={keyboardMap}
-              didPlayNote={(note, playedBy) => {
-                if (playerId === playedBy) {
-                  playNote(note);
-                }
-              }}
-              didStopNote={(note, playedBy) => {
-                if (playerId === playedBy) {
-                  stopNote(note);
-                }
-              }}
             />
           </div>
         </Box>
