@@ -149,10 +149,8 @@ const GameView: React.FC<Props> = ({
   // Calculate keyboard dimension
   const [middleBoxDimensions, middleBoxRef] = useDimensions<HTMLDivElement>();
   const { height } = useWindowDimensions();
-  const smallStartNote = !tracks ? 72 : tracks[playerTrackNum].smallStartNote;
-  const regularStartNote = !tracks
-    ? 72
-    : tracks[playerTrackNum].regularStartNote;
+  const smallStartNote = tracks[playerTrackNum].smallStartNote || 72;
+  const regularStartNote = tracks[playerTrackNum].regularStartNote || 72;
   const keyboardDimension = calculateGamePianoDimension(
     middleBoxDimensions.width,
     smallStartNote,

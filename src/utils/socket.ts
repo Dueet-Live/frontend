@@ -22,7 +22,7 @@ import {
   UnknownErrorResponse,
   UNKNOWN_MESSAGE_RESPONSE,
 } from '../types/messages';
-import { RoomInfo } from '../types/RoomInfo';
+import { RoomInfo } from '../types/roomInfo';
 
 const socket = io(process.env.REACT_APP_WS_URL!, {
   transports: ['websocket', 'polling'],

@@ -1,4 +1,4 @@
-import { PlayerInfo } from './PlayerInfo';
+import { PlayerInfo } from './playerInfo';
 
 export type RoomInfo = {
   id: string;

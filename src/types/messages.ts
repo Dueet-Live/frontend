@@ -1,4 +1,4 @@
-import { RoomInfo } from './RoomInfo';
+import { RoomInfo } from './roomInfo';
 
 /*************** Create room ***************/
 export const CREATE_ROOM_REQUEST = 'createRoomRequest';

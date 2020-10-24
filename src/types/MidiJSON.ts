@@ -17,6 +17,13 @@ type TimeSignatureEvent = {
   measures?: number;
 };
 
+type Track = {
+  smallStartNote?: number;
+  regularStartNote?: number;
+  channel: number;
+  notes: Note[];
+};
+
 export type MidiJSON = {
   // the transport and timing data
   header: {
@@ -25,12 +32,5 @@ export type MidiJSON = {
   };
 
   // an array of midi tracks
-  tracks: [
-    {
-      smallStartNote: number;
-      regularStartNote: number;
-      channel: number;
-      notes: Note[];
-    }
-  ];
+  tracks: Track[];
 };

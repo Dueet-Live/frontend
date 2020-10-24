@@ -1,6 +1,6 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { PlayerContext } from '../../contexts/PlayerContext';
-import { PlayingNote } from '../../types/PlayingNote';
+import { PlayingNote } from '../../types/playingNote';
 import { getKeyboardShortcutForNote } from '../../utils/getKeyboardShorcutsMapping';
 import {
   addNotePlayListener,

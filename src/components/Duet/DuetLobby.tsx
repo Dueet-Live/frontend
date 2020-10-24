@@ -14,7 +14,7 @@ import { RoomContext } from '../../contexts/RoomContext';
 import PianoIcon from '../../icons/PianoIcon';
 import PlayerIcon from '../../icons/PlayerIcon';
 import { Part } from '../../types/messages';
-import { Song } from '../../types/Song';
+import { Song } from '../../types/song';
 import { getMyPart, getPartsSelection } from '../../utils/roomInfo';
 import { choosePart } from '../../utils/socket';
 import DuetReadyButton from './DuetReadyButton';

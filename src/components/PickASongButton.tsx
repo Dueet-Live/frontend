@@ -17,7 +17,7 @@ import React, { useContext, useState } from 'react';
 import { PlayerContext } from '../contexts/PlayerContext';
 import { RoomContext } from '../contexts/RoomContext';
 import PickASongIcon from '../icons/PickASongIcon';
-import { RoomInfo } from '../types/RoomInfo';
+import { RoomInfo } from '../types/roomInfo';
 import { getReady } from '../utils/roomInfo';
 import { choosePiece } from '../utils/socket';
 import useGenres from '../utils/useGenres';

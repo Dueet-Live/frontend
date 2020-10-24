@@ -1,6 +1,6 @@
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
-import { KeyboardDimension } from '../../types/KeyboardDimension';
+import { KeyboardDimension } from '../../types/keyboardDimension';
 import {
   calculateBlackKeyWidth,
   getOffsetMap,

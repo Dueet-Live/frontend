@@ -5,7 +5,7 @@ import songsAPI from '../../api/songs';
 import { PlayerContext } from '../../contexts/PlayerContext';
 import { RoomView, RoomContext } from '../../contexts/RoomContext';
 import { MidiJSON } from '../../types/MidiJSON';
-import { RoomInfo } from '../../types/RoomInfo';
+import { RoomInfo } from '../../types/roomInfo';
 import { getFriendId, getMyPart } from '../../utils/roomInfo';
 import socket, {
   addListeners,

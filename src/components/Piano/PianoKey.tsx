@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import * as Tone from 'tone';
-import { PlayingNote } from '../../types/PlayingNote';
+import { PlayingNote } from '../../types/playingNote';
 import {
   calculateBlackKeyHeight,
   calculateBlackKeyWidth,
