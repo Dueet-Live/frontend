@@ -73,16 +73,25 @@ const GameView: React.FC<Props> = ({
     handleNoteStop(note, playedBy);
   };
 
+  // Song information
+  const tracks = chosenSongMIDI.tracks;
+  let playerTrackNum = 0;
   // 0 for solo
   // 0 for primo, 1 for secondo
-  let trackNum = 0;
   if (myPart === 'secondo') {
-    trackNum = 1;
+    playerTrackNum = 1;
+  }
+  const playerNotes = tracks[playerTrackNum].notes;
+  // TODO: schedule change (if have time), now take the first value only
+  const keyboardVolume = playerNotes[0].velocity;
+  // 1 for solo
+  // 2 for duet
+  let playbackChannel = 1;
+  if (myPart !== undefined) {
+    // Duet
+    playbackChannel = 2;
   }
 
-  const tracks = chosenSongMIDI.tracks;
-  // TODO: update based on part
-  const playerNotes = tracks[0].notes;
   const bpm = chosenSongMIDI.header?.tempos[0].bpm;
   const [beatsPerBar, noteDivision] =
     chosenSongMIDI.header === undefined
@@ -91,10 +100,6 @@ const GameView: React.FC<Props> = ({
   const lookAheadTime =
     calculateLookAheadTime(bpm, beatsPerBar, noteDivision) / 1000;
   const delayedStartTime = lookAheadTime + startTime;
-  // TODO: schedule change (if have time), now take the first value only
-  const keyboardVolume = playerNotes[0].velocity;
-  // TODO: update based on solo/duet (can be determined why whether myPart is present?)
-  const playbackChannel = 1;
 
   useEffect(() => {
     const startTime = Tone.now() + countDown;
@@ -150,8 +155,10 @@ const GameView: React.FC<Props> = ({
   // Calculate keyboard dimension
   const [middleBoxDimensions, middleBoxRef] = useDimensions<HTMLDivElement>();
   const { height } = useWindowDimensions();
-  const smallStartNote = !tracks ? 72 : tracks[trackNum].smallStartNote;
-  const regularStartNote = !tracks ? 72 : tracks[trackNum].regularStartNote;
+  const smallStartNote = !tracks ? 72 : tracks[playerTrackNum].smallStartNote;
+  const regularStartNote = !tracks
+    ? 72
+    : tracks[playerTrackNum].regularStartNote;
   const keyboardDimension = calculateGamePianoDimension(
     middleBoxDimensions.width,
     smallStartNote,
@@ -174,16 +181,16 @@ const GameView: React.FC<Props> = ({
             {timeToStart}
           </Typography>
         ) : (
-            <Waterfall
-              keyboardDimension={keyboardDimension}
-              startTime={startTime * 1000}
-              dimension={middleBoxDimensions}
-              bpm={bpm}
-              beatsPerBar={beatsPerBar}
-              noteDivision={noteDivision}
-              notes={playerNotes}
-            />
-          )}
+          <Waterfall
+            keyboardDimension={keyboardDimension}
+            startTime={startTime * 1000}
+            dimension={middleBoxDimensions}
+            bpm={bpm}
+            beatsPerBar={beatsPerBar}
+            noteDivision={noteDivision}
+            notes={playerNotes}
+          />
+        )}
       </div>
       <div className={classes.piano}>
         <PianoContext.Provider value={{ volume: keyboardVolume }}>
