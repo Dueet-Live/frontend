@@ -31,10 +31,12 @@ class NullSoundFontPlayer {
 export class AudioPlayer {
   audioContext: BaseContext;
   soundFontPlayer: NullSoundFontPlayer | Player;
+  defaultVolume: number;
 
-  constructor() {
+  constructor(defaultVolume: number = 1) {
     this.audioContext = Tone.context;
     this.soundFontPlayer = new NullSoundFontPlayer();
+    this.defaultVolume = defaultVolume;
   }
 
   // For a full list of supported instruments, refer to:
@@ -53,9 +55,13 @@ export class AudioPlayer {
       });
   }
 
-  playNote(note: string) {
+  playNote(note: string, volume?: number) {
     // console.log("Play " + note)
-    return this.soundFontPlayer.play(note);
+    if (volume === undefined) {
+      return this.soundFontPlayer.play(note, 0, { gain: this.defaultVolume });
+    } else {
+      return this.soundFontPlayer.play(note, 0, { gain: volume });
+    }
   }
 
   playNoteWithDuration(

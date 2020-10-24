@@ -22,12 +22,14 @@ import { calculateLookAheadTime } from './Waterfall/utils';
 import useWindowDimensions from '../utils/useWindowDimensions';
 import { Player } from 'tone';
 import { NullSoundFontPlayerNoteAudio } from './Piano/utils/InstrumentPlayer/AudioPlayer';
+import { PianoContext } from '../contexts/PianoContext';
 
 const useStyles = makeStyles(theme => ({
   root: {
     display: 'flex',
     flexDirection: 'column',
-    height: '100%',
+    flex: 1,
+    alignItems: 'stretch',
   },
   middleBox: {
     flexGrow: 1,
@@ -87,6 +89,8 @@ const GameView: React.FC<Props> = ({
       ? [0, 0]
       : chosenSongMIDI.header.timeSignatures[0].timeSignature;
   const lookAheadTime = calculateLookAheadTime(bpm, beatsPerBar, noteDivision);
+  // TODO: update
+  const keyboardVolume = playerNotes[0].velocity;
 
   useEffect(() => {
     const startTime = Tone.now() + countDown;
@@ -102,6 +106,14 @@ const GameView: React.FC<Props> = ({
       }, startTime - (countDown - 1 - i) - Tone.now());
     }
 
+    // TODO: Schedule ending screen
+    // const songDuration = 126;
+    // Tone.Transport.schedule(() => {
+
+    // }, startTime + songDuration - Tone.now());
+
+    // TODO: schedule keyboard volume change
+
     // Schedule playback
     const instrumentPlayer = new InstrumentPlayer();
     const handlers: (Player | NullSoundFontPlayerNoteAudio)[] = [];
@@ -112,7 +124,7 @@ const GameView: React.FC<Props> = ({
           note.midi,
           note.time + startTime + lookAheadTime / 1000,
           note.duration,
-          2 // Volume of the playback (currently the default is 5)
+          note.velocity
         );
         handlers.push(handler);
       }, note.time + startTime + lookAheadTime / 1000 - Tone.now() - 1);
@@ -179,14 +191,16 @@ const GameView: React.FC<Props> = ({
         )}
       </div>
       <div className={classes.piano}>
-        <InteractivePiano
-          includeOctaveShift={false}
-          keyboardDimension={keyboardDimension}
-          keyHeight={keyHeight}
-          keyboardMap={keyboardMap}
-          didPlayNote={didPlayNote}
-          didStopNote={didStopNote}
-        />
+        <PianoContext.Provider value={{ volume: keyboardVolume }}>
+          <InteractivePiano
+            includeOctaveShift={false}
+            keyboardDimension={keyboardDimension}
+            keyHeight={keyHeight}
+            keyboardMap={keyboardMap}
+            didPlayNote={didPlayNote}
+            didStopNote={didStopNote}
+          />
+        </PianoContext.Provider>
       </div>
     </div>
   );

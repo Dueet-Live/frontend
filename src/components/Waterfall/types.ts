@@ -2,6 +2,7 @@ export type Note = {
   time: number;
   duration: number;
   midi: number;
+  velocity: number;
 };
 
 export type KeyOffsetInfo = {

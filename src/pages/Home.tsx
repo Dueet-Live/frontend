@@ -2,7 +2,6 @@ import { Button, Grid, makeStyles, Typography } from '@material-ui/core';
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 import EqualizerIcon from '../icons/EqualizerIcon';
-import * as Tone from 'tone';
 
 const useStyles = makeStyles(theme => ({
   outer: {
@@ -70,9 +69,6 @@ const Home: React.FC = () => {
             color="primary"
             onClick={() => {
               history.push('/duet');
-              if (Tone.context.state !== 'running') {
-                Tone.context.resume();
-              }
             }}
             className={classes.button}
           >
