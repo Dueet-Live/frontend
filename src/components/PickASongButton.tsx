@@ -3,6 +3,7 @@ import {
   Dialog,
   DialogTitle,
   DialogTitleProps,
+  Grid,
   IconButton,
   List,
   ListItem,
@@ -49,8 +50,14 @@ const useStyles = makeStyles(theme => ({
   genreContainer: {
     display: 'flex',
     flexDirection: 'row',
-    padding: 10,
-    height: 200,
+    flex: 1,
+    alignItems: 'stretch',
+    paddingBottom: theme.spacing(1),
+  },
+  genreCard: {
+    width: '20%',
+    marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(1),
   },
   songContainer: {
     display: 'flex',
@@ -129,16 +136,21 @@ const PickASongButton: React.FC = () => {
         <DialogTitleWithButtons onClose={handleClose}>
           Choose a Genre
         </DialogTitleWithButtons>
-        <List className={classes.genreContainer}>
+        <Grid
+          container
+          alignItems="stretch"
+          justify="center"
+          className={classes.genreContainer}
+        >
           {genres.map(genre => (
-            <ListItem key={genre.id}>
+            <Grid item key={genre.id} className={classes.genreCard}>
               <GenreCard
                 genre={genre.name}
                 onClick={() => setGenre(genre.name)}
               />
-            </ListItem>
+            </Grid>
           ))}
-        </List>
+        </Grid>
       </>
     );
   };

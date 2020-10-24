@@ -1,19 +1,22 @@
 import { CardActionArea, makeStyles } from '@material-ui/core';
 import Card from '@material-ui/core/Card';
-import CardMedia from '@material-ui/core/CardMedia';
 import React from 'react';
 
 const useStyles = makeStyles(theme => ({
   root: {
     height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
   },
-  media: { height: '100%' },
   overlay: {
     opacity: '0.8',
     '&:hover, &:active, &:focus': {
       opacity: '1.0',
     },
-    height: '100%',
+    flex: 1,
+    display: 'flex',
+    alignItems: 'stretch',
+    backgroundSize: 'cover',
   },
   overlayText: {
     position: 'absolute',
@@ -35,12 +38,10 @@ const GenreCard: React.FC<{
 
   return (
     <Card className={classes.root} onClick={onClick}>
-      <CardActionArea className={classes.overlay}>
-        <CardMedia
-          component="img"
-          className={classes.media}
-          image={require(`../images/${genre}.png`)}
-        />
+      <CardActionArea
+        className={classes.overlay}
+        style={{ backgroundImage: `url(images/${genre}.png)` }}
+      >
         <div className={classes.overlayText}>{genre}</div>
       </CardActionArea>
     </Card>
