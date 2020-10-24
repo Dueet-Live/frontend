@@ -64,12 +64,12 @@ const GameView: React.FC<Props> = ({
   // Scoring
   const didPlayNote = (note: number, playedBy: number) => {
     // TODO: update score
-    console.log('Play', Tone.now() - startTime);
+    console.log('Play', Tone.now() - delayedStartTime);
     handleNotePlay(note, playedBy);
   };
   const didStopNote = (note: number, playedBy: number) => {
     // TODO: update score
-    console.log('Stop', Tone.now() - startTime);
+    console.log('Stop', Tone.now() - delayedStartTime);
     handleNoteStop(note, playedBy);
   };
 
@@ -88,12 +88,15 @@ const GameView: React.FC<Props> = ({
     chosenSongMIDI.header === undefined
       ? [0, 0]
       : chosenSongMIDI.header.timeSignatures[0].timeSignature;
-  const lookAheadTime = calculateLookAheadTime(bpm, beatsPerBar, noteDivision);
+  const lookAheadTime =
+    calculateLookAheadTime(bpm, beatsPerBar, noteDivision) / 1000;
+  const delayedStartTime = lookAheadTime + startTime;
   // TODO: update
   const keyboardVolume = playerNotes[0].velocity;
 
   useEffect(() => {
     const startTime = Tone.now() + countDown;
+    const delayedStartTime = lookAheadTime + startTime;
     setStartTime(startTime);
     console.log('Game start', startTime);
 
@@ -106,13 +109,13 @@ const GameView: React.FC<Props> = ({
       }, startTime - (countDown - 1 - i) - Tone.now());
     }
 
-    // TODO: Schedule ending screen
+    // TODO1: Schedule ending screen
     // const songDuration = 126;
     // Tone.Transport.schedule(() => {
 
     // }, startTime + songDuration - Tone.now());
 
-    // TODO: schedule keyboard volume change
+    // TODO2: schedule keyboard volume change
 
     // Schedule playback
     const instrumentPlayer = new InstrumentPlayer();
@@ -122,24 +125,12 @@ const GameView: React.FC<Props> = ({
       Tone.Transport.schedule(() => {
         const handler = instrumentPlayer.playNote(
           note.midi,
-          note.time + startTime + lookAheadTime / 1000,
+          note.time + delayedStartTime,
           note.duration,
           note.velocity
         );
         handlers.push(handler);
-      }, note.time + startTime + lookAheadTime / 1000 - Tone.now() - 1);
-    });
-    // TODO: remove
-    (tracks[0].notes as Note[]).forEach(note => {
-      Tone.Transport.schedule(() => {
-        const handler = instrumentPlayer.playNote(
-          note.midi,
-          note.time + startTime + lookAheadTime / 1000,
-          note.duration,
-          keyboardVolume
-        );
-        handlers.push(handler);
-      }, note.time + startTime + lookAheadTime / 1000 - Tone.now() - 1);
+      }, note.time + delayedStartTime - Tone.now() - 1);
     });
 
     return () => {
@@ -150,7 +141,7 @@ const GameView: React.FC<Props> = ({
         handler.stop();
       });
     };
-  }, [tracks, lookAheadTime, keyboardVolume]);
+  }, [tracks, lookAheadTime]);
 
   // Calculate keyboard dimension
   const [middleBoxDimensions, middleBoxRef] = useDimensions<HTMLDivElement>();
