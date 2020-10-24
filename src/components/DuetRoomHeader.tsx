@@ -1,18 +1,20 @@
 import {
   Box,
+  Button,
   IconButton,
   Link,
   makeStyles,
   Typography,
 } from '@material-ui/core';
-import { ArrowBack } from '@material-ui/icons';
+import { ArrowBack, MusicNoteOutlined } from '@material-ui/icons';
 import React, { useContext } from 'react';
 import { useHistory } from 'react-router-dom';
 import { PlayerContext } from '../contexts/PlayerContext';
-import { RoomContext } from '../contexts/RoomContext';
+import { RoomContext, RoomView } from '../contexts/RoomContext';
 import PlayerIcon from '../icons/PlayerIcon';
 import SettingsIcon from '../icons/SettingsIcon';
-import PickASongButton from './PickASongButton';
+import { updateReady } from '../utils/socket';
+import useSong from '../utils/useSong';
 import RoomHeader from './shared/RoomHeader';
 
 const useStyles = makeStyles(theme => ({
@@ -34,11 +36,18 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const DuetRoomHeader: React.FC<{ isPlaying: boolean }> = ({ isPlaying }) => {
+type Props = {
+  view: RoomView;
+  setView: (view: RoomView) => void;
+};
+
+const DuetRoomHeader: React.FC<Props> = ({ view, setView }) => {
   const classes = useStyles();
   const history = useHistory();
   const { me, friend } = useContext(PlayerContext);
   const { roomInfo } = useContext(RoomContext);
+  const { piece } = roomInfo;
+  const chosenSong = useSong(piece);
 
   const roomDetails = () => {
     if (me === -1) {
@@ -82,18 +91,53 @@ const DuetRoomHeader: React.FC<{ isPlaying: boolean }> = ({ isPlaying }) => {
     );
   };
 
+  const backButton = () => {
+    let backText = '';
+    let handleBack = () => {};
+
+    switch (view) {
+      case 'duet.lobby': {
+        backText = 'Home';
+        handleBack = () => history.push('/');
+        break;
+      }
+      case 'duet.try': {
+        backText = 'Lobby';
+        handleBack = () => setView('duet.lobby');
+        break;
+      }
+      case 'duet.play': {
+        handleBack = () => {
+          setView('duet.lobby');
+          updateReady(false);
+        };
+      }
+    }
+
+    return (
+      <Button onClick={handleBack} startIcon={<ArrowBack />}>
+        {backText}
+      </Button>
+    );
+  };
+
+  const centerComponents = () => {
+    if (view === 'duet.play' && chosenSong !== null) {
+      return (
+        <>
+          <MusicNoteOutlined color="action" />
+          <Typography variant="body1" color="textPrimary">
+            {chosenSong.name}
+          </Typography>
+        </>
+      );
+    }
+  };
+
   return (
     <RoomHeader>
-      <IconButton
-        edge="start"
-        className={classes.icon}
-        size="small"
-        onClick={() => history.push('/')}
-      >
-        <ArrowBack />
-      </IconButton>
-      {/* TODO Make this button responsive. It should truncate when too long */}
-      <PickASongButton isPlaying={isPlaying} />
+      {backButton()}
+      {centerComponents()}
       <Box component="span" className={classes.empty} />
       {roomDetails()}
       <IconButton edge="end" size="small" className={classes.settingIcon}>

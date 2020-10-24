@@ -1,5 +1,6 @@
 import { History } from 'history';
 import io from 'socket.io-client';
+import { RoomView } from '../contexts/RoomContext';
 import {
   CHOOSE_PART_REQUEST,
   CHOOSE_PIECE_REQUEST,
@@ -31,7 +32,7 @@ const socket = io(process.env.REACT_APP_WS_URL!, {
 export function addListeners(
   setPlayerId: (id: number) => void,
   setRoomState: (roomInfo: RoomInfo) => void,
-  setTimeToStart: (inSeconds: number) => void,
+  setView: (view: RoomView) => void,
   history: History<unknown>
 ) {
   /*************** Create room ***************/
@@ -84,7 +85,7 @@ export function addListeners(
   });
 
   socket.on(START_GAME_NOTIFICATION, ({ inSeconds }: { inSeconds: number }) => {
-    setTimeToStart(inSeconds);
+    setView('duet.play');
   });
 }
 export function removeRoomStateListeners() {

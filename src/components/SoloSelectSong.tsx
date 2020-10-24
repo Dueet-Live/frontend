@@ -7,6 +7,7 @@ import {
   Typography,
 } from '@material-ui/core';
 import React, { useContext } from 'react';
+import { RoomContext } from '../contexts/RoomContext';
 import PianoIcon from '../icons/PianoIcon';
 import { RoomInfo } from '../types/roomInfo';
 import { Song } from '../types/song';
@@ -14,7 +15,6 @@ import { choosePiece } from '../utils/socket';
 import useGenres from '../utils/useGenres';
 import useSongs from '../utils/useSongs';
 import GenreCard from './GenreCard';
-import { RoomContext } from '../contexts/RoomContext';
 import SoloReadyButton from './SoloReadyButton';
 import SongCard from './SongCard';
 
@@ -22,7 +22,8 @@ const useStyles = makeStyles(theme => ({
   genreContainer: {
     display: 'flex',
     flexDirection: 'row',
-    height: '100%',
+    flex: 1,
+    alignItems: 'stretch',
   },
   songContainer: {
     display: 'flex',
@@ -60,7 +61,10 @@ const useStyles = makeStyles(theme => ({
     width: '20%',
   },
   details: {
-    padding: theme.spacing(2),
+    paddingBottom: theme.spacing(2),
+    paddingLeft: theme.spacing(2),
+    paddingRight: theme.spacing(2),
+    paddingTop: theme.spacing(1),
   },
 }));
 

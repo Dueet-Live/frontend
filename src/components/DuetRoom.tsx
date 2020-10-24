@@ -1,38 +1,22 @@
-import {
-  Box,
-  makeStyles,
-  Typography,
-  useMediaQuery,
-  useTheme,
-} from '@material-ui/core';
+import { Box, makeStyles } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import songsAPI from '../api/songs';
-import { Part } from '../types/messages';
+import { PlayerContext } from '../contexts/PlayerContext';
+import { RoomContext, RoomView } from '../contexts/RoomContext';
 import { RoomInfo } from '../types/roomInfo';
-import {
-  calculateDefaultPianoDimension,
-  calculateGamePianoDimension,
-  calculateKeyHeight,
-} from '../utils/calculateKeyboardDimension';
-import { getKeyboardMappingWithSpecificStart } from '../utils/getKeyboardShorcutsMapping';
-import { getFriendId, getMyPart, getPartsSelection } from '../utils/roomInfo';
+import { getFriendId, getMyPart } from '../utils/roomInfo';
 import socket, {
   addListeners,
-  choosePart,
   createRoom,
   joinRoom,
   removeRoomStateListeners,
 } from '../utils/socket';
-import { useDimensions } from '../utils/useDimensions';
-import useWindowDimensions from '../utils/useWindowDimensions';
-import DuetReadyButton from './DuetReadyButton';
+import useSong from '../utils/useSong';
+import DuetLobby from './DuetLobby';
 import DuetRoomHeader from './DuetRoomHeader';
-import { PartSelection } from './PartSelection';
-import { PlayerContext } from '../contexts/PlayerContext';
-import { RoomContext } from '../contexts/RoomContext';
-import { Waterfall } from './Waterfall';
-import InteractivePiano from './Piano/InteractivePiano';
+import GameView from './GameView';
+import DefaultPiano from './Piano/DefaultPiano';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -40,23 +24,19 @@ const useStyles = makeStyles(theme => ({
     flexDirection: 'column',
     height: '100%',
   },
-  box: {
+  body: {
     flexGrow: 1,
     flexShrink: 1,
-    minHeight: '0px',
     position: 'relative',
+    display: 'flex',
+    flexDirection: 'column',
   },
   header: {
     flexGrow: 0,
   },
   piano: {
-    flexGrow: 0,
-  },
-  readyButton: {
-    // TODO remove absolute spacing (and find better positioning)
+    bottom: 0,
     position: 'absolute',
-    left: theme.spacing(2),
-    top: theme.spacing(6),
   },
 }));
 
@@ -74,18 +54,17 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   } as RoomInfo);
   const [playerId, setPlayerId] = useState(-1);
 
-  // TODO probably want to refactor these into a single object?
-  const [timeToStart, setTimeToStart] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [chosenSongMIDI, setChosenSongMIDI] = useState<any>({});
+  const [view, setView] = useState<RoomView>('duet.lobby');
 
   const { piece } = roomState;
+  const chosenSong = useSong(piece);
 
   useEffect(() => {
     // connect to ws server
     socket.open();
 
-    addListeners(setPlayerId, setRoomState, setTimeToStart, history);
+    addListeners(setPlayerId, setRoomState, setView, history);
     return () => {
       removeRoomStateListeners();
       socket.close();
@@ -102,21 +81,6 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [maybeRoomId]);
-
-  useEffect(() => {
-    if (timeToStart <= 0) {
-      return;
-    }
-
-    setTimeout(() => {
-      if (timeToStart > 0) {
-        setTimeToStart(timeToStart - 1);
-      }
-      if (timeToStart === 1) {
-        setIsPlaying(true);
-      }
-    }, 1000);
-  }, [timeToStart]);
 
   useEffect(() => {
     if (piece === undefined) return;
@@ -137,96 +101,36 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   }, [piece]);
 
   const friendId = getFriendId(roomState, playerId);
-  const partsSelection = getPartsSelection(roomState);
   const myPart = getMyPart(roomState, playerId);
 
-  // Calculate keyboard dimension
-  const isGameMode = isPlaying || timeToStart > 0;
-  const tracks = chosenSongMIDI.tracks;
-  const bpm = chosenSongMIDI.header?.tempos[0].bpm;
-  const [beatsPerBar, noteDivision] =
-    chosenSongMIDI.header === undefined
-      ? [0, 0]
-      : chosenSongMIDI.header.timeSignatures[0].timeSignature;
+  const mainBody = () => {
+    const tracks = chosenSongMIDI.tracks;
 
-  // Calculate keyboard dimension
-  const [middleBoxDimensions, middleBoxRef] = useDimensions<HTMLDivElement>();
-  const { height } = useWindowDimensions();
-  const SMALL_START_NOTE = !(isGameMode && tracks)
-    ? 72
-    : tracks[myPart === 'primo' ? 0 : 1].smallStartNote;
+    if (view === 'duet.lobby') {
+      return (
+        <DuetLobby
+          isPieceDownloaded={!!tracks}
+          chosenSong={chosenSong}
+          tryPiano={() => setView('duet.try')}
+        />
+      );
+    }
 
-  const REGULAR_START_NOTE = !(isGameMode && tracks)
-    ? 72
-    : tracks[myPart === 'primo' ? 0 : 1].regularStartNote;
+    if (view === 'duet.try') {
+      return (
+        <div className={classes.piano}>
+          <DefaultPiano />
+        </div>
+      );
+    }
 
-  const keyboardDimension = isGameMode
-    ? calculateGamePianoDimension(
-        middleBoxDimensions.width,
-        SMALL_START_NOTE,
-        REGULAR_START_NOTE
-      )
-    : calculateDefaultPianoDimension(middleBoxDimensions.width);
-  const keyHeight = calculateKeyHeight(height);
-
-  // Get custom keyboard mapping for game
-  const theme = useTheme();
-  const isDesktopView = useMediaQuery(theme.breakpoints.up('md'));
-  const keyboardMap =
-    isGameMode && isDesktopView
-      ? getKeyboardMappingWithSpecificStart(
-          REGULAR_START_NOTE,
-          keyboardDimension['start'],
-          keyboardDimension['range']
-        )
-      : undefined;
-
-  // if timeToStart is not 0,
-  //   hide readybutton, partselection, and parts of room header, show number
-  //   show number countdown
-  // if timeToStart is 0 and playing, show waterfall, music, etc.
-  // if timeToStart is 0 and not playing, show the current stuff
-  const middleBox = () => {
-    if (isPlaying && tracks) {
+    if (view === 'duet.play') {
       // at this point, myPart is definitely either primo or secondo, otherwise
       // game should not have started.
-      const notes = tracks[myPart === 'primo' ? 0 : 1].notes;
+      // TODO account for part in duet
 
-      return (
-        <Waterfall
-          {...keyboardDimension}
-          dimension={middleBoxDimensions}
-          bpm={bpm}
-          beatsPerBar={beatsPerBar}
-          notes={notes}
-          noteDivision={noteDivision}
-        />
-      );
+      return <GameView chosenSongMIDI={chosenSongMIDI} myPart={myPart} />;
     }
-
-    if (timeToStart !== 0) {
-      return (
-        <Typography variant="h1" align="center" color="primary">
-          {timeToStart}
-        </Typography>
-      );
-    }
-
-    return (
-      <>
-        <DuetReadyButton
-          className={classes.readyButton}
-          isPieceDownloaded={!!tracks}
-        />
-        <PartSelection
-          primo={partsSelection.primo}
-          secondo={partsSelection.secondo}
-          didSelect={(part: Part) => {
-            choosePart(part);
-          }}
-        />
-      </>
-    );
   };
 
   return (
@@ -245,23 +149,10 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
         <Box className={classes.root}>
           {/* header */}
           <div className={classes.header}>
-            <DuetRoomHeader isPlaying={isGameMode} />
+            <DuetRoomHeader view={view} setView={setView} />
           </div>
 
-          {/* available space for the rest of the content */}
-          <div ref={middleBoxRef} className={classes.box}>
-            {middleBox()}
-          </div>
-
-          {/* piano */}
-          <div className={classes.piano}>
-            <InteractivePiano
-              includeOctaveShift={!isGameMode}
-              {...keyboardDimension}
-              keyHeight={keyHeight}
-              keyboardMap={keyboardMap}
-            />
-          </div>
+          <div className={classes.body}>{mainBody()}</div>
         </Box>
       </PlayerContext.Provider>
     </RoomContext.Provider>

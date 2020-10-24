@@ -38,7 +38,8 @@ export function getMyPart(roomState: RoomInfo, myId: number) {
 
   for (const player of players) {
     if (player.id === myId) {
-      return player.assignedPart;
+      const part = player.assignedPart;
+      return part === undefined ? null : part;
     }
   }
   // this should never happen

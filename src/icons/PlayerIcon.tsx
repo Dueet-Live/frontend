@@ -1,4 +1,4 @@
-import { SvgIcon, SvgIconProps } from '@material-ui/core';
+import { makeStyles, SvgIcon, SvgIconProps } from '@material-ui/core';
 import React from 'react';
 import { ReactComponent as icon0 } from '../svg/bear.svg';
 import { ReactComponent as icon1 } from '../svg/cat.svg';
@@ -29,20 +29,36 @@ const playerMap = [
   icon9,
 ];
 
-// Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a>
-const PlayerIcon: React.FC<Props> = ({ num, myPlayerId, ...props }) => {
+const useStyles = makeStyles({
+  root: {
+    padding: '1px',
+    borderRadius: '50%',
+  },
   // TODO should probably define these in a theme
-  const color = num === myPlayerId ? '#904ae9' : '#e1a546';
+  myIcon: {
+    border: `3px solid #904ae9`,
+  },
+  friendIcon: {
+    border: `3px solid #e1a546`,
+  },
+});
+
+// Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a>
+const PlayerIcon: React.FC<Props> = ({
+  num,
+  myPlayerId,
+  className,
+  ...props
+}) => {
+  const classes = useStyles();
   return (
     <SvgIcon
       component={playerMap[num]}
       viewBox="0 0 512 512"
+      className={`${classes.root} ${
+        num === myPlayerId ? classes.myIcon : classes.friendIcon
+      } ${className}`}
       {...props}
-      style={{
-        padding: '1px',
-        border: `3px solid ${color}`,
-        borderRadius: '50%',
-      }}
     />
   );
 };

@@ -3,6 +3,7 @@ import {
   Dialog,
   DialogTitle,
   DialogTitleProps,
+  Grid,
   IconButton,
   List,
   ListItem,
@@ -13,6 +14,8 @@ import {
 } from '@material-ui/core';
 import { ArrowBack, Close, MusicNoteOutlined } from '@material-ui/icons';
 import React, { useContext, useState } from 'react';
+import { PlayerContext } from '../contexts/PlayerContext';
+import { RoomContext } from '../contexts/RoomContext';
 import PickASongIcon from '../icons/PickASongIcon';
 import { RoomInfo } from '../types/roomInfo';
 import { getReady } from '../utils/roomInfo';
@@ -21,8 +24,6 @@ import useGenres from '../utils/useGenres';
 import useSong from '../utils/useSong';
 import useSongs from '../utils/useSongs';
 import GenreCard from './GenreCard';
-import { PlayerContext } from '../contexts/PlayerContext';
-import { RoomContext } from '../contexts/RoomContext';
 import SongCard from './SongCard';
 
 const useStyles = makeStyles(theme => ({
@@ -49,8 +50,14 @@ const useStyles = makeStyles(theme => ({
   genreContainer: {
     display: 'flex',
     flexDirection: 'row',
-    padding: 10,
-    height: 200,
+    flex: 1,
+    alignItems: 'stretch',
+    paddingBottom: theme.spacing(1),
+  },
+  genreCard: {
+    width: '20%',
+    marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(1),
   },
   songContainer: {
     display: 'flex',
@@ -58,6 +65,9 @@ const useStyles = makeStyles(theme => ({
     padding: 10,
     overflowY: 'auto',
     height: 200,
+  },
+  dialogNotFullscreen: {
+    height: 300,
   },
 }));
 
@@ -98,7 +108,7 @@ const DialogTitleWithButtons: React.FC<DialogTitleWithButtonsProps> = ({
   );
 };
 
-const PickASongButton: React.FC<{ isPlaying: boolean }> = ({ isPlaying }) => {
+const PickASongButton: React.FC = () => {
   const [open, setOpen] = useState(false);
   const [genre, setGenre] = useState('');
 
@@ -129,16 +139,21 @@ const PickASongButton: React.FC<{ isPlaying: boolean }> = ({ isPlaying }) => {
         <DialogTitleWithButtons onClose={handleClose}>
           Choose a Genre
         </DialogTitleWithButtons>
-        <List className={classes.genreContainer}>
+        <Grid
+          container
+          alignItems="stretch"
+          justify="center"
+          className={classes.genreContainer}
+        >
           {genres.map(genre => (
-            <ListItem key={genre.id}>
+            <Grid item key={genre.id} className={classes.genreCard}>
               <GenreCard
                 genre={genre.name}
                 onClick={() => setGenre(genre.name)}
               />
-            </ListItem>
+            </Grid>
           ))}
-        </List>
+        </Grid>
       </>
     );
   };
@@ -181,7 +196,7 @@ const PickASongButton: React.FC<{ isPlaying: boolean }> = ({ isPlaying }) => {
       <Button
         className={classes.pickASongButton}
         onClick={handleOpen}
-        disabled={isPlaying || iAmReady}
+        disabled={iAmReady}
       >
         {chosenSong === null ? (
           <>
@@ -200,6 +215,9 @@ const PickASongButton: React.FC<{ isPlaying: boolean }> = ({ isPlaying }) => {
         fullWidth
         open={open}
         onClose={handleClose}
+        PaperProps={
+          fullScreen ? {} : { className: classes.dialogNotFullscreen }
+        }
       >
         {genre === '' ? pickingGenre() : pickingSong()}
       </Dialog>
