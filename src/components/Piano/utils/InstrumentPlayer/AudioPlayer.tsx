@@ -32,6 +32,7 @@ export class AudioPlayer {
   audioContext: BaseContext;
   soundFontPlayer: NullSoundFontPlayer | Player;
   defaultVolume: number;
+  maxVolume: number = 5;
 
   constructor(defaultVolume: number = 1) {
     this.audioContext = Tone.context;
@@ -45,7 +46,7 @@ export class AudioPlayer {
     SoundFontPlayer.instrument(
       this.audioContext.rawContext as AudioContext,
       instrumentName,
-      { gain: 5 }
+      { gain: this.maxVolume }
     )
       .then(soundFontPlayer => {
         this.soundFontPlayer = soundFontPlayer;
@@ -58,9 +59,13 @@ export class AudioPlayer {
   playNote(note: string, volume?: number) {
     // console.log("Play " + note)
     if (volume === undefined) {
-      return this.soundFontPlayer.play(note, 0, { gain: this.defaultVolume });
+      return this.soundFontPlayer.play(note, 0, {
+        gain: this.defaultVolume * this.maxVolume,
+      });
     } else {
-      return this.soundFontPlayer.play(note, 0, { gain: volume });
+      return this.soundFontPlayer.play(note, 0, {
+        gain: volume * this.maxVolume,
+      });
     }
   }
 
@@ -71,6 +76,9 @@ export class AudioPlayer {
     volume: number
   ) {
     // console.log("Play " + note)
-    return this.soundFontPlayer.play(note, time, { duration, gain: volume });
+    return this.soundFontPlayer.play(note, time, {
+      duration,
+      gain: volume * this.maxVolume,
+    });
   }
 }

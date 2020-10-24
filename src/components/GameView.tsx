@@ -136,7 +136,7 @@ const GameView: React.FC<Props> = ({
           note.midi,
           note.time + startTime + lookAheadTime / 1000,
           note.duration,
-          5
+          keyboardVolume
         );
         handlers.push(handler);
       }, note.time + startTime + lookAheadTime / 1000 - Tone.now() - 1);
@@ -150,7 +150,7 @@ const GameView: React.FC<Props> = ({
         handler.stop();
       });
     };
-  }, [tracks, lookAheadTime]);
+  }, [tracks, lookAheadTime, keyboardVolume]);
 
   // Calculate keyboard dimension
   const [middleBoxDimensions, middleBoxRef] = useDimensions<HTMLDivElement>();
