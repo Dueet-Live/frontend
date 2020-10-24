@@ -40,7 +40,7 @@ const GenreCard: React.FC<{
     <Card className={classes.root} onClick={onClick}>
       <CardActionArea
         className={classes.overlay}
-        style={{ backgroundImage: `url(images/${genre}.png)` }}
+        style={{ backgroundImage: `url(/images/${genre}.png)` }}
       >
         <div className={classes.overlayText}>{genre}</div>
       </CardActionArea>

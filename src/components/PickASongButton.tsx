@@ -66,6 +66,9 @@ const useStyles = makeStyles(theme => ({
     overflowY: 'auto',
     height: 200,
   },
+  dialogNotFullscreen: {
+    height: 300,
+  },
 }));
 
 type DialogTitleWithButtonsProps = DialogTitleProps & {
@@ -212,6 +215,9 @@ const PickASongButton: React.FC = () => {
         fullWidth
         open={open}
         onClose={handleClose}
+        PaperProps={
+          fullScreen ? {} : { className: classes.dialogNotFullscreen }
+        }
       >
         {genre === '' ? pickingGenre() : pickingSong()}
       </Dialog>
