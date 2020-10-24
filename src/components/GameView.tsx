@@ -13,15 +13,23 @@ import {
 } from '../utils/calculateKeyboardDimension';
 import { getKeyboardMappingWithSpecificStart } from '../utils/getKeyboardShorcutsMapping';
 import { useDimensions } from '../utils/useDimensions';
-import useWindowDimensions from '../utils/useWindowDimensions';
-import InteractivePiano from './Piano/InteractivePiano';
 import { Waterfall } from './Waterfall';
+import InteractivePiano from './Piano/InteractivePiano';
+import * as Tone from 'tone';
+import { Note } from './Waterfall/types';
+import InstrumentPlayer from './Piano/utils/InstrumentPlayer';
+import { calculateLookAheadTime } from './Waterfall/utils';
+import useWindowDimensions from '../utils/useWindowDimensions';
+import { Player } from 'tone';
+import { NullSoundFontPlayerNoteAudio } from './Piano/utils/InstrumentPlayer/AudioPlayer';
+import { PianoContext } from '../contexts/PianoContext';
 
 const useStyles = makeStyles(theme => ({
   root: {
     display: 'flex',
     flexDirection: 'column',
-    height: '100%',
+    flex: 1,
+    alignItems: 'stretch',
   },
   middleBox: {
     flexGrow: 1,
@@ -49,57 +57,108 @@ const GameView: React.FC<Props> = ({
   handleNoteStop = noOp,
 }) => {
   const classes = useStyles();
-  const [timeToStart, setTimeToStart] = useState(3);
+  const [startTime, setStartTime] = useState(-1);
+  const countDown = 3;
+  const [timeToStart, setTimeToStart] = useState(countDown);
 
+  // Scoring
   const didPlayNote = (note: number, playedBy: number) => {
     // TODO: update score
-
+    console.log('Play', Tone.now() - delayedStartTime);
     handleNotePlay(note, playedBy);
   };
   const didStopNote = (note: number, playedBy: number) => {
     // TODO: update score
-
-    handleNotePlay(note, playedBy);
+    console.log('Stop', Tone.now() - delayedStartTime);
+    handleNoteStop(note, playedBy);
   };
 
+  // Song information
+  const tracks = chosenSongMIDI.tracks;
+  let playerTrackNum = 0;
   // 0 for solo
   // 0 for primo, 1 for secondo
-  let trackNum = 0;
   if (myPart === 'secondo') {
-    trackNum = 1;
+    playerTrackNum = 1;
+  }
+  const playerNotes = tracks[playerTrackNum].notes;
+  // TODO: schedule change (if have time), now take the first value only
+  const keyboardVolume = playerNotes[0].velocity;
+  // 1 for solo
+  // 2 for duet
+  let playbackChannel = 1;
+  if (myPart !== undefined) {
+    // Duet
+    playbackChannel = 2;
   }
 
-  useEffect(() => {
-    if (timeToStart <= 0) {
-      return;
-    }
-
-    const handler = setTimeout(() => {
-      if (timeToStart > 0) {
-        setTimeToStart(timeToStart - 1);
-      }
-    }, 1000);
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [timeToStart]);
-
-  // song information
-  const tracks = chosenSongMIDI.tracks;
   const bpm = chosenSongMIDI.header?.tempos[0].bpm;
   const [beatsPerBar, noteDivision] =
     chosenSongMIDI.header === undefined
       ? [0, 0]
       : chosenSongMIDI.header.timeSignatures[0].timeSignature;
+  const lookAheadTime =
+    calculateLookAheadTime(bpm, beatsPerBar, noteDivision) / 1000;
+  const delayedStartTime = lookAheadTime + startTime;
+
+  useEffect(() => {
+    const startTime = Tone.now() + countDown;
+    const delayedStartTime = lookAheadTime + startTime;
+    setStartTime(startTime);
+    console.log('Game start', startTime);
+
+    Tone.Transport.start();
+
+    // Schedule countdown
+    for (let i = 0; i < countDown; i++) {
+      Tone.Transport.schedule(() => {
+        setTimeToStart(countDown - 1 - i);
+      }, startTime - (countDown - 1 - i) - Tone.now());
+    }
+
+    // TODO1: Schedule ending screen
+    // const songDuration = 126;
+    // Tone.Transport.schedule(() => {
+
+    // }, startTime + songDuration - Tone.now());
+
+    // TODO2: schedule keyboard volume change
+
+    // Schedule playback
+    const instrumentPlayer = new InstrumentPlayer();
+    const handlers: (Player | NullSoundFontPlayerNoteAudio)[] = [];
+    const playbackNotes = tracks
+      .filter((track: any) => track.channel === playbackChannel)
+      .flatMap((track: any) => track.notes) as Note[];
+    playbackNotes.forEach(note => {
+      Tone.Transport.schedule(() => {
+        const handler = instrumentPlayer.playNote(
+          note.midi,
+          note.time + delayedStartTime,
+          note.duration,
+          note.velocity
+        );
+        handlers.push(handler);
+      }, note.time + delayedStartTime - Tone.now() - 1);
+    });
+
+    return () => {
+      Tone.Transport.cancel();
+      Tone.Transport.stop();
+      Tone.Transport.position = 0;
+      handlers.forEach(handler => {
+        handler.stop();
+      });
+    };
+  }, [tracks, lookAheadTime, playbackChannel]);
 
   // Calculate keyboard dimension
   const [middleBoxDimensions, middleBoxRef] = useDimensions<HTMLDivElement>();
   const { height } = useWindowDimensions();
-  const smallStartNote = !tracks ? 72 : tracks[trackNum].smallStartNote;
-
-  const regularStartNote = !tracks ? 72 : tracks[trackNum].regularStartNote;
-
+  const smallStartNote = !tracks ? 72 : tracks[playerTrackNum].smallStartNote;
+  const regularStartNote = !tracks
+    ? 72
+    : tracks[playerTrackNum].regularStartNote;
   const keyboardDimension = calculateGamePianoDimension(
     middleBoxDimensions.width,
     smallStartNote,
@@ -111,11 +170,7 @@ const GameView: React.FC<Props> = ({
   const theme = useTheme();
   const isDesktopView = useMediaQuery(theme.breakpoints.up('md'));
   const keyboardMap = isDesktopView
-    ? getKeyboardMappingWithSpecificStart(
-        regularStartNote,
-        keyboardDimension['start'],
-        keyboardDimension['range']
-      )
+    ? getKeyboardMappingWithSpecificStart(regularStartNote, keyboardDimension)
     : undefined;
 
   return (
@@ -127,24 +182,27 @@ const GameView: React.FC<Props> = ({
           </Typography>
         ) : (
           <Waterfall
-            {...keyboardDimension}
+            keyboardDimension={keyboardDimension}
+            startTime={startTime * 1000}
             dimension={middleBoxDimensions}
             bpm={bpm}
             beatsPerBar={beatsPerBar}
             noteDivision={noteDivision}
-            notes={tracks[trackNum].notes}
+            notes={playerNotes}
           />
         )}
       </div>
       <div className={classes.piano}>
-        <InteractivePiano
-          includeOctaveShift={false}
-          {...keyboardDimension}
-          keyHeight={keyHeight}
-          keyboardMap={keyboardMap}
-          didPlayNote={didPlayNote}
-          didStopNote={didStopNote}
-        />
+        <PianoContext.Provider value={{ volume: keyboardVolume }}>
+          <InteractivePiano
+            includeOctaveShift={false}
+            keyboardDimension={keyboardDimension}
+            keyHeight={keyHeight}
+            keyboardMap={keyboardMap}
+            didPlayNote={didPlayNote}
+            didStopNote={didStopNote}
+          />
+        </PianoContext.Provider>
       </div>
     </div>
   );

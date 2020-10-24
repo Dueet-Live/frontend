@@ -36,6 +36,10 @@ export default class Instrument {
     });
   }
 
+  playNote(note: string, time: number, duration: number, volume: number) {
+    return this.audioPlayer.playNoteWithDuration(note, time, duration, volume);
+  }
+
   getActiveNotes() {
     return Object.keys(this.activeNoteMap);
   }

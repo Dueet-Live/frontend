@@ -2,6 +2,7 @@ import { Component } from 'react';
 import { isEqual } from './utils/arrayHelpers';
 import { InstrumentName } from 'soundfont-player';
 import InstrumentPlayer from './utils/InstrumentPlayer';
+import { PianoContext } from '../../contexts/PianoContext';
 
 type Props = {
   instrument: InstrumentName;
@@ -9,6 +10,7 @@ type Props = {
 };
 
 export default class InstrumentAudio extends Component<Props> {
+  static contextType = PianoContext;
   instrumentPlayer?: InstrumentPlayer;
 
   constructor(props: Props) {
@@ -19,7 +21,7 @@ export default class InstrumentAudio extends Component<Props> {
   }
 
   componentDidMount() {
-    this.instrumentPlayer = new InstrumentPlayer();
+    this.instrumentPlayer = new InstrumentPlayer(this.context.volume);
     this.setInstrument();
     this.playNotes();
   }

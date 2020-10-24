@@ -67,7 +67,9 @@ const Home: React.FC = () => {
           <Button
             variant="outlined"
             color="primary"
-            onClick={() => history.push('/duet')}
+            onClick={() => {
+              history.push('/duet');
+            }}
             className={classes.button}
           >
             Duet
@@ -77,7 +79,9 @@ const Home: React.FC = () => {
           <Button
             variant="outlined"
             color="primary"
-            onClick={() => history.push('/solo')}
+            onClick={() => {
+              history.push('/solo');
+            }}
             className={classes.button}
           >
             Solo

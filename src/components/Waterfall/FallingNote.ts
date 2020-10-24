@@ -30,7 +30,8 @@ export class FallingNote {
     note: Note,
     speed: number,
     fallingDistance: number,
-    keyOffsetInfo: KeyOffsetInfo
+    keyOffsetInfo: KeyOffsetInfo,
+    currentTime: number
   ) {
     const width =
       (isAccidentalNote(note.midi)
@@ -39,12 +40,13 @@ export class FallingNote {
       MARGIN * 2;
     const horizontalPos = keyOffsetInfo.leftMarginMap[note.midi] + MARGIN;
     const length = note.duration * speed;
+    const verticalPos = -length + (currentTime - note.time) * speed;
     return new FallingNote(
       note.midi,
       width,
       horizontalPos,
       length,
-      -length,
+      verticalPos,
       fallingDistance
     );
   }

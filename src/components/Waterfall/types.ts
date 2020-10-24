@@ -2,12 +2,7 @@ export type Note = {
   time: number;
   duration: number;
   midi: number;
-};
-
-export type KeyboardDimension = {
-  start: number;
-  range: number;
-  keyWidth: number;
+  velocity: number;
 };
 
 export type KeyOffsetInfo = {
