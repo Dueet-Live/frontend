@@ -81,7 +81,7 @@ const GameView: React.FC<Props> = ({
   }
 
   const tracks = chosenSongMIDI.tracks;
-  // TODO: consider duet mode
+  // TODO: update based on part
   const playerNotes = tracks[0].notes;
   const bpm = chosenSongMIDI.header?.tempos[0].bpm;
   const [beatsPerBar, noteDivision] =
@@ -91,8 +91,10 @@ const GameView: React.FC<Props> = ({
   const lookAheadTime =
     calculateLookAheadTime(bpm, beatsPerBar, noteDivision) / 1000;
   const delayedStartTime = lookAheadTime + startTime;
-  // TODO: update
+  // TODO: schedule change (if have time), now take the first value only
   const keyboardVolume = playerNotes[0].velocity;
+  // TODO: update based on solo/duet (can be determined why whether myPart is present?)
+  const playbackChannel = 1;
 
   useEffect(() => {
     const startTime = Tone.now() + countDown;
@@ -120,8 +122,10 @@ const GameView: React.FC<Props> = ({
     // Schedule playback
     const instrumentPlayer = new InstrumentPlayer();
     const handlers: (Player | NullSoundFontPlayerNoteAudio)[] = [];
-    // TODO: consider duet mode
-    (tracks[1].notes.concat(tracks[2].notes) as Note[]).forEach(note => {
+    const playbackNotes = tracks
+      .filter((track: any) => track.channel === playbackChannel)
+      .flatMap((track: any) => track.notes) as Note[];
+    playbackNotes.forEach(note => {
       Tone.Transport.schedule(() => {
         const handler = instrumentPlayer.playNote(
           note.midi,
@@ -141,7 +145,7 @@ const GameView: React.FC<Props> = ({
         handler.stop();
       });
     };
-  }, [tracks, lookAheadTime]);
+  }, [tracks, lookAheadTime, playbackChannel]);
 
   // Calculate keyboard dimension
   const [middleBoxDimensions, middleBoxRef] = useDimensions<HTMLDivElement>();
@@ -170,16 +174,16 @@ const GameView: React.FC<Props> = ({
             {timeToStart}
           </Typography>
         ) : (
-          <Waterfall
-            keyboardDimension={keyboardDimension}
-            startTime={startTime * 1000}
-            dimension={middleBoxDimensions}
-            bpm={bpm}
-            beatsPerBar={beatsPerBar}
-            noteDivision={noteDivision}
-            notes={playerNotes}
-          />
-        )}
+            <Waterfall
+              keyboardDimension={keyboardDimension}
+              startTime={startTime * 1000}
+              dimension={middleBoxDimensions}
+              bpm={bpm}
+              beatsPerBar={beatsPerBar}
+              noteDivision={noteDivision}
+              notes={playerNotes}
+            />
+          )}
       </div>
       <div className={classes.piano}>
         <PianoContext.Provider value={{ volume: keyboardVolume }}>
