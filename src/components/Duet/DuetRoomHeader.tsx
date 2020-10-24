@@ -9,13 +9,13 @@ import {
 import { ArrowBack, MusicNoteOutlined } from '@material-ui/icons';
 import React, { useContext } from 'react';
 import { useHistory } from 'react-router-dom';
-import { PlayerContext } from '../contexts/PlayerContext';
-import { RoomContext, RoomView } from '../contexts/RoomContext';
-import PlayerIcon from '../icons/PlayerIcon';
-import SettingsIcon from '../icons/SettingsIcon';
-import { updateReady } from '../utils/socket';
-import useSong from '../utils/useSong';
-import RoomHeader from './shared/RoomHeader';
+import { PlayerContext } from '../../contexts/PlayerContext';
+import { RoomView, RoomContext } from '../../contexts/RoomContext';
+import PlayerIcon from '../../icons/PlayerIcon';
+import SettingsIcon from '../../icons/SettingsIcon';
+import { updateReady } from '../../utils/socket';
+import useSong from '../../utils/useSong';
+import RoomHeader from '../shared/RoomHeader';
 
 const useStyles = makeStyles(theme => ({
   icon: {

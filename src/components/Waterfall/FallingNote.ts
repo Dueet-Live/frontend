@@ -1,5 +1,6 @@
+import { Note } from '../../types/MidiJSON';
 import isAccidentalNote from '../Piano/utils/isAccidentalNote';
-import { KeyOffsetInfo, Note } from './types';
+import { KeyOffsetInfo } from './types';
 
 const MARGIN = 2;
 export class FallingNote {

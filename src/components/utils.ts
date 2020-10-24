@@ -1,8 +1,10 @@
+import { MidiJSON, Note } from '../types/MidiJSON';
+
 /** Returns a copy of `song` that is `factor` times faster. */
-export const changeSongSpeed = (song: any, factor: number) => {
+export const changeSongSpeed = (song: MidiJSON, factor: number) => {
   const songCopy = Object.assign({}, song);
   songCopy.header.tempos[0].bpm *= factor;
-  songCopy.tracks = songCopy.tracks.map((track: any) =>
+  songCopy.tracks = songCopy.tracks.map(track =>
     Object.assign({}, track, {
       notes: changeNotesTimeInfo(track.notes, factor),
     })
@@ -10,8 +12,8 @@ export const changeSongSpeed = (song: any, factor: number) => {
   return changeSongSpeed;
 };
 
-const changeNotesTimeInfo = (notes: any, factor: number) => {
-  return notes.map((note: any) =>
+const changeNotesTimeInfo = (notes: Note[], factor: number): Note[] => {
+  return notes.map(note =>
     Object.assign({}, note, {
       duration: note.duration * factor,
       time: note.time * factor,

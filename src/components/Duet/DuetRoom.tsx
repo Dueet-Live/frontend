@@ -1,22 +1,23 @@
 import { Box, makeStyles } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import songsAPI from '../api/songs';
-import { PlayerContext } from '../contexts/PlayerContext';
-import { RoomContext, RoomView } from '../contexts/RoomContext';
-import { RoomInfo } from '../types/roomInfo';
-import { getFriendId, getMyPart } from '../utils/roomInfo';
+import songsAPI from '../../api/songs';
+import { PlayerContext } from '../../contexts/PlayerContext';
+import { RoomView, RoomContext } from '../../contexts/RoomContext';
+import { MidiJSON } from '../../types/MidiJSON';
+import { RoomInfo } from '../../types/roomInfo';
+import { getFriendId, getMyPart } from '../../utils/roomInfo';
 import socket, {
   addListeners,
+  removeRoomStateListeners,
   createRoom,
   joinRoom,
-  removeRoomStateListeners,
-} from '../utils/socket';
-import useSong from '../utils/useSong';
+} from '../../utils/socket';
+import useSong from '../../utils/useSong';
+import GameView from '../Game/GameView';
+import DefaultPiano from '../Piano/DefaultPiano';
 import DuetLobby from './DuetLobby';
 import DuetRoomHeader from './DuetRoomHeader';
-import GameView from './GameView';
-import DefaultPiano from './Piano/DefaultPiano';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -54,7 +55,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   } as RoomInfo);
   const [playerId, setPlayerId] = useState(-1);
 
-  const [chosenSongMIDI, setChosenSongMIDI] = useState<any>({});
+  const [chosenSongMIDI, setChosenSongMIDI] = useState<MidiJSON | undefined>();
   const [view, setView] = useState<RoomView>('duet.lobby');
 
   const { piece } = roomState;
@@ -90,7 +91,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
       try {
         const song = await songsAPI.getSongWithContent(piece);
 
-        setChosenSongMIDI(JSON.parse(song.content));
+        setChosenSongMIDI(JSON.parse(song.content) as MidiJSON);
       } catch (err) {
         // TODO set a notification that it failed to retrieve song
         // from server
@@ -104,12 +105,10 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   const myPart = getMyPart(roomState, playerId);
 
   const mainBody = () => {
-    const tracks = chosenSongMIDI.tracks;
-
     if (view === 'duet.lobby') {
       return (
         <DuetLobby
-          isPieceDownloaded={!!tracks}
+          isPieceDownloaded={!!chosenSongMIDI}
           chosenSong={chosenSong}
           tryPiano={() => setView('duet.try')}
         />
@@ -124,7 +123,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
       );
     }
 
-    if (view === 'duet.play') {
+    if (view === 'duet.play' && !!chosenSongMIDI) {
       // at this point, myPart is definitely either primo or secondo, otherwise
       // game should not have started.
       // TODO account for part in duet

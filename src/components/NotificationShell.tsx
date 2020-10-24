@@ -3,7 +3,7 @@ import { Close } from '@material-ui/icons';
 import { Alert } from '@material-ui/lab';
 import React, { useEffect, useState } from 'react';
 import { Notification } from '../types/Notification';
-import { NotificationContext } from './Notification/NotificationContext';
+import { NotificationContext } from '../contexts/NotificationContext';
 
 const NotificationShell: React.FC = ({ children }) => {
   const [notification, setNotification] = useState<Notification>({

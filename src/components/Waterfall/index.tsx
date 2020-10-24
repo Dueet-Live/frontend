@@ -7,13 +7,14 @@ import {
 } from '../../utils/calculateKeyboardDimension';
 import { Dimensions } from '../../utils/useDimensions';
 import { FallingNote } from './FallingNote';
-import { KeyOffsetInfo, MidiInfo, Note } from './types';
+import { MidiInfo } from './types';
 import {
   calculateLookAheadTime,
   convertTimeInfoToMilliseconds,
   drawFallingNote,
 } from './utils';
 import * as Tone from 'tone';
+import { Note } from '../../types/MidiJSON';
 
 type Props = MidiInfo & {
   keyboardDimension: KeyboardDimension;
@@ -53,7 +54,7 @@ export const Waterfall: React.FC<Props> = ({
       leftMarginMap: getOffsetMap(start, range, keyWidth),
       whiteKeyWidth: keyWidth,
       blackKeyWidth: calculateBlackKeyWidth(keyWidth),
-    } as KeyOffsetInfo;
+    };
   }, [keyboardDimension]);
 
   const startAnimation = useCallback(() => {

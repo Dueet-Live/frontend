@@ -1,4 +1,4 @@
-import { Note } from './types';
+import { Note } from '../../types/MidiJSON';
 import { FallingNote } from './FallingNote';
 
 /*************** For time. ****************/
@@ -6,14 +6,14 @@ import { FallingNote } from './FallingNote';
  * Converts every time information of note in `notes` to milliseconds, assuming that the current information
  * is in seconds.
  */
-export const convertTimeInfoToMilliseconds = (notes: Array<Note>) => {
-  return notes.map(
-    (note: Note) =>
-      ({
-        time: note.time * 1000,
-        duration: note.duration * 1000,
-        midi: note.midi,
-      } as Note)
+export const convertTimeInfoToMilliseconds = (
+  notes: Array<Note>
+): Array<Note> => {
+  return notes.map(note =>
+    Object.assign({}, note, {
+      time: note.time * 1000,
+      duration: note.duration * 1000,
+    })
   );
 };
 
@@ -43,9 +43,12 @@ export const calculateLookAheadTime = (
  * @param {number} delay delay specified in milliseconds
  * @return New array of notes with delayed start time as specified by `delay`.
  */
-export const delayStartTime = (notes: Array<Note>, delay: number) => {
-  return notes.map(
-    (note: Note) => Object.assign({}, note, { time: note.time + delay }) as Note
+export const delayStartTime = (
+  notes: Array<Note>,
+  delay: number
+): Array<Note> => {
+  return notes.map(note =>
+    Object.assign({}, note, { time: note.time + delay })
   );
 };
 

@@ -1,9 +1,4 @@
-export type Note = {
-  time: number;
-  duration: number;
-  midi: number;
-  velocity: number;
-};
+import { Note } from '../../types/MidiJSON';
 
 export type KeyOffsetInfo = {
   leftMarginMap: { [note: number]: number };

@@ -1,14 +1,15 @@
 import { Box, makeStyles } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
-import songsAPI from '../api/songs';
-import { RoomContext, RoomView } from '../contexts/RoomContext';
-import { RoomInfo } from '../types/roomInfo';
-import useSong from '../utils/useSong';
-import GameView from './GameView';
-import DefaultPiano from './Piano/DefaultPiano';
-import SoloRoomHeader from './SoloRoomHeader';
+import songsAPI from '../../api/songs';
+import { RoomContext, RoomView } from '../../contexts/RoomContext';
+import { RoomInfo } from '../../types/roomInfo';
+import useSong from '../../utils/useSong';
+import DefaultPiano from '../Piano/DefaultPiano';
 import SoloSelectSong from './SoloSelectSong';
-import { startAudioContext } from '../utils/tonejsContex';
+import { startAudioContext } from '../../utils/toneContext';
+import GameView from '../Game/GameView';
+import SoloRoomHeader from './SoloRoomHeader';
+import { MidiJSON } from '../../types/MidiJSON';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -40,7 +41,7 @@ const SoloRoom: React.FC = () => {
     players: [],
     id: '',
   } as RoomInfo);
-  const [chosenSongMIDI, setChosenSongMIDI] = useState<any>({});
+  const [chosenSongMIDI, setChosenSongMIDI] = useState<MidiJSON | undefined>();
   const [view, setView] = useState<RoomView>('solo.select');
   const [songSelectionGenre, setSongSelectionGenre] = useState('');
 
@@ -54,7 +55,7 @@ const SoloRoom: React.FC = () => {
       if (piece === undefined) return;
       try {
         const song = await songsAPI.getSongWithContent(piece);
-        setChosenSongMIDI(JSON.parse(song.content));
+        setChosenSongMIDI(JSON.parse(song.content) as MidiJSON);
       } catch (err) {
         // TODO set a notification that it failed to retrieve song
         // from server
@@ -65,14 +66,12 @@ const SoloRoom: React.FC = () => {
   }, [piece]);
 
   const mainBody = () => {
-    const tracks = chosenSongMIDI.tracks;
-
     if (view === 'solo.select') {
       return (
         <SoloSelectSong
           genre={songSelectionGenre}
           setGenre={setSongSelectionGenre}
-          isPieceDownloaded={!!tracks}
+          isPieceDownloaded={!!chosenSongMIDI}
           handleStart={() => {
             setView('solo.play');
             startAudioContext(); // AudioContext has to be started with a click event
@@ -91,7 +90,7 @@ const SoloRoom: React.FC = () => {
       );
     }
 
-    if (view === 'solo.play') {
+    if (view === 'solo.play' && !!chosenSongMIDI) {
       return <GameView chosenSongMIDI={chosenSongMIDI} />;
     }
 

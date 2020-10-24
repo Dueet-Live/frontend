@@ -70,13 +70,13 @@ export class AudioPlayer {
   }
 
   playNoteWithDuration(
-    note: string,
+    note: number,
     time: number,
     duration: number,
     volume: number
   ) {
     // console.log("Play " + note)
-    return this.soundFontPlayer.play(note, time, {
+    return this.soundFontPlayer.play(note.toString(), time, {
       duration,
       gain: volume * this.maxVolume,
     });

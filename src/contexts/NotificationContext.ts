@@ -1,5 +1,5 @@
 import React from 'react';
-import { Notification } from '../../types/Notification';
+import { Notification } from '../types/Notification';
 
 type NotificationContextProps = (notification: Notification) => void;
 

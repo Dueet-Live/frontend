@@ -1,10 +1,10 @@
 import { ButtonProps } from '@material-ui/core';
 import React, { useContext } from 'react';
-import { PlayerContext } from '../contexts/PlayerContext';
-import { RoomContext } from '../contexts/RoomContext';
-import { getPartsSelection, getReady } from '../utils/roomInfo';
-import { updateReady } from '../utils/socket';
-import ReadyButton from './shared/ReadyButton';
+import { PlayerContext } from '../../contexts/PlayerContext';
+import { RoomContext } from '../../contexts/RoomContext';
+import { getPartsSelection, getReady } from '../../utils/roomInfo';
+import { updateReady } from '../../utils/socket';
+import ReadyButton from '../shared/ReadyButton';
 
 type Props = ButtonProps & {
   isDownloadingSong: boolean;
