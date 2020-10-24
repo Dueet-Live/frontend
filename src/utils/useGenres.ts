@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Genre } from '../types/song';
+import { Genre } from '../types/Song';
 import localforage, { GENRES } from './extendedLocalForage';
 
 export default function useGenres() {

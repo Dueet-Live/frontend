@@ -7,16 +7,16 @@ import {
   Typography,
 } from '@material-ui/core';
 import React, { useContext } from 'react';
-import { RoomContext } from '../contexts/RoomContext';
-import PianoIcon from '../icons/PianoIcon';
-import { RoomInfo } from '../types/roomInfo';
-import { Song } from '../types/song';
-import { choosePiece } from '../utils/socket';
-import useGenres from '../utils/useGenres';
-import useSongs from '../utils/useSongs';
-import GenreCard from './GenreCard';
+import { RoomContext } from '../../contexts/RoomContext';
+import PianoIcon from '../../icons/PianoIcon';
+import { RoomInfo } from '../../types/RoomInfo';
+import { Song } from '../../types/Song';
+import { choosePiece } from '../../utils/socket';
+import useGenres from '../../utils/useGenres';
+import useSongs from '../../utils/useSongs';
+import GenreCard from '../GenreCard';
 import SoloReadyButton from './SoloReadyButton';
-import SongCard from './SongCard';
+import SongCard from '../SongCard';
 
 const useStyles = makeStyles(theme => ({
   genreContainer: {

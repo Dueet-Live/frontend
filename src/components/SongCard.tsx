@@ -1,6 +1,6 @@
 import { Button, makeStyles } from '@material-ui/core';
 import React from 'react';
-import { Song } from '../types/song';
+import { Song } from '../types/Song';
 
 const useStyles = makeStyles({
   root: {

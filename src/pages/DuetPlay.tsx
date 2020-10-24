@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import DuetRoom from '../components/DuetRoom';
+import DuetRoom from '../components/Duet/DuetRoom';
 
 const DuetPlay: React.FC = () => {
   const location = useLocation();

@@ -5,7 +5,7 @@ import { getKeyboardMapping } from '../../utils/getKeyboardShorcutsMapping';
 import OctaveShiftKey from './OctaveShiftKey';
 import Piano from './Piano';
 import PianoContainer from './PianoContainer';
-import { KeyboardDimension } from '../../types/keyboardDimension';
+import { KeyboardDimension } from '../../types/KeyboardDimension';
 
 type Props = {
   includeOctaveShift: boolean;

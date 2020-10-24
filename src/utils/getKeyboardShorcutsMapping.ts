@@ -1,4 +1,4 @@
-import { KeyboardDimension } from '../types/keyboardDimension';
+import { KeyboardDimension } from '../types/KeyboardDimension';
 
 const shortcuts = [
   ['Z'],

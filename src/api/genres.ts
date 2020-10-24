@@ -1,4 +1,4 @@
-import { Genre, GenreWithSongs } from '../types/song';
+import { Genre, GenreWithSongs } from '../types/Song';
 import base from './base';
 
 const genresAPI = {

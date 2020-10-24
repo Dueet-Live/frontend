@@ -1,4 +1,4 @@
-import { RoomInfo } from '../types/roomInfo';
+import { RoomInfo } from '../types/RoomInfo';
 
 export function getFriendId(roomState: RoomInfo, myId: number) {
   const players = roomState.players;

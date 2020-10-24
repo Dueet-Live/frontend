@@ -1,5 +1,3 @@
-export type MIDI_Json = string;
-
 export type Genre = {
   id: number;
   name: string;
@@ -17,5 +15,5 @@ export type Song = {
 };
 
 export type SongWithContent = Song & {
-  content: MIDI_Json;
+  content: string;
 };

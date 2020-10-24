@@ -9,16 +9,16 @@ import {
   Typography,
 } from '@material-ui/core';
 import React, { useContext } from 'react';
-import { PlayerContext } from '../contexts/PlayerContext';
-import { RoomContext } from '../contexts/RoomContext';
-import PianoIcon from '../icons/PianoIcon';
-import PlayerIcon from '../icons/PlayerIcon';
-import { Part } from '../types/messages';
-import { Song } from '../types/song';
-import { getMyPart, getPartsSelection } from '../utils/roomInfo';
-import { choosePart } from '../utils/socket';
+import { PlayerContext } from '../../contexts/PlayerContext';
+import { RoomContext } from '../../contexts/RoomContext';
+import PianoIcon from '../../icons/PianoIcon';
+import PlayerIcon from '../../icons/PlayerIcon';
+import { Part } from '../../types/messages';
+import { Song } from '../../types/Song';
+import { getMyPart, getPartsSelection } from '../../utils/roomInfo';
+import { choosePart } from '../../utils/socket';
 import DuetReadyButton from './DuetReadyButton';
-import PickASongButton from './PickASongButton';
+import PickASongButton from '../PickASongButton';
 
 const useStyles = makeStyles(theme => ({
   root: {

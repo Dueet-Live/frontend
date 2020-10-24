@@ -1,5 +1,5 @@
 import React from 'react';
-import { RoomInfo } from '../types/roomInfo';
+import { RoomInfo } from '../types/RoomInfo';
 
 export type RoomView =
   | 'solo.select'
@@ -20,6 +20,6 @@ export const RoomContext = React.createContext<RoomContextProps>({
     id: '',
     piece: undefined,
     players: [],
-  } as RoomInfo,
+  },
   setRoomInfo: () => {},
 });

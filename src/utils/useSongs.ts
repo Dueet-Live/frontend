@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Song } from '../types/song';
+import { Song } from '../types/Song';
 import localforage, { SONGS } from './extendedLocalForage';
 
 export default function useSongs(type: 'solo' | 'duet') {

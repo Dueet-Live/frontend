@@ -6,23 +6,25 @@ import {
 } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
 import { noOp } from 'tone/build/esm/core/util/Interface';
-import { Part } from '../types/messages';
+import * as Tone from 'tone';
+import { Player } from 'tone';
+import { Part } from '../../types/messages';
+import {
+  AudioPlayer,
+  NullSoundFontPlayerNoteAudio,
+} from '../Piano/utils/InstrumentPlayer/AudioPlayer';
+import { PianoContext } from '../../contexts/PianoContext';
 import {
   calculateGamePianoDimension,
   calculateKeyHeight,
-} from '../utils/calculateKeyboardDimension';
-import { getKeyboardMappingWithSpecificStart } from '../utils/getKeyboardShorcutsMapping';
-import { useDimensions } from '../utils/useDimensions';
-import { Waterfall } from './Waterfall';
-import InteractivePiano from './Piano/InteractivePiano';
-import * as Tone from 'tone';
-import { Note } from './Waterfall/types';
-import InstrumentPlayer from './Piano/utils/InstrumentPlayer';
-import { calculateLookAheadTime } from './Waterfall/utils';
-import useWindowDimensions from '../utils/useWindowDimensions';
-import { Player } from 'tone';
-import { NullSoundFontPlayerNoteAudio } from './Piano/utils/InstrumentPlayer/AudioPlayer';
-import { PianoContext } from '../contexts/PianoContext';
+} from '../../utils/calculateKeyboardDimension';
+import { getKeyboardMappingWithSpecificStart } from '../../utils/getKeyboardShorcutsMapping';
+import { useDimensions } from '../../utils/useDimensions';
+import useWindowDimensions from '../../utils/useWindowDimensions';
+import InteractivePiano from '../Piano/InteractivePiano';
+import { Waterfall } from '../Waterfall';
+import { calculateLookAheadTime } from '../Waterfall/utils';
+import { MidiJSON } from '../../types/MidiJSON';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -43,7 +45,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 type Props = {
-  chosenSongMIDI: any;
+  chosenSongMIDI: MidiJSON;
   myPart?: Part | null;
   handleNotePlay?: (key: number, playerId: number) => void;
   handleNoteStop?: (key: number, playerId: number) => void;
@@ -61,42 +63,20 @@ const GameView: React.FC<Props> = ({
   const countDown = 3;
   const [timeToStart, setTimeToStart] = useState(countDown);
 
-  // Scoring
-  const didPlayNote = (note: number, playedBy: number) => {
-    // TODO: update score
-    console.log('Play', Tone.now() - delayedStartTime);
-    handleNotePlay(note, playedBy);
-  };
-  const didStopNote = (note: number, playedBy: number) => {
-    // TODO: update score
-    console.log('Stop', Tone.now() - delayedStartTime);
-    handleNoteStop(note, playedBy);
-  };
-
   // Song information
   const tracks = chosenSongMIDI.tracks;
-  let playerTrackNum = 0;
   // 0 for solo
   // 0 for primo, 1 for secondo
-  if (myPart === 'secondo') {
-    playerTrackNum = 1;
-  }
+  let playerTrackNum = myPart === 'secondo' ? 1 : 0;
+  // 1 for solo, 2 for secondo
+  let playbackChannel = myPart === undefined ? 1 : 2;
   const playerNotes = tracks[playerTrackNum].notes;
   // TODO: schedule change (if have time), now take the first value only
   const keyboardVolume = playerNotes[0].velocity;
-  // 1 for solo
-  // 2 for duet
-  let playbackChannel = 1;
-  if (myPart !== undefined) {
-    // Duet
-    playbackChannel = 2;
-  }
 
-  const bpm = chosenSongMIDI.header?.tempos[0].bpm;
-  const [beatsPerBar, noteDivision] =
-    chosenSongMIDI.header === undefined
-      ? [0, 0]
-      : chosenSongMIDI.header.timeSignatures[0].timeSignature;
+  const { tempos, timeSignatures } = chosenSongMIDI.header;
+  const bpm = tempos[0].bpm;
+  const [beatsPerBar, noteDivision] = timeSignatures[0].timeSignature;
   const lookAheadTime =
     calculateLookAheadTime(bpm, beatsPerBar, noteDivision) / 1000;
   const delayedStartTime = lookAheadTime + startTime;
@@ -125,14 +105,16 @@ const GameView: React.FC<Props> = ({
     // TODO2: schedule keyboard volume change
 
     // Schedule playback
-    const instrumentPlayer = new InstrumentPlayer();
+    // TODO: share the same player as the keyboard
+    const audioPlayer = new AudioPlayer();
+    audioPlayer.setInstrument('acoustic_grand_piano');
     const handlers: (Player | NullSoundFontPlayerNoteAudio)[] = [];
     const playbackNotes = tracks
-      .filter((track: any) => track.channel === playbackChannel)
-      .flatMap((track: any) => track.notes) as Note[];
+      .filter(track => track.channel === playbackChannel)
+      .flatMap(track => track.notes);
     playbackNotes.forEach(note => {
       Tone.Transport.schedule(() => {
-        const handler = instrumentPlayer.playNote(
+        const handler = audioPlayer.playNoteWithDuration(
           note.midi,
           note.time + delayedStartTime,
           note.duration,
@@ -151,6 +133,18 @@ const GameView: React.FC<Props> = ({
       });
     };
   }, [tracks, lookAheadTime, playbackChannel]);
+
+  // Scoring
+  const didPlayNote = (note: number, playedBy: number) => {
+    // TODO: update score
+    console.log('Play', Tone.now() - delayedStartTime);
+    handleNotePlay(note, playedBy);
+  };
+  const didStopNote = (note: number, playedBy: number) => {
+    // TODO: update score
+    console.log('Stop', Tone.now() - delayedStartTime);
+    handleNoteStop(note, playedBy);
+  };
 
   // Calculate keyboard dimension
   const [middleBoxDimensions, middleBoxRef] = useDimensions<HTMLDivElement>();
