@@ -17,7 +17,7 @@ type TimeSignatureEvent = {
   measures?: number;
 };
 
-type Track = {
+export type Track = {
   smallStartNote?: number;
   regularStartNote?: number;
   channel: number;

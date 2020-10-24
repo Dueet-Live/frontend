@@ -25,6 +25,8 @@ import InteractivePiano from '../Piano/InteractivePiano';
 import { Waterfall } from '../Waterfall';
 import { calculateLookAheadTime } from '../Waterfall/utils';
 import { MidiJSON } from '../../types/MidiJSON';
+import GameEndView from './GameEndView';
+import { calculateSongDuration, getPlaybackNotes } from '../../utils/songInfo';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -60,11 +62,12 @@ const GameView: React.FC<Props> = ({
 }) => {
   const classes = useStyles();
   const [startTime, setStartTime] = useState(-1);
+  const [gameEnd, setGameEnd] = useState(false);
   const countDown = 3;
   const [timeToStart, setTimeToStart] = useState(countDown);
 
   // Song information
-  const tracks = chosenSongMIDI.tracks;
+  const { tracks } = chosenSongMIDI;
   // 0 for solo
   // 0 for primo, 1 for secondo
   let playerTrackNum = myPart === 'secondo' ? 1 : 0;
@@ -96,22 +99,20 @@ const GameView: React.FC<Props> = ({
       }, startTime - (countDown - 1 - i) - Tone.now());
     }
 
-    // TODO1: Schedule ending screen
-    // const songDuration = 126;
-    // Tone.Transport.schedule(() => {
+    // Schedule ending screen
+    const songDuration = calculateSongDuration(tracks);
+    Tone.Transport.schedule(() => {
+      setGameEnd(true);
+    }, delayedStartTime + songDuration - Tone.now() + 0.1);
 
-    // }, startTime + songDuration - Tone.now());
-
-    // TODO2: schedule keyboard volume change
+    // TODO: schedule keyboard volume change
 
     // Schedule playback
     // TODO: share the same player as the keyboard
     const audioPlayer = new AudioPlayer();
     audioPlayer.setInstrument('acoustic_grand_piano');
     const handlers: (Player | NullSoundFontPlayerNoteAudio)[] = [];
-    const playbackNotes = tracks
-      .filter(track => track.channel === playbackChannel)
-      .flatMap(track => track.notes);
+    const playbackNotes = getPlaybackNotes(tracks, playbackChannel);
     playbackNotes.forEach(note => {
       Tone.Transport.schedule(() => {
         const handler = audioPlayer.playNoteWithDuration(
@@ -165,36 +166,50 @@ const GameView: React.FC<Props> = ({
     ? getKeyboardMappingWithSpecificStart(regularStartNote, keyboardDimension)
     : undefined;
 
+  const middleBox = () => {
+    if (timeToStart !== 0) {
+      return (
+        <Typography variant="h1" align="center" color="primary">
+          {timeToStart}
+        </Typography>
+      );
+    }
+
+    if (!gameEnd) {
+      return (
+        <Waterfall
+          keyboardDimension={keyboardDimension}
+          startTime={startTime * 1000}
+          dimension={middleBoxDimensions}
+          bpm={bpm}
+          beatsPerBar={beatsPerBar}
+          noteDivision={noteDivision}
+          notes={playerNotes}
+        />
+      );
+    }
+
+    return <GameEndView />;
+  };
+
   return (
     <div className={classes.root}>
       <div ref={middleBoxRef} className={classes.middleBox}>
-        {timeToStart !== 0 ? (
-          <Typography variant="h1" align="center" color="primary">
-            {timeToStart}
-          </Typography>
-        ) : (
-          <Waterfall
-            keyboardDimension={keyboardDimension}
-            startTime={startTime * 1000}
-            dimension={middleBoxDimensions}
-            bpm={bpm}
-            beatsPerBar={beatsPerBar}
-            noteDivision={noteDivision}
-            notes={playerNotes}
-          />
-        )}
+        {middleBox()}
       </div>
       <div className={classes.piano}>
-        <PianoContext.Provider value={{ volume: keyboardVolume }}>
-          <InteractivePiano
-            includeOctaveShift={false}
-            keyboardDimension={keyboardDimension}
-            keyHeight={keyHeight}
-            keyboardMap={keyboardMap}
-            didPlayNote={didPlayNote}
-            didStopNote={didStopNote}
-          />
-        </PianoContext.Provider>
+        {!gameEnd && (
+          <PianoContext.Provider value={{ volume: keyboardVolume }}>
+            <InteractivePiano
+              includeOctaveShift={false}
+              keyboardDimension={keyboardDimension}
+              keyHeight={keyHeight}
+              keyboardMap={keyboardMap}
+              didPlayNote={didPlayNote}
+              didStopNote={didStopNote}
+            />
+          </PianoContext.Provider>
+        )}
       </div>
     </div>
   );
