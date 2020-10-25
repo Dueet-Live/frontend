@@ -4,6 +4,7 @@ import { PlayerContext } from '../../contexts/PlayerContext';
 import { RoomContext } from '../../contexts/RoomContext';
 import { getPartsSelection, getReady } from '../../utils/roomInfo';
 import { updateReady } from '../../utils/socket';
+import { startAudioContext } from '../../utils/toneContext';
 import ReadyButton from '../shared/ReadyButton';
 
 type Props = ButtonProps & {
@@ -25,6 +26,9 @@ const DuetReadyButton: React.FC<Props> = ({ isDownloadingSong, ...props }) => {
 
   const handleReady = (isReady: boolean) => {
     updateReady(isReady);
+    if (isReady) {
+      startAudioContext(); // AudioContext has to be started with a click event
+    }
   };
 
   const disabled =
