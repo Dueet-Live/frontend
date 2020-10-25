@@ -7,4 +7,4 @@ export type TraditionalKeyboardDimension = {
 export type SmartKeyboardDimension = {
   leftMargin: number;
   keyWidth: number;
-}
+};

@@ -1,6 +1,6 @@
 import { TraditionalKeyboardDimension } from '../types/keyboardDimension';
 
-const shortcuts = [
+const shortcutsForTraditionalPiano = [
   ['Z'],
   ['S'],
   ['X'],
@@ -54,7 +54,7 @@ export function getKeyboardMapping(
   const mapRange = Math.min(30, range - offset);
   const map: { [key: string]: number } = {};
   for (let i = 0; i < mapRange; i++) {
-    const shortcutKeys = shortcuts[i];
+    const shortcutKeys = shortcutsForTraditionalPiano[i];
     const note = firstMappedNote + i;
     shortcutKeys.forEach(shortcut => {
       map[shortcut] = note;
@@ -63,7 +63,7 @@ export function getKeyboardMapping(
   return map;
 }
 
-// GAME MODE (desktop view only)
+// GAME MODE - Traditional Piano (desktop view only)
 // Assume the start note and first mapped note are both C here
 export function getKeyboardMappingWithSpecificStart(
   firstMappedNote: number,
@@ -73,7 +73,7 @@ export function getKeyboardMappingWithSpecificStart(
   const mapRange = Math.min(30, range - (firstMappedNote - start));
   const map: { [key: string]: number } = {};
   for (let i = 0; i < mapRange; i++) {
-    const shortcutKeys = shortcuts[i];
+    const shortcutKeys = shortcutsForTraditionalPiano[i];
     const note = firstMappedNote + i;
     shortcutKeys.forEach(shortcut => {
       map[shortcut] = note;
@@ -89,3 +89,25 @@ export function getKeyboardShortcutForNote(
   const keyboardShortcuts = Object.keys(keyboardMap);
   return keyboardShortcuts.filter(shortcut => keyboardMap[shortcut] === note);
 }
+
+const shortcutsForSmartPiano = [
+  ['A'],
+  ['S'],
+  ['D'],
+  ['F'],
+  ['G'],
+  ['H'],
+  ['J'],
+];
+
+// GAME MODE - Smart Piano (desktop view only)
+export const getSmartKeyboardMapping = () => {
+  const map: { [key: string]: number } = {};
+  for (let i = 0; i < 7; i++) {
+    const shortcutKeys = shortcutsForSmartPiano[i];
+    shortcutKeys.forEach(shortcut => {
+      map[shortcut] = i;
+    });
+  }
+  return map;
+};
