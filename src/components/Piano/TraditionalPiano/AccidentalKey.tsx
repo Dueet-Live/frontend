@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
-import { PlayerContext } from '../../contexts/PlayerContext';
-import { PlayingNote } from '../../types/playingNote';
-import './InteractivePiano.css';
+import { PlayerContext } from '../../../contexts/PlayerContext';
+import { PlayingNote } from '../types/playingNote';
+import './TraditionalPiano.css';
 
 type Props = {
   note: number;
@@ -28,24 +28,24 @@ const AccidentalKey: React.FC<Props> = ({
       return '';
     } else {
       if (playingNote[0].playerId === me) {
-        return 'interactive-piano__accidental-key--playing-by-me';
+        return 'traditional-piano__accidental-key--playing-by-me';
       } else {
-        return 'interactive-piano__accidental-key--playing-by-others';
+        return 'traditional-piano__accidental-key--playing-by-others';
       }
     }
   };
 
   return (
-    <div className={'interactive-piano__accidental-key__wrapper'}>
+    <div className={'traditional-piano__accidental-key__wrapper'}>
       <button
-        className={`interactive-piano__accidental-key ${getClassName()}`}
+        className={`traditional-piano__accidental-key ${getClassName()}`}
         style={{ width: keyWidth, height: keyHeight }}
         data-note={note}
         {...eventHandlers}
       >
-        <div className={'interactive-piano__text-container'}>
-          <div className="interactive-piano__text--top-text">{topText}</div>
-          <div className="interactive-piano__text--bottom-text">
+        <div className={'traditional-piano__text-container'}>
+          <div className="traditional-piano__text--top-text">{topText}</div>
+          <div className="traditional-piano__text--bottom-text">
             {bottomText}
           </div>
         </div>

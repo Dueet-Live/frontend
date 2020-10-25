@@ -1,18 +1,19 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
-import { PlayerContext } from '../../contexts/PlayerContext';
-import { PlayingNote } from '../../types/playingNote';
-import { getKeyboardShortcutForNote } from '../../utils/getKeyboardShorcutsMapping';
+import { PlayerContext } from '../../../contexts/PlayerContext';
+import { PlayingNote } from '../types/playingNote';
+import { getKeyboardShortcutForNote } from '../../../utils/getKeyboardShorcutsMapping';
 import {
   addNotePlayListener,
   playNote,
   removeNotePlayListener,
   stopNote,
-} from '../../utils/socket';
-import './InteractivePiano.css';
+} from '../../../utils/socket';
+import './TraditionalPiano.css';
 import InstrumentAudio from './InstrumentAudio';
-import PianoKey from './PianoKey';
-import getNotesBetween from './utils/getNotesBetween';
+import PianoKey from './TraditionalPianoKey';
+import getNotesBetween from '../utils/getNotesBetween';
 import { noOp } from 'tone/build/esm/core/util/Interface';
+import isRegularKey from '../utils/isRegularKey';
 
 type Props = {
   startNote: number;
@@ -24,11 +25,7 @@ type Props = {
   didStopNote?: (note: number, playerId: number) => void;
 };
 
-function isRegularKey(event: KeyboardEvent) {
-  return !event.ctrlKey && !event.metaKey && !event.shiftKey;
-}
-
-const Piano: React.FC<Props> = ({
+const TraditionalKeyboard: React.FC<Props> = ({
   startNote,
   endNote,
   keyWidth,
@@ -212,7 +209,7 @@ const Piano: React.FC<Props> = ({
 
   return (
     <div
-      className="interactive-piano__keyboard-container"
+      className="traditional-piano__keyboard-container"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
       onTouchMove={handleTouchMove}
@@ -245,4 +242,4 @@ const Piano: React.FC<Props> = ({
   );
 };
 
-export default Piano;
+export default TraditionalKeyboard;

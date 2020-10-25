@@ -1,25 +1,15 @@
-.interactive-piano__piano-container {
-  display: inline-flex;
-  box-sizing: border-box;
-  /* border-top: 10px solid #904ae9; */
-  position: relative;
-  margin: 0;
-  touch-action: none;
-  user-select: none;
-}
-
-.interactive-piano__keyboard-container {
+.traditional-piano__keyboard-container {
   display: flex;
   flex: 1;
   z-index: 1; 
 }
 
-.interactive-piano__accidental-key__wrapper {
+.traditional-piano__accidental-key__wrapper {
   position: relative;
   width: 0;
 }
 
-.interactive-piano__accidental-key {
+.traditional-piano__accidental-key {
   /* Webkit / Chrome Specific CSS to remove tap highlight color */
   -webkit-tap-highlight-color: transparent;
   /* Firefox Specific CSS to remove button differences and focus ring */
@@ -35,17 +25,17 @@
   color: #dbdbdb;
 }
 
-.interactive-piano__accidental-key--playing-by-me {
+.traditional-piano__accidental-key--playing-by-me {
   background: #904ae9;
   color: #fff;
 }
 
-.interactive-piano__accidental-key--playing-by-others {
+.traditional-piano__accidental-key--playing-by-others {
   background: #E1A546;
   color: #fff;
 }
 
-.interactive-piano__natural-key {
+.traditional-piano__natural-key {
   /* Webkit / Chrome Specific CSS to remove tap highlight color */
   -webkit-tap-highlight-color: transparent;
   /* Firefox Specific CSS to remove button differences and focus ring */
@@ -60,17 +50,17 @@
   color: #444;
 }
 
-.interactive-piano__natural-key--playing-by-me {
+.traditional-piano__natural-key--playing-by-me {
   border-bottom: 10px solid #904ae9;
   color: #904ae9;
 }
 
-.interactive-piano__natural-key--playing-by-others {
+.traditional-piano__natural-key--playing-by-others {
   border-bottom: 10px solid #E1A546;
   color: #E1A546;
 }
 
-.interactive-piano__text-container {
+.traditional-piano__text-container {
   pointer-events: none;
   height: 100%;
   display: flex;
@@ -79,17 +69,17 @@
   font-size: 1rem;
 }
 
-.interactive-piano__text--top-text {
+.traditional-piano__text--top-text {
   pointer-events: none;
   color: rgb(136, 134, 134);
   margin-bottom: 3px; 
 }
 
-.interactive-piano__text--bottom-text {
+.traditional-piano__text--bottom-text {
   pointer-events: none;
 }
 
-.interactive-piano__octave-shift-key {
+.traditional-piano__octave-shift-key {
   /* Webkit / Chrome Specific CSS to remove tap highlight color */
   -webkit-tap-highlight-color: transparent;
   /* Firefox Specific CSS to remove button differences and focus ring */
@@ -105,10 +95,10 @@
   z-index: 2; 
 }
 
-.interactive-piano__octave-shift-key:first-of-type {
+.traditional-piano__octave-shift-key:first-of-type {
   margin-left: 0;
 }
 
-.interactive-piano__octave-shift-key:last-of-type {
+.traditional-piano__octave-shift-key:last-of-type {
   margin-right: 0;
 }

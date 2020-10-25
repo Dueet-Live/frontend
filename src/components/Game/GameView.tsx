@@ -17,11 +17,11 @@ import { PianoContext } from '../../contexts/PianoContext';
 import {
   calculateGamePianoDimension,
   calculateKeyHeight,
-} from '../../utils/calculateKeyboardDimension';
+} from '../../utils/calculateTraditionalKeyboardDimension';
 import { getKeyboardMappingWithSpecificStart } from '../../utils/getKeyboardShorcutsMapping';
 import { useDimensions } from '../../utils/useDimensions';
 import useWindowDimensions from '../../utils/useWindowDimensions';
-import InteractivePiano from '../Piano/InteractivePiano';
+import TraditionalPiano from '../Piano/TraditionalPiano/TraditionalPiano';
 import { Waterfall } from '../Waterfall';
 import { calculateLookAheadTime } from '../Waterfall/utils';
 import { MidiJSON } from '../../types/MidiJSON';
@@ -209,7 +209,7 @@ const GameView: React.FC<Props> = ({
       <div className={classes.piano}>
         {!gameEnd && (
           <PianoContext.Provider value={{ volume: keyboardVolume }}>
-            <InteractivePiano
+            <TraditionalPiano
               includeOctaveShift={false}
               keyboardDimension={keyboardDimension}
               keyHeight={keyHeight}

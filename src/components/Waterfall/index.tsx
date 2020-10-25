@@ -1,10 +1,10 @@
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
-import { KeyboardDimension } from '../../types/keyboardDimension';
+import { TraditionalKeyboardDimension } from '../../types/keyboardDimension';
 import {
   calculateBlackKeyWidth,
   getOffsetMap,
-} from '../../utils/calculateKeyboardDimension';
+} from '../../utils/calculateTraditionalKeyboardDimension';
 import { Dimensions } from '../../utils/useDimensions';
 import { FallingNote } from './FallingNote';
 import { MidiInfo } from './types';
@@ -17,9 +17,9 @@ import * as Tone from 'tone';
 import { Note } from '../../types/MidiJSON';
 
 type Props = MidiInfo & {
-  keyboardDimension: KeyboardDimension;
+  keyboardDimension: TraditionalKeyboardDimension;
+  waterfallDimension: Dimensions;
   startTime?: number;
-  dimension: Dimensions;
 };
 
 const useStyles = makeStyles(theme => ({
@@ -31,7 +31,7 @@ const useStyles = makeStyles(theme => ({
 export const Waterfall: React.FC<Props> = ({
   startTime = 0,
   keyboardDimension,
-  dimension,
+  waterfallDimension,
   bpm,
   beatsPerBar,
   noteDivision,
@@ -76,7 +76,7 @@ export const Waterfall: React.FC<Props> = ({
       while (
         firstHiddenNoteIndex.current < notesInMs.current.length &&
         notesInMs.current[firstHiddenNoteIndex.current].time <=
-          timestamp - startTime
+        timestamp - startTime
       ) {
         const note = notesInMs.current[firstHiddenNoteIndex.current];
         const newNote = FallingNote.createFromNoteInfo(
@@ -144,8 +144,8 @@ export const Waterfall: React.FC<Props> = ({
       <canvas
         ref={canvasRef}
         className={classes.canvas}
-        height={dimension.height}
-        width={dimension.width}
+        height={waterfallDimension.height}
+        width={waterfallDimension.width}
       >
         Unable to render the required visuals on this browser ): Perhaps, switch
         to another browser?

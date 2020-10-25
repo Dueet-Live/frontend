@@ -7,7 +7,6 @@ const referenceKeywidth = 50;
 const octageRange = 12;
 
 /********************* DEFAULT MODE **************************************/
-/* Before game play */
 /* Assumption: startNote is always C */
 function calculateKeyboardRange(totalWidth: number): number {
   const keyboardWidth = calculateKeyboardWidth(totalWidth, true);

@@ -15,7 +15,7 @@ import socket, {
 } from '../../utils/socket';
 import useSong from '../../utils/useSong';
 import GameView from '../Game/GameView';
-import DefaultPiano from '../Piano/DefaultPiano';
+import FreePlayPiano from '../Piano/TraditionalPiano/FreePlayPiano';
 import DuetLobby from './DuetLobby';
 import DuetRoomHeader from './DuetRoomHeader';
 
@@ -118,7 +118,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
     if (view === 'duet.try') {
       return (
         <div className={classes.piano}>
-          <DefaultPiano />
+          <FreePlayPiano />
         </div>
       );
     }

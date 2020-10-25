@@ -4,7 +4,7 @@ import songsAPI from '../../api/songs';
 import { RoomContext, RoomView } from '../../contexts/RoomContext';
 import { RoomInfo } from '../../types/roomInfo';
 import useSong from '../../utils/useSong';
-import DefaultPiano from '../Piano/DefaultPiano';
+import FreePlayPiano from '../Piano/TraditionalPiano/FreePlayPiano';
 import SoloSelectSong from './SoloSelectSong';
 import { startAudioContext } from '../../utils/toneContext';
 import GameView from '../Game/GameView';
@@ -85,7 +85,7 @@ const SoloRoom: React.FC = () => {
     if (view === 'solo.try') {
       return (
         <div className={classes.piano}>
-          <DefaultPiano />
+          <FreePlayPiano />
         </div>
       );
     }

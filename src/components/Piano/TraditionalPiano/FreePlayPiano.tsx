@@ -3,16 +3,16 @@ import { noOp } from 'tone/build/esm/core/util/Interface';
 import {
   calculateDefaultPianoDimension,
   calculateKeyHeight,
-} from '../../utils/calculateKeyboardDimension';
-import useWindowDimensions from '../../utils/useWindowDimensions';
-import InteractivePiano from './InteractivePiano';
+} from '../../../utils/calculateTraditionalKeyboardDimension';
+import useWindowDimensions from '../../../utils/useWindowDimensions';
+import TraditionalPiano from './TraditionalPiano';
 
 type Props = {
   handleNotePlay?: (key: number, playerId: number) => void;
   handleNoteStop?: (key: number, playerId: number) => void;
 };
 
-const DefaultPiano: React.FC<Props> = ({
+const FreePlayPiano: React.FC<Props> = ({
   handleNotePlay = noOp,
   handleNoteStop = noOp,
 }) => {
@@ -21,7 +21,7 @@ const DefaultPiano: React.FC<Props> = ({
   const keyHeight = calculateKeyHeight(height);
 
   return (
-    <InteractivePiano
+    <TraditionalPiano
       includeOctaveShift={true}
       keyboardDimension={keyboardDimension}
       keyHeight={keyHeight}
@@ -31,4 +31,4 @@ const DefaultPiano: React.FC<Props> = ({
   );
 };
 
-export default DefaultPiano;
+export default FreePlayPiano;

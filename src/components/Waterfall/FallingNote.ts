@@ -1,6 +1,6 @@
 import { Note } from '../../types/MidiJSON';
 import isAccidentalNote from '../Piano/utils/isAccidentalNote';
-import { KeyOffsetInfo } from './types';
+import { TraditionalKeyOffsetInfo } from './types';
 
 const MARGIN = 2;
 export class FallingNote {
@@ -31,7 +31,7 @@ export class FallingNote {
     note: Note,
     speed: number,
     fallingDistance: number,
-    keyOffsetInfo: KeyOffsetInfo,
+    keyOffsetInfo: TraditionalKeyOffsetInfo,
     currentTime: number
   ) {
     const width =
@@ -63,7 +63,7 @@ export class FallingNote {
    */
   createWithUpdatedDimensionAndProgress(
     newFallingDistance: number,
-    keyOffsetInfo: KeyOffsetInfo
+    keyOffsetInfo: TraditionalKeyOffsetInfo
   ) {
     const verticalDistanceChangeRatio =
       this.fallingDistance / newFallingDistance;

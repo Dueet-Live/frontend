@@ -1,8 +1,8 @@
 import { Component } from 'react';
-import { isEqual } from './utils/arrayHelpers';
+import { isEqual } from '../utils/arrayHelpers';
 import { InstrumentName } from 'soundfont-player';
-import InstrumentPlayer from './utils/InstrumentPlayer';
-import { PianoContext } from '../../contexts/PianoContext';
+import InstrumentPlayer from '../InstrumentPlayer';
+import { PianoContext } from '../../../contexts/PianoContext';
 
 type Props = {
   instrument: InstrumentName;

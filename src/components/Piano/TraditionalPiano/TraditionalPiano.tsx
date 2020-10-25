@@ -1,22 +1,21 @@
 import React, { useEffect, useState } from 'react';
-import './InteractivePiano.css';
 import { useTheme, useMediaQuery } from '@material-ui/core';
-import { getKeyboardMapping } from '../../utils/getKeyboardShorcutsMapping';
+import { getKeyboardMapping } from '../../../utils/getKeyboardShorcutsMapping';
 import OctaveShiftKey from './OctaveShiftKey';
-import Piano from './Piano';
-import PianoContainer from './PianoContainer';
-import { KeyboardDimension } from '../../types/keyboardDimension';
+import TraditionalKeyboard from './TraditionalKeyboard';
+import PianoContainer from '../PianoContainer';
+import { TraditionalKeyboardDimension } from '../../../types/keyboardDimension';
 
 type Props = {
   includeOctaveShift: boolean;
-  keyboardDimension: KeyboardDimension;
+  keyboardDimension: TraditionalKeyboardDimension;
   keyHeight: number;
   keyboardMap?: { [key: string]: number };
   didPlayNote?: (key: number, playerId: number) => void;
   didStopNote?: (key: number, playerId: number) => void;
 };
 
-const InteractivePiano: React.FC<Props> = ({
+const TraditionalPiano: React.FC<Props> = ({
   includeOctaveShift = true,
   keyboardDimension,
   keyHeight,
@@ -71,7 +70,7 @@ const InteractivePiano: React.FC<Props> = ({
         />
       )}
 
-      <Piano
+      <TraditionalKeyboard
         startNote={startNote}
         endNote={endNote}
         keyWidth={keyWidth}
@@ -92,4 +91,4 @@ const InteractivePiano: React.FC<Props> = ({
   );
 };
 
-export default InteractivePiano;
+export default TraditionalPiano;
