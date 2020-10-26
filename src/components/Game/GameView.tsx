@@ -27,6 +27,7 @@ import { calculateLookAheadTime } from '../Waterfall/utils';
 import { MidiJSON } from '../../types/MidiJSON';
 import GameEndView from './GameEndView';
 import { calculateSongDuration, getPlaybackNotes } from '../../utils/songInfo';
+import ProgressBar from './ProgressBar';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -68,6 +69,7 @@ const GameView: React.FC<Props> = ({
 
   // Song information
   const { tracks } = chosenSongMIDI;
+  const songDuration = calculateSongDuration(tracks);
   // 0 for solo
   // 0 for primo, 1 for secondo
   let playerTrackNum = myPart === 'secondo' ? 1 : 0;
@@ -100,7 +102,6 @@ const GameView: React.FC<Props> = ({
     }
 
     // Schedule ending screen
-    const songDuration = calculateSongDuration(tracks);
     Tone.Transport.schedule(() => {
       setGameEnd(true);
     }, delayedStartTime + songDuration - Tone.now() + 0.1);
@@ -133,6 +134,7 @@ const GameView: React.FC<Props> = ({
         handler.stop();
       });
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tracks, lookAheadTime, playbackChannel]);
 
   // Scoring
@@ -194,6 +196,13 @@ const GameView: React.FC<Props> = ({
 
   return (
     <div className={classes.root}>
+      {!gameEnd && (
+        <ProgressBar
+          startTime={startTime}
+          delayedStartTime={delayedStartTime}
+          songDuration={songDuration}
+        />
+      )}
       <div ref={middleBoxRef} className={classes.middleBox}>
         {middleBox()}
       </div>
