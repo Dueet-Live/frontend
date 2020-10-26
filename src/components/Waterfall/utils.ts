@@ -74,5 +74,35 @@ export const drawFallingNote = (
   gradient.addColorStop(1, GRADIENT_COLOUR_END);
   context.fillStyle = gradient;
 
-  context.fillRect(startX, startY, note.width, note.length);
+  drawRoundRect(context, startX, startY, note.width, note.length, 5);
+};
+
+const drawRoundRect = (
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  radius: number
+) => {
+  const borderRadius = { tl: radius, tr: radius, br: radius, bl: radius };
+
+  ctx.beginPath();
+  ctx.moveTo(x + borderRadius.tl, y);
+  ctx.lineTo(x + width - borderRadius.tr, y);
+  ctx.quadraticCurveTo(x + width, y, x + width, y + borderRadius.tr);
+  ctx.lineTo(x + width, y + height - borderRadius.br);
+  ctx.quadraticCurveTo(
+    x + width,
+    y + height,
+    x + width - borderRadius.br,
+    y + height
+  );
+  ctx.lineTo(x + borderRadius.bl, y + height);
+  ctx.quadraticCurveTo(x, y + height, x, y + height - borderRadius.bl);
+  ctx.lineTo(x, y + borderRadius.tl);
+  ctx.quadraticCurveTo(x, y, x + borderRadius.tl, y);
+  ctx.closePath();
+
+  ctx.fill();
 };
