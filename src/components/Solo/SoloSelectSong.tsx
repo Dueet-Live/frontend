@@ -15,15 +15,17 @@ import { choosePiece } from '../../utils/socket';
 import useGenres from '../../utils/useGenres';
 import useSongs from '../../utils/useSongs';
 import GenreCard from '../GenreCard';
-import SoloReadyButton from './SoloReadyButton';
 import SongCard from '../SongCard';
+import SoloReadyButton from './SoloReadyButton';
 
 const useStyles = makeStyles(theme => ({
   genreContainer: {
     display: 'flex',
     flexDirection: 'row',
-    flex: 1,
-    alignItems: 'stretch',
+    overflowY: 'auto',
+    height: 0,
+    flex: '1 1 auto',
+    alignContent: 'start',
   },
   songContainer: {
     display: 'flex',
@@ -54,11 +56,6 @@ const useStyles = makeStyles(theme => ({
     '&:first-letter': {
       textTransform: 'capitalize',
     },
-  },
-  genreCard: {
-    marginLeft: theme.spacing(1),
-    marginRight: theme.spacing(1),
-    width: '20%',
   },
   details: {
     paddingBottom: theme.spacing(2),
@@ -103,19 +100,13 @@ const SoloSelectSong: React.FC<Props> = ({
         >
           Choose a genre
         </Typography>
-        <Grid
-          container
-          alignItems="stretch"
-          justify="center"
-          className={classes.genreContainer}
-        >
+        <Grid container justify="center" className={classes.genreContainer}>
           {genres.map(genre => (
-            <Grid item key={genre.id} className={classes.genreCard}>
-              <GenreCard
-                genre={genre.name}
-                onClick={() => setGenre(genre.name)}
-              />
-            </Grid>
+            <GenreCard
+              genre={genre.name}
+              onClick={() => setGenre(genre.name)}
+              key={genre.name}
+            />
           ))}
         </Grid>
       </>
