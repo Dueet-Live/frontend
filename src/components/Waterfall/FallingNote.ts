@@ -95,10 +95,11 @@ export class FallingNote {
     const verticalPos = this.verticalPos * verticalDistanceChangeRatio;
     const length = this.length * verticalDistanceChangeRatio;
     const { keyWidth, leftMarginMap } = keyOffsetInfo;
+    const width = keyWidth - MARGIN * 2;
     const horizontalPos = leftMarginMap[this.identifier] + MARGIN;
     return new FallingNote(
       this.identifier,
-      keyWidth,
+      width,
       horizontalPos,
       length,
       verticalPos,

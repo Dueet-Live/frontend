@@ -121,7 +121,7 @@ const GameView: React.FC<Props> = ({
 
     Tone.Transport.start();
 
-    // TODO: Schedule smart mapping change events
+    // Schedule smart mapping change events
     mappingChangeEvents.forEach(({ time, mapping }) => {
       Tone.Transport.schedule(() => {
         setCurrentMapping(mapping);
@@ -143,7 +143,6 @@ const GameView: React.FC<Props> = ({
     // TODO: schedule keyboard volume change
 
     // Schedule playback
-    // TODO: share the same player as the keyboard
     instrumentPlayer.setInstrument('acoustic_grand_piano');
     const handlers: (Player | NullSoundFontPlayerNoteAudio)[] = [];
     const playbackNotes = getPlaybackNotes(tracks, playbackChannel);
@@ -185,13 +184,12 @@ const GameView: React.FC<Props> = ({
   // Calculate keyboard dimension
   const [middleBoxDimensions, middleBoxRef] = useDimensions<HTMLDivElement>();
   const { height } = useWindowDimensions();
-  const keyboardDimension = useMemo(
-    () => calculateSmartKeyboardDimension(middleBoxDimensions.width),
-    [middleBoxDimensions]
+  const keyboardDimension = calculateSmartKeyboardDimension(
+    middleBoxDimensions.width
   );
   const keyHeight = useMemo(() => calculateSmartKeyHeight(height), [height]);
 
-  // Get custom traditional keyboard mapping for game
+  // Get custom smart keyboard mapping for game
   const theme = useTheme();
   const isDesktopView = useMediaQuery(theme.breakpoints.up('md'));
   const keyboardMap = isDesktopView ? getSmartKeyboardMapping() : undefined;
