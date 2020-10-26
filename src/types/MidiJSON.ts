@@ -24,6 +24,10 @@ export type Track = {
   notes: Note[];
 };
 
+export type SmartNote = Note & {
+  smartKey: number;
+};
+
 export type MidiJSON = {
   // the transport and timing data
   header: {

@@ -14,7 +14,7 @@ import { BaseContext } from 'tone';
 
 export class NullSoundFontPlayerNoteAudio {
   // eslint-disable-next-line class-methods-use-this
-  stop() { }
+  stop() {}
 }
 
 class NullSoundFontPlayer {

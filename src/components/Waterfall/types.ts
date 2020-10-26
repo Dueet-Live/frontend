@@ -1,4 +1,4 @@
-import { Note } from '../../types/MidiJSON';
+import { Note, SmartNote } from '../../types/MidiJSON';
 
 export type TraditionalKeyOffsetInfo = {
   leftMarginMap: { [note: number]: number };
@@ -11,9 +11,16 @@ export type SmartKeyOffsetInfo = {
   keyWidth: number;
 };
 
-export type MidiInfo = {
+type BasicMidiInfo = {
   bpm: number;
   beatsPerBar: number;
   noteDivision: number;
-  notes: Array<Note>;
+};
+
+export type MidiInfo = BasicMidiInfo & {
+  notes: Note[];
+};
+
+export type SmartMidiInfo = BasicMidiInfo & {
+  notes: SmartNote[];
 };

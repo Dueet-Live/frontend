@@ -4,30 +4,33 @@ import {
   useMediaQuery,
   useTheme,
 } from '@material-ui/core';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { noOp } from 'tone/build/esm/core/util/Interface';
 import * as Tone from 'tone';
 import { Player } from 'tone';
 import { Part } from '../../types/messages';
-import {
-  AudioPlayer,
-  NullSoundFontPlayerNoteAudio,
-} from '../Piano/utils/InstrumentPlayer/AudioPlayer';
-import { PianoContext } from '../../contexts/PianoContext';
-import {
-  calculateGamePianoDimension,
-  calculateKeyHeight,
-} from '../../utils/calculateTraditionalKeyboardDimension';
-import { getKeyboardMappingWithSpecificStart } from '../../utils/getKeyboardShorcutsMapping';
+import { NullSoundFontPlayerNoteAudio } from '../Piano/InstrumentPlayer/AudioPlayer';
+import { getSmartKeyboardMapping } from '../../utils/getKeyboardShorcutsMapping';
 import { useDimensions } from '../../utils/useDimensions';
 import useWindowDimensions from '../../utils/useWindowDimensions';
-import TraditionalPiano from '../Piano/TraditionalPiano/TraditionalPiano';
-import { Waterfall } from '../Waterfall';
+import { default as Waterfall } from '../Waterfall';
 import { calculateLookAheadTime } from '../Waterfall/utils';
 import { MidiJSON } from '../../types/MidiJSON';
 import GameEndView from './GameEndView';
-import { calculateSongDuration, getPlaybackNotes } from '../../utils/songInfo';
 import ProgressBar from './ProgressBar';
+import {
+  calculateSongDuration,
+  getPlaybackNotes,
+  getSmartMappingChangeEvents,
+  getSmartNotes,
+  SmartMappingChangeEvent,
+} from '../../utils/songInfo';
+import InstrumentPlayer from '../Piano/InstrumentPlayer';
+import SmartPiano from '../Piano/SmartPiano/SmartPiano';
+import {
+  calculateSmartKeyboardDimension,
+  calculateSmartKeyHeight,
+} from '../../utils/calculateSmartKeyboardDimension';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -68,23 +71,47 @@ const GameView: React.FC<Props> = ({
   const [timeToStart, setTimeToStart] = useState(countDown);
 
   // Song information
-  const { tracks } = chosenSongMIDI;
+  const { tracks, header } = chosenSongMIDI;
   const songDuration = calculateSongDuration(tracks);
+  const { tempos, timeSignatures } = header;
+  const bpm = tempos[0].bpm;
+  const [beatsPerBar, noteDivision] = timeSignatures[0].timeSignature;
+  const lookAheadTime = useMemo(
+    () => calculateLookAheadTime(bpm, beatsPerBar, noteDivision) / 1000,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
+  const delayedStartTime = lookAheadTime + startTime;
   // 0 for solo
   // 0 for primo, 1 for secondo
   let playerTrackNum = myPart === 'secondo' ? 1 : 0;
   // 1 for solo, 2 for secondo
   let playbackChannel = myPart === undefined ? 1 : 2;
-  const playerNotes = tracks[playerTrackNum].notes;
+
+  // Transform to smart notes
+  const normalPlayerNotes = tracks[playerTrackNum].notes;
+  const mappingChangeEvents: SmartMappingChangeEvent[] = useMemo(
+    () => getSmartMappingChangeEvents(normalPlayerNotes),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
+  const playerNotes = useMemo(
+    () => getSmartNotes(normalPlayerNotes, mappingChangeEvents),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
+  const [currentMapping, setCurrentMapping] = useState<number[]>(
+    mappingChangeEvents[0].mapping
+  );
+
+  // Initialise instrument
   // TODO: schedule change (if have time), now take the first value only
   const keyboardVolume = playerNotes[0].velocity;
-
-  const { tempos, timeSignatures } = chosenSongMIDI.header;
-  const bpm = tempos[0].bpm;
-  const [beatsPerBar, noteDivision] = timeSignatures[0].timeSignature;
-  const lookAheadTime =
-    calculateLookAheadTime(bpm, beatsPerBar, noteDivision) / 1000;
-  const delayedStartTime = lookAheadTime + startTime;
+  const instrumentPlayer = useMemo(
+    () => new InstrumentPlayer(keyboardVolume),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
 
   useEffect(() => {
     const startTime = Tone.now() + countDown;
@@ -93,6 +120,13 @@ const GameView: React.FC<Props> = ({
     console.log('Game start', startTime);
 
     Tone.Transport.start();
+
+    // TODO: Schedule smart mapping change events
+    mappingChangeEvents.forEach(({ time, mapping }) => {
+      Tone.Transport.schedule(() => {
+        setCurrentMapping(mapping);
+      }, delayedStartTime + time - Tone.now());
+    });
 
     // Schedule countdown
     for (let i = 0; i < countDown; i++) {
@@ -110,13 +144,12 @@ const GameView: React.FC<Props> = ({
 
     // Schedule playback
     // TODO: share the same player as the keyboard
-    const audioPlayer = new AudioPlayer();
-    audioPlayer.setInstrument('acoustic_grand_piano');
+    instrumentPlayer.setInstrument('acoustic_grand_piano');
     const handlers: (Player | NullSoundFontPlayerNoteAudio)[] = [];
     const playbackNotes = getPlaybackNotes(tracks, playbackChannel);
     playbackNotes.forEach(note => {
       Tone.Transport.schedule(() => {
-        const handler = audioPlayer.playNoteWithDuration(
+        const handler = instrumentPlayer.playNoteWithDuration(
           note.midi,
           note.time + delayedStartTime,
           note.duration,
@@ -135,9 +168,9 @@ const GameView: React.FC<Props> = ({
       });
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tracks, lookAheadTime, playbackChannel]);
+  }, [tracks, lookAheadTime, playbackChannel, instrumentPlayer]);
 
-  // Scoring
+  // TODO: scoring
   const didPlayNote = (note: number, playedBy: number) => {
     // TODO: update score
     console.log('Play', Tone.now() - delayedStartTime);
@@ -152,23 +185,18 @@ const GameView: React.FC<Props> = ({
   // Calculate keyboard dimension
   const [middleBoxDimensions, middleBoxRef] = useDimensions<HTMLDivElement>();
   const { height } = useWindowDimensions();
-  const smallStartNote = tracks[playerTrackNum].smallStartNote || 72;
-  const regularStartNote = tracks[playerTrackNum].regularStartNote || 72;
-  const keyboardDimension = calculateGamePianoDimension(
-    middleBoxDimensions.width,
-    smallStartNote,
-    regularStartNote
+  const keyboardDimension = useMemo(
+    () => calculateSmartKeyboardDimension(middleBoxDimensions.width),
+    [middleBoxDimensions]
   );
-  const keyHeight = calculateKeyHeight(height);
+  const keyHeight = useMemo(() => calculateSmartKeyHeight(height), [height]);
 
-  // Get custom keyboard mapping for game
+  // Get custom traditional keyboard mapping for game
   const theme = useTheme();
   const isDesktopView = useMediaQuery(theme.breakpoints.up('md'));
-  const keyboardMap = isDesktopView
-    ? getKeyboardMappingWithSpecificStart(regularStartNote, keyboardDimension)
-    : undefined;
+  const keyboardMap = isDesktopView ? getSmartKeyboardMapping() : undefined;
 
-  const middleBox = () => {
+  const middleBox = useMemo(() => {
     if (timeToStart !== 0) {
       return (
         <Typography variant="h1" align="center" color="primary">
@@ -182,7 +210,7 @@ const GameView: React.FC<Props> = ({
         <Waterfall
           keyboardDimension={keyboardDimension}
           startTime={startTime * 1000}
-          dimension={middleBoxDimensions}
+          waterfallDimension={middleBoxDimensions}
           bpm={bpm}
           beatsPerBar={beatsPerBar}
           noteDivision={noteDivision}
@@ -192,7 +220,8 @@ const GameView: React.FC<Props> = ({
     }
 
     return <GameEndView />;
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [timeToStart, gameEnd]);
 
   return (
     <div className={classes.root}>
@@ -204,20 +233,19 @@ const GameView: React.FC<Props> = ({
         />
       )}
       <div ref={middleBoxRef} className={classes.middleBox}>
-        {middleBox()}
+        {middleBox}
       </div>
       <div className={classes.piano}>
         {!gameEnd && (
-          <PianoContext.Provider value={{ volume: keyboardVolume }}>
-            <TraditionalPiano
-              includeOctaveShift={false}
-              keyboardDimension={keyboardDimension}
-              keyHeight={keyHeight}
-              keyboardMap={keyboardMap}
-              didPlayNote={didPlayNote}
-              didStopNote={didStopNote}
-            />
-          </PianoContext.Provider>
+          <SmartPiano
+            instrumentPlayer={instrumentPlayer}
+            keyHeight={keyHeight}
+            keyWidth={keyboardDimension.keyWidth}
+            smartMapping={currentMapping}
+            keyboardMap={keyboardMap}
+            didPlayNote={didPlayNote}
+            didStopNote={didStopNote}
+          />
         )}
       </div>
     </div>

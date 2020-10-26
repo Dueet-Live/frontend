@@ -1,0 +1,58 @@
+.smart-piano__keyboard-container {
+  display: flex;
+  justify-items: center;
+  touch-action: none;
+  user-select: none;
+}
+
+.smart-piano__key {
+  /* Webkit / Chrome Specific CSS to remove tap highlight color */
+  -webkit-tap-highlight-color: transparent;
+  /* Firefox Specific CSS to remove button differences and focus ring */
+  background-image: none;
+  cursor: pointer;
+  background: #fafafa;
+  border-radius: 0 0 3px 3px;
+  border-color: rgba(73, 73, 73, 0.2);
+  padding: 10px;
+  outline: none;
+  box-sizing: border-box;
+  color: #444;
+}
+
+.smart-piano__key--playing-by-me {
+  background: #904ae9;
+  color: #fff;
+}
+  
+.smart-piano__key--playing-by-others {
+  background: #E1A546;
+  color: #fff;
+}
+
+.smart-piano__key:first-of-type {
+  margin-left: auto;
+}
+
+.smart-piano__key:last-of-type {
+  margin-right: auto;
+}
+
+.smart-piano__text-container {
+  pointer-events: none;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  font-size: 1rem;
+}
+
+.smart-piano__text--top-text {
+  pointer-events: none;
+  color: rgb(136, 134, 134);
+  margin-bottom: 3px; 
+}
+
+.smart-piano__text--bottom-text {
+  pointer-events: none;
+}

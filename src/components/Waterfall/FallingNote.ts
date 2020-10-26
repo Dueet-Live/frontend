@@ -1,10 +1,10 @@
-import { Note } from '../../types/MidiJSON';
+import { Note, SmartNote } from '../../types/MidiJSON';
 import isAccidentalNote from '../Piano/utils/isAccidentalNote';
-import { TraditionalKeyOffsetInfo } from './types';
+import { SmartKeyOffsetInfo, TraditionalKeyOffsetInfo } from './types';
 
 const MARGIN = 2;
 export class FallingNote {
-  midi: number;
+  identifier: number; // Midi for normal note, smartKey for smart note
   width: number;
   horizontalPos: number;
   length: number;
@@ -12,19 +12,44 @@ export class FallingNote {
   fallingDistance: number;
 
   constructor(
-    midi: number,
+    identifier: number,
     width: number,
     horizontalPos: number,
     length: number,
     verticalPos: number,
     fallingDistance: number
   ) {
-    this.midi = midi;
+    this.identifier = identifier;
     this.width = width;
     this.horizontalPos = horizontalPos;
     this.length = length;
     this.verticalPos = verticalPos;
     this.fallingDistance = fallingDistance;
+  }
+
+  static createFromSmartNoteInfo(
+    note: SmartNote,
+    speed: number,
+    fallingDistance: number,
+    keyOffsetInfo: SmartKeyOffsetInfo,
+    currentTime: number
+  ) {
+    const { keyWidth, leftMarginMap } = keyOffsetInfo;
+    if (leftMarginMap[note.smartKey] === undefined) {
+      console.log('falling note our of range');
+    }
+    const width = keyWidth - MARGIN * 2;
+    const horizontalPos = leftMarginMap[note.smartKey] + MARGIN;
+    const length = note.duration * speed;
+    const verticalPos = -length + (currentTime - note.time) * speed;
+    return new FallingNote(
+      note.smartKey,
+      width,
+      horizontalPos,
+      length,
+      verticalPos,
+      fallingDistance
+    );
   }
 
   static createFromNoteInfo(
@@ -63,21 +88,17 @@ export class FallingNote {
    */
   createWithUpdatedDimensionAndProgress(
     newFallingDistance: number,
-    keyOffsetInfo: TraditionalKeyOffsetInfo
+    keyOffsetInfo: SmartKeyOffsetInfo
   ) {
     const verticalDistanceChangeRatio =
       this.fallingDistance / newFallingDistance;
     const verticalPos = this.verticalPos * verticalDistanceChangeRatio;
     const length = this.length * verticalDistanceChangeRatio;
-    const width =
-      (isAccidentalNote(this.midi)
-        ? keyOffsetInfo.blackKeyWidth
-        : keyOffsetInfo.whiteKeyWidth) -
-      MARGIN * 2;
-    const horizontalPos = keyOffsetInfo.leftMarginMap[this.midi] + MARGIN;
+    const { keyWidth, leftMarginMap } = keyOffsetInfo;
+    const horizontalPos = leftMarginMap[this.identifier] + MARGIN;
     return new FallingNote(
-      this.midi,
-      width,
+      this.identifier,
+      keyWidth,
       horizontalPos,
       length,
       verticalPos,

@@ -90,7 +90,7 @@ export function getKeyboardShortcutForNote(
   return keyboardShortcuts.filter(shortcut => keyboardMap[shortcut] === note);
 }
 
-const shortcutsForSmartPiano = [
+export const shortcutsForSmartPiano = [
   ['A'],
   ['S'],
   ['D'],

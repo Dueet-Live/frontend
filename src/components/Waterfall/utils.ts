@@ -1,4 +1,4 @@
-import { Note } from '../../types/MidiJSON';
+import { SmartNote } from '../../types/MidiJSON';
 import { FallingNote } from './FallingNote';
 
 /*************** For time. ****************/
@@ -7,8 +7,8 @@ import { FallingNote } from './FallingNote';
  * is in seconds.
  */
 export const convertTimeInfoToMilliseconds = (
-  notes: Array<Note>
-): Array<Note> => {
+  notes: Array<SmartNote>
+): Array<SmartNote> => {
   return notes.map(note =>
     Object.assign({}, note, {
       time: note.time * 1000,
@@ -33,22 +33,6 @@ export const calculateLookAheadTime = (
     (NUM_MILLISECONDS_PER_MIN / bpm) *
     beatsPerBar *
     (DEFAULT_NOTE_DIVISION / noteDivision)
-  );
-};
-
-/**
- * Delays the start time of each note in `notes` by `delay` milliseconds.
- *
- * @param {Array<note>} notes
- * @param {number} delay delay specified in milliseconds
- * @return New array of notes with delayed start time as specified by `delay`.
- */
-export const delayStartTime = (
-  notes: Array<Note>,
-  delay: number
-): Array<Note> => {
-  return notes.map(note =>
-    Object.assign({}, note, { time: note.time + delay })
   );
 };
 
