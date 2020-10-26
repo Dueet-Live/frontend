@@ -43,31 +43,30 @@ const useStyles = makeStyles(theme => ({
     left: theme.spacing(1),
     top: theme.spacing(1),
   },
-  root: {
+  title: {
     margin: 0,
     padding: theme.spacing(2),
   },
   genreContainer: {
     display: 'flex',
     flexDirection: 'row',
-    flex: 1,
-    alignItems: 'stretch',
     paddingBottom: theme.spacing(1),
+    overflowY: 'auto',
+    alignContent: 'start',
   },
   genreCard: {
-    width: '20%',
-    marginLeft: theme.spacing(1),
-    marginRight: theme.spacing(1),
+    margin: theme.spacing(1),
   },
   songContainer: {
     display: 'flex',
     flexDirection: 'column',
     padding: 10,
     overflowY: 'auto',
-    height: 200,
+    height: 500,
   },
   dialogNotFullscreen: {
-    height: 300,
+    height: 600,
+    paddingBottom: theme.spacing(2),
   },
 }));
 
@@ -84,7 +83,7 @@ const DialogTitleWithButtons: React.FC<DialogTitleWithButtonsProps> = ({
 }) => {
   const classes = useStyles();
   return (
-    <DialogTitle disableTypography className={classes.root} {...props}>
+    <DialogTitle disableTypography className={classes.title} {...props}>
       {onBack && (
         <IconButton
           aria-label="back"
@@ -139,19 +138,13 @@ const PickASongButton: React.FC = () => {
         <DialogTitleWithButtons onClose={handleClose}>
           Choose a Genre
         </DialogTitleWithButtons>
-        <Grid
-          container
-          alignItems="stretch"
-          justify="center"
-          className={classes.genreContainer}
-        >
+        <Grid container justify="center" className={classes.genreContainer}>
           {genres.map(genre => (
-            <Grid item key={genre.id} className={classes.genreCard}>
-              <GenreCard
-                genre={genre.name}
-                onClick={() => setGenre(genre.name)}
-              />
-            </Grid>
+            <GenreCard
+              key={genre.id}
+              genre={genre.name}
+              onClick={() => setGenre(genre.name)}
+            />
           ))}
         </Grid>
       </>
