@@ -12,6 +12,7 @@ import { useHistory } from 'react-router-dom';
 import { RoomContext, RoomView } from '../../contexts/RoomContext';
 import SettingsIcon from '../../icons/SettingsIcon';
 import useSong from '../../utils/useSong';
+import { Score } from '../Game/types';
 import RoomHeader from '../shared/RoomHeader';
 
 const useStyles = makeStyles(theme => ({
@@ -36,6 +37,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 type Props = {
+  score: Score;
   view: RoomView;
   selectedGenre: string;
   setGenre: (genre: string) => void;
@@ -43,6 +45,7 @@ type Props = {
 };
 
 const SoloRoomHeader: React.FC<Props> = ({
+  score,
   view,
   selectedGenre,
   setGenre,
@@ -102,11 +105,23 @@ const SoloRoomHeader: React.FC<Props> = ({
     }
 
     if (view === 'solo.play' && chosenSong !== null) {
+      const accuracy =
+        score.total === 0
+          ? 0
+          : ((score.correct / score.total) * 100).toFixed(0);
       return (
         <>
           <MusicNoteOutlined color="action" />
           <Typography variant="body1" color="textPrimary">
             {chosenSong.name}
+          </Typography>
+
+          <Typography
+            variant="h5"
+            color="textPrimary"
+            className={classes.header}
+          >
+            Accuracy: {accuracy}%
           </Typography>
         </>
       );

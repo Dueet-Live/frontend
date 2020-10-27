@@ -29,6 +29,7 @@ import { Waterfall } from '../Waterfall';
 import { calculateLookAheadTime } from '../Waterfall/utils';
 import GameEndView from './GameEndView';
 import ProgressBar from './ProgressBar';
+import { Score } from './types';
 import getNotesAtTimeFromNotes from './utils/getNotesAtTimeFromNotes';
 
 const useStyles = makeStyles(theme => ({
@@ -51,6 +52,7 @@ const useStyles = makeStyles(theme => ({
 
 type Props = {
   chosenSongMIDI: MidiJSON;
+  setScore: (update: (prevScore: Score) => Score) => void;
   myPart?: Part | null;
   handleNotePlay?: (key: number, playerId: number) => void;
   handleNoteStop?: (key: number, playerId: number) => void;
@@ -59,6 +61,7 @@ type Props = {
 
 const GameView: React.FC<Props> = ({
   chosenSongMIDI,
+  setScore,
   myPart,
   handleNotePlay = noOp,
   handleNoteStop = noOp,
@@ -69,8 +72,10 @@ const GameView: React.FC<Props> = ({
   const countDown = 3;
   const [timeToStart, setTimeToStart] = useState(countDown);
   const pressedNotes = useRef<Set<number>>(new Set());
-  // TODO to be lifted later
-  const score = useRef<number>(0);
+
+  // for scoring
+  const gameEndRef = useRef(false);
+  const prevIndexInMIDI = useRef(0);
 
   // Song information
   const { tracks } = chosenSongMIDI;
@@ -109,6 +114,7 @@ const GameView: React.FC<Props> = ({
     // Schedule ending screen
     Tone.Transport.schedule(() => {
       setGameEnd(true);
+      gameEndRef.current = true;
     }, delayedStartTime + songDuration - Tone.now() + 0.1);
 
     // TODO: schedule keyboard volume change
@@ -133,7 +139,7 @@ const GameView: React.FC<Props> = ({
 
     const scoreHandler = setInterval(() => {
       // stop updating score if game has ended
-      if (gameEnd) {
+      if (gameEndRef.current) {
         clearInterval(scoreHandler);
         return;
       }
@@ -143,20 +149,23 @@ const GameView: React.FC<Props> = ({
         return;
       }
 
-      console.log('updating score');
-      console.log(score.current);
       const currentlyPressed = new Set(pressedNotes.current);
 
       // get set of notes that should be pressed right now from playerNotes
-      const correctNotes = getNotesAtTimeFromNotes(
+      // we use refs here to reduce computation worload during each callback
+      const [correctNotes, index] = getNotesAtTimeFromNotes(
         Tone.now() - delayedStartTime,
-        playerNotes
+        playerNotes,
+        prevIndexInMIDI.current
       );
 
       // if both sets of notes are equal
-      if (isEqual(currentlyPressed, correctNotes)) {
-        score.current++;
-      }
+      setScore((prevScore: Score) => ({
+        correct:
+          prevScore.correct + (isEqual(currentlyPressed, correctNotes) ? 1 : 0),
+        total: prevScore.total + 1,
+      }));
+      prevIndexInMIDI.current = index;
     }, 500);
 
     return () => {
