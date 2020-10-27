@@ -1,6 +1,10 @@
 import { Note, SmartNote } from '../../types/MidiJSON';
 import isAccidentalNote from '../Piano/utils/isAccidentalNote';
-import { SmartKeyOffsetInfo, TraditionalKeyOffsetInfo } from './types';
+import {
+  KeyOffsetInfo,
+  SmartKeyOffsetInfo,
+  TraditionalKeyOffsetInfo,
+} from './types';
 
 const MARGIN = 2;
 export class FallingNote {
@@ -34,16 +38,17 @@ export class FallingNote {
     keyOffsetInfo: SmartKeyOffsetInfo,
     currentTime: number
   ) {
+    const { smartKey, time, duration } = note;
     const { keyWidth, leftMarginMap } = keyOffsetInfo;
     if (leftMarginMap[note.smartKey] === undefined) {
       console.log('falling note our of range');
     }
     const width = keyWidth - MARGIN * 2;
-    const horizontalPos = leftMarginMap[note.smartKey] + MARGIN;
-    const length = note.duration * speed;
-    const verticalPos = -length + (currentTime - note.time) * speed;
+    const horizontalPos = leftMarginMap[smartKey] + MARGIN;
+    const length = duration * speed;
+    const verticalPos = -length + (currentTime - time) * speed;
     return new FallingNote(
-      note.smartKey,
+      smartKey,
       width,
       horizontalPos,
       length,
@@ -59,16 +64,18 @@ export class FallingNote {
     keyOffsetInfo: TraditionalKeyOffsetInfo,
     currentTime: number
   ) {
+    const { midi, time, duration } = note;
+    const { blackKeyWidth, whiteKeyWidth, leftMarginMap } = keyOffsetInfo;
+    if (leftMarginMap[note.midi] === undefined) {
+      console.log('falling note our of range');
+    }
     const width =
-      (isAccidentalNote(note.midi)
-        ? keyOffsetInfo.blackKeyWidth
-        : keyOffsetInfo.whiteKeyWidth) -
-      MARGIN * 2;
-    const horizontalPos = keyOffsetInfo.leftMarginMap[note.midi] + MARGIN;
-    const length = note.duration * speed;
-    const verticalPos = -length + (currentTime - note.time) * speed;
+      (isAccidentalNote(midi) ? blackKeyWidth : whiteKeyWidth) - MARGIN * 2;
+    const horizontalPos = leftMarginMap[midi] + MARGIN;
+    const length = duration * speed;
+    const verticalPos = -length + (currentTime - time) * speed;
     return new FallingNote(
-      note.midi,
+      midi,
       width,
       horizontalPos,
       length,
@@ -88,15 +95,24 @@ export class FallingNote {
    */
   createWithUpdatedDimensionAndProgress(
     newFallingDistance: number,
-    keyOffsetInfo: SmartKeyOffsetInfo
+    keyOffsetInfo: KeyOffsetInfo
   ) {
     const verticalDistanceChangeRatio =
       this.fallingDistance / newFallingDistance;
     const verticalPos = this.verticalPos * verticalDistanceChangeRatio;
     const length = this.length * verticalDistanceChangeRatio;
-    const { keyWidth, leftMarginMap } = keyOffsetInfo;
-    const width = keyWidth - MARGIN * 2;
+    const { leftMarginMap } = keyOffsetInfo;
     const horizontalPos = leftMarginMap[this.identifier] + MARGIN;
+    let width: number;
+    if (keyOffsetInfo.isSmart) {
+      const { keyWidth } = keyOffsetInfo;
+      width = keyWidth - MARGIN * 2;
+    } else {
+      const { blackKeyWidth, whiteKeyWidth } = keyOffsetInfo;
+      width =
+        (isAccidentalNote(this.identifier) ? blackKeyWidth : whiteKeyWidth) -
+        MARGIN * 2;
+    }
     return new FallingNote(
       this.identifier,
       width,

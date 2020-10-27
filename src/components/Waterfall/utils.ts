@@ -1,39 +1,17 @@
-import { SmartNote } from '../../types/MidiJSON';
+import { Header } from '../../types/MidiJSON';
 import { FallingNote } from './FallingNote';
-
-/*************** For time. ****************/
-/**
- * Converts every time information of note in `notes` to milliseconds, assuming that the current information
- * is in seconds.
- */
-export const convertTimeInfoToMilliseconds = (
-  notes: Array<SmartNote>
-): Array<SmartNote> => {
-  return notes.map(note =>
-    Object.assign({}, note, {
-      time: note.time * 1000,
-      duration: note.duration * 1000,
-    })
-  );
-};
 
 const DEFAULT_NOTE_DIVISION = 4;
 /**
- * Calculates the amount of time we should look ahead by in milliseconds.
+ * Calculates the amount of time we should look ahead by in seconds.
  *
  * In this case, we try to look ahead by one musical bar.
  */
-export const calculateLookAheadTime = (
-  bpm: number,
-  beatsPerBar: number,
-  noteDivision: number
-) => {
-  const NUM_MILLISECONDS_PER_MIN = 60000;
-  return (
-    (NUM_MILLISECONDS_PER_MIN / bpm) *
-    beatsPerBar *
-    (DEFAULT_NOTE_DIVISION / noteDivision)
-  );
+export const calculateLookAheadTime = (header: Header) => {
+  const { tempos, timeSignatures } = header;
+  const bpm = tempos[0].bpm;
+  const [beatsPerBar, noteDivision] = timeSignatures[0].timeSignature;
+  return (60 / bpm) * beatsPerBar * (DEFAULT_NOTE_DIVISION / noteDivision);
 };
 
 /*************** For animation. ****************/

@@ -35,7 +35,7 @@ const shortcutsForTraditionalPiano = [
 
 // DEFAULT MODE
 // Always center the mappings
-export function getKeyboardMapping(
+export function getTraditionalKeyboardMapping(
   startNote: number, // the leftmost note on screen
   range: number
 ): { [key: string]: number } {
@@ -65,7 +65,7 @@ export function getKeyboardMapping(
 
 // GAME MODE - Traditional Piano (desktop view only)
 // Assume the start note and first mapped note are both C here
-export function getKeyboardMappingWithSpecificStart(
+export function getTraditionalKeyboardMappingWithSpecificStart(
   firstMappedNote: number,
   keyboardDimension: TraditionalKeyboardDimension
 ): { [key: string]: number } {

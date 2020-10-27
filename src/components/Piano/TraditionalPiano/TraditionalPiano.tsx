@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useTheme, useMediaQuery } from '@material-ui/core';
-import { getKeyboardMapping } from '../../../utils/getKeyboardShorcutsMapping';
+import { getTraditionalKeyboardMapping } from '../../../utils/getKeyboardShorcutsMapping';
 import OctaveShiftKey from './OctaveShiftKey';
 import TraditionalKeyboard from './TraditionalKeyboard';
 import PianoContainer from '../PianoContainer';
 import { TraditionalKeyboardDimension } from '../../../types/keyboardDimension';
+import InstrumentPlayer from '../InstrumentPlayer';
 
 type Props = {
+  instrumentPlayer: InstrumentPlayer;
   includeOctaveShift: boolean;
   keyboardDimension: TraditionalKeyboardDimension;
   keyHeight: number;
@@ -16,6 +18,7 @@ type Props = {
 };
 
 const TraditionalPiano: React.FC<Props> = ({
+  instrumentPlayer,
   includeOctaveShift = true,
   keyboardDimension,
   keyHeight,
@@ -56,7 +59,7 @@ const TraditionalPiano: React.FC<Props> = ({
   const theme = useTheme();
   const isDesktopView = useMediaQuery(theme.breakpoints.up('md'));
   const defaultKeyboardMap = isDesktopView
-    ? getKeyboardMapping(startNote, range)
+    ? getTraditionalKeyboardMapping(startNote, range)
     : {};
 
   return (
@@ -71,6 +74,7 @@ const TraditionalPiano: React.FC<Props> = ({
       )}
 
       <TraditionalKeyboard
+        instrumentPlayer={instrumentPlayer}
         startNote={startNote}
         endNote={endNote}
         keyWidth={keyWidth}

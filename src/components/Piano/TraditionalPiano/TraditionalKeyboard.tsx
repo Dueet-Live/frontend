@@ -9,13 +9,14 @@ import {
   stopNote,
 } from '../../../utils/socket';
 import './TraditionalPiano.css';
-import InstrumentAudio from './InstrumentAudio';
 import PianoKey from './TraditionalPianoKey';
 import getNotesBetween from '../utils/getNotesBetween';
 import { noOp } from 'tone/build/esm/core/util/Interface';
 import isRegularKey from '../utils/isRegularKey';
+import InstrumentPlayer from '../InstrumentPlayer';
 
 type Props = {
+  instrumentPlayer: InstrumentPlayer;
   startNote: number;
   endNote: number;
   keyWidth: number;
@@ -26,6 +27,7 @@ type Props = {
 };
 
 const TraditionalKeyboard: React.FC<Props> = ({
+  instrumentPlayer,
   startNote,
   endNote,
   keyWidth,
@@ -51,6 +53,8 @@ const TraditionalKeyboard: React.FC<Props> = ({
         playNote(note);
       }
 
+      instrumentPlayer.playNote(note);
+
       setPlayingNotes(playingNotes => {
         return [...playingNotes, { note, playerId }];
       });
@@ -58,7 +62,7 @@ const TraditionalKeyboard: React.FC<Props> = ({
       // Trigger callback
       didPlayNote(note, playerId);
     },
-    [isDuetMode, me, didPlayNote]
+    [isDuetMode, me, didPlayNote, instrumentPlayer]
   );
 
   const stopPlayingNote = useCallback(
@@ -67,6 +71,8 @@ const TraditionalKeyboard: React.FC<Props> = ({
       if (isDuetMode && playerId === me) {
         stopNote(note);
       }
+
+      instrumentPlayer.stopNote(note);
 
       setPlayingNotes(playingNotes => {
         return playingNotes.filter(
@@ -78,7 +84,7 @@ const TraditionalKeyboard: React.FC<Props> = ({
       // Trigger callback
       didStopNote(note, playerId);
     },
-    [isDuetMode, me, didStopNote]
+    [isDuetMode, me, didStopNote, instrumentPlayer]
   );
 
   /* Handle friends' notes */
@@ -234,10 +240,6 @@ const TraditionalKeyboard: React.FC<Props> = ({
           keyboardShortcut={getKeyboardShortcutForNote(keyboardMap, note)}
         />
       ))}
-      <InstrumentAudio
-        notes={playingNotes.map(playingNote => playingNote.note.toString())}
-        instrument={'acoustic_grand_piano'}
-      />
     </div>
   );
 };
