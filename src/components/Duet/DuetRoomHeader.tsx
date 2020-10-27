@@ -5,12 +5,13 @@ import {
   Link,
   makeStyles,
   Typography,
+  useMediaQuery,
 } from '@material-ui/core';
 import { ArrowBack, MusicNoteOutlined } from '@material-ui/icons';
 import React, { useContext } from 'react';
 import { useHistory } from 'react-router-dom';
 import { PlayerContext } from '../../contexts/PlayerContext';
-import { RoomView, RoomContext } from '../../contexts/RoomContext';
+import { RoomContext, RoomView } from '../../contexts/RoomContext';
 import PlayerIcon from '../../icons/PlayerIcon';
 import SettingsIcon from '../../icons/SettingsIcon';
 import { updateReady } from '../../utils/socket';
@@ -48,6 +49,7 @@ const DuetRoomHeader: React.FC<Props> = ({ view, setView }) => {
   const { roomInfo } = useContext(RoomContext);
   const { piece } = roomInfo;
   const chosenSong = useSong(piece);
+  const hideBackText = useMediaQuery('(min-width:400px)');
 
   const roomDetails = () => {
     if (me === -1) {
@@ -112,6 +114,10 @@ const DuetRoomHeader: React.FC<Props> = ({ view, setView }) => {
           updateReady(false);
         };
       }
+    }
+
+    if (!hideBackText) {
+      backText = '';
     }
 
     return (
