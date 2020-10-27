@@ -4,11 +4,12 @@ import {
   IconButton,
   makeStyles,
   Typography,
+  useMediaQuery,
 } from '@material-ui/core';
 import { ArrowBack, MusicNoteOutlined } from '@material-ui/icons';
 import React, { useContext } from 'react';
 import { useHistory } from 'react-router-dom';
-import { RoomView, RoomContext } from '../../contexts/RoomContext';
+import { RoomContext, RoomView } from '../../contexts/RoomContext';
 import SettingsIcon from '../../icons/SettingsIcon';
 import useSong from '../../utils/useSong';
 import RoomHeader from '../shared/RoomHeader';
@@ -53,6 +54,7 @@ const SoloRoomHeader: React.FC<Props> = ({
     roomInfo: { piece },
   } = useContext(RoomContext);
   const chosenSong = useSong(piece);
+  const hideBackText = useMediaQuery('(min-width:400px)');
 
   const backButton = () => {
     let backText = '';
@@ -77,6 +79,10 @@ const SoloRoomHeader: React.FC<Props> = ({
         handleBack = () => setView('solo.select');
         break;
       }
+    }
+
+    if (!hideBackText) {
+      backText = '';
     }
 
     return (
