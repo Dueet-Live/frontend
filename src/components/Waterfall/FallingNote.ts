@@ -41,7 +41,7 @@ export class FallingNote {
     const { smartKey, time, duration } = note;
     const { keyWidth, leftMarginMap } = keyOffsetInfo;
     if (leftMarginMap[note.smartKey] === undefined) {
-      console.log('falling note our of range');
+      console.log('smart falling note our of range', note, leftMarginMap);
     }
     const width = keyWidth - MARGIN * 2;
     const horizontalPos = leftMarginMap[smartKey] + MARGIN;
@@ -67,7 +67,7 @@ export class FallingNote {
     const { midi, time, duration } = note;
     const { blackKeyWidth, whiteKeyWidth, leftMarginMap } = keyOffsetInfo;
     if (leftMarginMap[note.midi] === undefined) {
-      console.log('falling note our of range');
+      console.log('falling note our of range', note, leftMarginMap);
     }
     const width =
       (isAccidentalNote(midi) ? blackKeyWidth : whiteKeyWidth) - MARGIN * 2;

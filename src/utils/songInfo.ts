@@ -45,7 +45,7 @@ export const getSmartNotes = (
   const smartNotes: SmartNote[] = notes.map(note => {
     return Object.assign({}, note, {
       ...notes,
-      smartKey: map[note.midi],
+      smartKey: map[note.midi] || Math.floor(Math.random() * Math.floor(7)),
     });
   });
 
