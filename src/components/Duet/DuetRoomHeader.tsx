@@ -47,9 +47,15 @@ type Props = {
   view: RoomView;
   setView: (view: RoomView) => void;
   score: Score;
+  resetScore: () => void;
 };
 
-const DuetRoomHeader: React.FC<Props> = ({ view, setView, score }) => {
+const DuetRoomHeader: React.FC<Props> = ({
+  view,
+  setView,
+  score,
+  resetScore,
+}) => {
   const classes = useStyles();
   const history = useHistory();
   const { me, friend } = useContext(PlayerContext);
@@ -118,6 +124,7 @@ const DuetRoomHeader: React.FC<Props> = ({ view, setView, score }) => {
       case 'duet.play': {
         handleBack = () => {
           setView('duet.lobby');
+          resetScore();
           updateReady(false);
         };
       }

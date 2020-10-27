@@ -128,7 +128,6 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
     if (view === 'duet.play' && !!chosenSongMIDI) {
       // at this point, myPart is definitely either primo or secondo, otherwise
       // game should not have started.
-      // TODO account for part in duet
 
       return (
         <GameView
@@ -156,7 +155,12 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
         <Box className={classes.root}>
           {/* header */}
           <div className={classes.header}>
-            <DuetRoomHeader view={view} setView={setView} score={score} />
+            <DuetRoomHeader
+              view={view}
+              setView={setView}
+              score={score}
+              resetScore={() => setScore({ correct: 0, total: 0 })}
+            />
           </div>
 
           <div className={classes.body}>{mainBody()}</div>

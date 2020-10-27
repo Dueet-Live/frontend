@@ -42,6 +42,7 @@ type Props = {
   selectedGenre: string;
   setGenre: (genre: string) => void;
   setView: (roomView: RoomView) => void;
+  resetScore: () => void;
 };
 
 const SoloRoomHeader: React.FC<Props> = ({
@@ -50,6 +51,7 @@ const SoloRoomHeader: React.FC<Props> = ({
   selectedGenre,
   setGenre,
   setView,
+  resetScore,
 }) => {
   const classes = useStyles();
   const history = useHistory();
@@ -79,7 +81,10 @@ const SoloRoomHeader: React.FC<Props> = ({
         if (view === 'solo.try') {
           backText = 'Song Selection';
         }
-        handleBack = () => setView('solo.select');
+        handleBack = () => {
+          resetScore();
+          setView('solo.select');
+        };
         break;
       }
     }

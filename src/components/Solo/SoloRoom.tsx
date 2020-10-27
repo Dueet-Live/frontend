@@ -115,6 +115,7 @@ const SoloRoom: React.FC = () => {
             setView={setView}
             selectedGenre={songSelectionGenre}
             setGenre={setSongSelectionGenre}
+            resetScore={() => setScore({ correct: 0, total: 0 })}
           />
         </div>
         {/* main body */}

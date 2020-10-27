@@ -152,7 +152,7 @@ const GameView: React.FC<Props> = ({
       const currentlyPressed = new Set(pressedNotes.current);
 
       // get set of notes that should be pressed right now from playerNotes
-      // we use refs here to reduce computation worload during each callback
+      // we use refs here to reduce computation workload during each callback
       const [correctNotes, index] = getNotesAtTimeFromNotes(
         Tone.now() - delayedStartTime,
         playerNotes,
