@@ -54,7 +54,7 @@ type Props = {
 const GameView: React.FC<Props> = ({
   chosenSongMIDI,
   myPart,
-  showSmartPiano = false,
+  showSmartPiano = true,
   handleNotePlay = noOp,
   handleNoteStop = noOp,
 }) => {
@@ -174,12 +174,12 @@ const GameView: React.FC<Props> = ({
   /*************** Callbacks *****************/
   const didPlayNote = (note: number, playedBy: number) => {
     // TODO: update score
-    console.log('Play', Tone.now() - delayedStartTime);
+    console.log('Play', note, playedBy, Tone.now() - delayedStartTime);
     handleNotePlay(note, playedBy);
   };
   const didStopNote = (note: number, playedBy: number) => {
     // TODO: update score
-    console.log('Stop', Tone.now() - delayedStartTime);
+    console.log('Stop', note, playedBy, Tone.now() - delayedStartTime);
     handleNoteStop(note, playedBy);
   };
 
