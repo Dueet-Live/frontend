@@ -95,9 +95,9 @@ export const shortcutsForSmartPiano = [
   ['S'],
   ['D'],
   ['F'],
-  ['G'],
-  ['H'],
   ['J'],
+  ['K'],
+  ['L'],
 ];
 
 // GAME MODE - Smart Piano (desktop view only)
