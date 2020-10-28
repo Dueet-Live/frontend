@@ -43,6 +43,13 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
+/*
+TODO:
+- remove smartnote, use isSmart as prop
+- add a function in util to determine the notes that should be used
+- pass in normal notes LOL
+*/
+
 const Waterfall: React.FC<Props> = props => {
   const classes = useStyles();
   const { startTime, lookAheadTime, waterfallDimension } = props;

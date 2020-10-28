@@ -12,9 +12,7 @@ import ProgressBar from './ProgressBar';
 import {
   calculateSongDuration,
   getPlaybackNotes,
-  getSmartMappingChangeEvents,
   getSmartNotes,
-  SmartMappingChangeEvent,
 } from '../../utils/songInfo';
 import InstrumentPlayer from '../Piano/InstrumentPlayer';
 import { calculateSmartKeyboardDimension } from '../../utils/calculateSmartKeyboardDimension';
@@ -23,6 +21,8 @@ import { TraditionalKeyboardDimension } from '../../types/keyboardDimension';
 import GameMiddleView from './GameMiddleView';
 import GameTraditionalPiano from './GameTraditionalPiano';
 import GameSmartPiano from './GameSmartPiano';
+import { getIndexToNotesMap } from '../Piano/utils/getKeyToNotesMap';
+import { MappedNote } from '../Piano/types/mappedNote';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -86,14 +86,12 @@ const GameView: React.FC<Props> = ({
   const playbackChannel = myPart === undefined ? 1 : 2;
   const playerTrack = tracks[playerTrackNum];
   const normalPlayerNotes = playerTrack.notes;
-  const mappingChangeEvents: SmartMappingChangeEvent[] = useMemo(
-    () => getSmartMappingChangeEvents(normalPlayerNotes),
+  const indexToNotesMap: MappedNote[][] = useMemo(
+    () => getIndexToNotesMap(normalPlayerNotes),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
-  const [currentMapping, setCurrentMapping] = useState<number[]>(
-    mappingChangeEvents.length === 0 ? [] : mappingChangeEvents[0].mapping
-  );
+
   const playerNotes = useMemo<Note[] | SmartNote[]>(() => {
     if (showSmartPiano) {
       return getSmartNotes(normalPlayerNotes, mappingChangeEvents);
@@ -119,15 +117,6 @@ const GameView: React.FC<Props> = ({
     console.log('Game start', startTime);
 
     Tone.Transport.start();
-
-    // Schedule smart mapping change events (for smart piano only)
-    if (showSmartPiano) {
-      mappingChangeEvents.forEach(({ time, mapping }) => {
-        Tone.Transport.schedule(() => {
-          setCurrentMapping(mapping);
-        }, delayedStartTime + time - Tone.now());
-      });
-    }
 
     // Schedule countdown
     for (let i = 0; i < countDown; i++) {
@@ -204,9 +193,10 @@ const GameView: React.FC<Props> = ({
         <GameSmartPiano
           instrumentPlayer={instrumentPlayer}
           keyWidth={keyboardDimension.keyWidth}
-          currentMapping={currentMapping}
+          indexToNotesMap={indexToNotesMap}
           didPlayNote={didPlayNote}
           didStopNote={didStopNote}
+          startTime={delayedStartTime}
         />
       );
     } else {
@@ -222,7 +212,7 @@ const GameView: React.FC<Props> = ({
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [keyboardDimension, currentMapping]);
+  }, [keyboardDimension, indexToNotesMap]);
 
   return (
     <div className={classes.root}>

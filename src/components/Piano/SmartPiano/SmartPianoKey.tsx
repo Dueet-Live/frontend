@@ -1,12 +1,10 @@
 import React, { useContext, useState } from 'react';
-import * as Tone from 'tone';
 import { PlayerContext } from '../../../contexts/PlayerContext';
 import { PlayingNote } from '../types/playingNote';
 import './SmartPiano.css';
 
 type Props = {
   index: number;
-  note: number;
   keyWidth: number;
   keyHeight: number;
   startPlayingNote: () => void;
@@ -18,7 +16,6 @@ type Props = {
 
 const SmartPianoKey: React.FC<Props> = ({
   index,
-  note,
   keyWidth,
   keyHeight,
   startPlayingNote,
@@ -75,10 +72,6 @@ const SmartPianoKey: React.FC<Props> = ({
       }
     : {};
 
-  const getTopText = () => {
-    return Tone.Frequency(note, 'midi').toNote();
-  };
-
   const getBottomText = () => {
     if (keyboardShortcut.length === 0) {
       return '';
@@ -108,7 +101,6 @@ const SmartPianoKey: React.FC<Props> = ({
       {...eventHandlers}
     >
       <div className="smart-piano__text-container">
-        <div className="smart-piano__text--top-text">{getTopText()}</div>
         <div className="smart-piano__text--bottom-text">{getBottomText()}</div>
       </div>
     </button>

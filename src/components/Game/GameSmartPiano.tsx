@@ -5,11 +5,13 @@ import { getSmartKeyboardMapping } from '../../utils/getKeyboardShorcutsMapping'
 import useWindowDimensions from '../../utils/useWindowDimensions';
 import InstrumentPlayer from '../Piano/InstrumentPlayer';
 import SmartPiano from '../Piano/SmartPiano/SmartPiano';
+import { MappedNote } from '../Piano/types/mappedNote';
 
 type Props = {
   instrumentPlayer: InstrumentPlayer;
   keyWidth: number;
-  currentMapping: number[];
+  indexToNotesMap: MappedNote[][];
+  startTime: number;
   didPlayNote: (key: number, playerId: number) => void;
   didStopNote: (key: number, playerId: number) => void;
 };
@@ -17,9 +19,10 @@ type Props = {
 const GameSmartPiano: React.FC<Props> = ({
   instrumentPlayer, // Unchanged
   keyWidth,
-  currentMapping,
+  indexToNotesMap,
   didStopNote, // Unchanged
   didPlayNote, // Unchanged
+  startTime,
 }) => {
   const { height } = useWindowDimensions();
   const keyHeight = useMemo(() => calculateSmartKeyHeight(height), [height]);
@@ -36,10 +39,11 @@ const GameSmartPiano: React.FC<Props> = ({
 
   return (
     <SmartPiano
+      startTime={startTime}
       instrumentPlayer={instrumentPlayer}
       keyHeight={keyHeight}
       keyWidth={keyWidth}
-      smartMapping={currentMapping}
+      indexToNotesMap={indexToNotesMap}
       keyboardMap={keyboardMap}
       didPlayNote={didPlayNote}
       didStopNote={didStopNote}
@@ -50,7 +54,7 @@ const GameSmartPiano: React.FC<Props> = ({
 function areEqual(prevProps: Props, nextProps: Props) {
   return (
     prevProps.keyWidth === nextProps.keyWidth &&
-    prevProps.currentMapping === nextProps.currentMapping
+    prevProps.indexToNotesMap === nextProps.indexToNotesMap
   );
 }
 
