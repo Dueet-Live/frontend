@@ -4,11 +4,12 @@ import {
   useMediaQuery,
   useTheme,
 } from '@material-ui/core';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import * as Tone from 'tone';
 import { Player } from 'tone';
 import { noOp } from 'tone/build/esm/core/util/Interface';
 import { PianoContext } from '../../contexts/PianoContext';
+import { PlayerContext } from '../../contexts/PlayerContext';
 import { Part } from '../../types/messages';
 import { MidiJSON } from '../../types/MidiJSON';
 import {
@@ -76,6 +77,7 @@ const GameView: React.FC<Props> = ({
   // for scoring
   const gameEndRef = useRef(false);
   const prevIndexInMIDI = useRef(0);
+  const { me } = useContext(PlayerContext);
 
   // Song information
   const { tracks } = chosenSongMIDI;
@@ -184,13 +186,17 @@ const GameView: React.FC<Props> = ({
   const didPlayNote = (note: number, playedBy: number) => {
     // TODO: update score
     console.log('Play', Tone.now() - delayedStartTime);
-    pressedNotes.current.add(note);
+    if (playedBy === me) {
+      pressedNotes.current.add(note);
+    }
     handleNotePlay(note, playedBy);
   };
   const didStopNote = (note: number, playedBy: number) => {
     // TODO: update score
     console.log('Stop', Tone.now() - delayedStartTime);
-    pressedNotes.current.delete(note);
+    if (playedBy === me) {
+      pressedNotes.current.delete(note);
+    }
     handleNoteStop(note, playedBy);
   };
 
