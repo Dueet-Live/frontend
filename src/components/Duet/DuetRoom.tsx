@@ -1,5 +1,5 @@
 import { Box, makeStyles } from '@material-ui/core';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import songsAPI from '../../api/songs';
 import { PlayerContext } from '../../contexts/PlayerContext';
@@ -14,9 +14,10 @@ import socket, {
   removeRoomStateListeners,
 } from '../../utils/socket';
 import useSong from '../../utils/useSong';
+import { FeedbackNotesHandle } from '../Game/FeedbackNotes';
 import GameView from '../Game/GameView';
-import FreePlayPiano from '../Piano/TraditionalPiano/FreePlayPiano';
 import { Score } from '../Game/types';
+import FreePlayPiano from '../Piano/TraditionalPiano/FreePlayPiano';
 import DuetLobby from './DuetLobby';
 import DuetRoomHeader from './DuetRoomHeader';
 
@@ -106,6 +107,17 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   const friendId = getFriendId(roomState, playerId);
   const myPart = getMyPart(roomState, playerId);
 
+  const myFlyingNotesHandleRef = useRef<FeedbackNotesHandle | null>(null);
+  const friendFlyingNotesHandleRef = useRef<FeedbackNotesHandle | null>(null);
+
+  const handleNotePlay = (note: number, playedBy: number) => {
+    if (playedBy === playerId) {
+      myFlyingNotesHandleRef.current?.addNote();
+    } else {
+      friendFlyingNotesHandleRef.current?.addNote();
+    }
+  };
+
   const mainBody = () => {
     if (view === 'duet.lobby') {
       return (
@@ -120,7 +132,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
     if (view === 'duet.try') {
       return (
         <div className={classes.piano}>
-          <FreePlayPiano />
+          <FreePlayPiano handleNotePlay={handleNotePlay} />
         </div>
       );
     }
@@ -134,6 +146,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
           chosenSongMIDI={chosenSongMIDI}
           setScore={setScore}
           myPart={myPart}
+          handleNotePlay={handleNotePlay}
         />
       );
     }
@@ -160,6 +173,8 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
               setView={setView}
               score={score}
               resetScore={() => setScore({ correct: 0, total: 0 })}
+              myFlyingNotesHandleRef={myFlyingNotesHandleRef}
+              friendFlyingNotesHandleRef={friendFlyingNotesHandleRef}
             />
           </div>
 

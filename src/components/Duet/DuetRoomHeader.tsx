@@ -16,12 +16,13 @@ import PlayerIcon from '../../icons/PlayerIcon';
 import SettingsIcon from '../../icons/SettingsIcon';
 import { updateReady } from '../../utils/socket';
 import useSong from '../../utils/useSong';
+import { FeedbackNotes, FeedbackNotesHandleRef } from '../Game/FeedbackNotes';
 import { Score } from '../Game/types';
 import RoomHeader from '../shared/RoomHeader';
 
 const useStyles = makeStyles(theme => ({
   icon: {
-    marginRight: theme.spacing(1),
+    marginRight: theme.spacing(2),
   },
   settingIcon: {
     marginLeft: theme.spacing(1),
@@ -41,6 +42,9 @@ const useStyles = makeStyles(theme => ({
     left: '50%',
     transform: 'translate(-50%)',
   },
+  flyingNotes: {
+    // position: 'absolute',
+  },
 }));
 
 type Props = {
@@ -48,6 +52,8 @@ type Props = {
   setView: (view: RoomView) => void;
   score: Score;
   resetScore: () => void;
+  myFlyingNotesHandleRef: FeedbackNotesHandleRef;
+  friendFlyingNotesHandleRef: FeedbackNotesHandleRef;
 };
 
 const DuetRoomHeader: React.FC<Props> = ({
@@ -55,6 +61,8 @@ const DuetRoomHeader: React.FC<Props> = ({
   setView,
   score,
   resetScore,
+  myFlyingNotesHandleRef,
+  friendFlyingNotesHandleRef,
 }) => {
   const classes = useStyles();
   const history = useHistory();
@@ -63,6 +71,18 @@ const DuetRoomHeader: React.FC<Props> = ({
   const { piece } = roomInfo;
   const chosenSong = useSong(piece);
   const hideBackText = useMediaQuery('(min-width:400px)');
+
+  const playerIconWithFlyingNotes = (
+    num: number,
+    handleRef: FeedbackNotesHandleRef
+  ) => {
+    return (
+      <Box>
+        <PlayerIcon num={num} myPlayerId={me} className={classes.icon} />
+        <FeedbackNotes handleRef={handleRef} />
+      </Box>
+    );
+  };
 
   const roomDetails = () => {
     if (me === -1) {
@@ -75,11 +95,10 @@ const DuetRoomHeader: React.FC<Props> = ({
     }
 
     return (
-      <Box alignContent="center" display="flex">
-        <PlayerIcon num={me} myPlayerId={me} className={classes.icon} />
-        {friend !== null && (
-          <PlayerIcon num={friend} myPlayerId={me} className={classes.icon} />
-        )}
+      <Box alignItems="center" display="flex">
+        {playerIconWithFlyingNotes(me, myFlyingNotesHandleRef)}
+        {friend !== null &&
+          playerIconWithFlyingNotes(friend, friendFlyingNotesHandleRef)}
         {friend === null && (
           <>
             <Typography

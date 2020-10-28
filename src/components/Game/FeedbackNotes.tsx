@@ -4,34 +4,49 @@ import { v4 as uuid } from 'uuid';
 
 const useStyles = makeStyles({
   container: {
-    height: '100%',
-    position: 'relative',
+    position: 'absolute',
+    overflow: 'hidden',
+    // FIXME: HACK
+    // This is with respect to the app bar dimensions
+    height: '400%',
+    width: '40px',
   },
 });
 
 // https://github.com/mui-org/material-ui/issues/13793
 const useAnimationStyles = ({
-  startY,
-  deltaY,
   startX,
   deltaX,
+  startY,
+  deltaY,
   animationDuration,
 }: {
-  startY: number;
-  deltaY: number;
+  // percent of parent container width
   startX: number;
   deltaX: number;
+  // percent of note height
+  startY: number;
+  deltaY: number;
   animationDuration: number;
 }) => {
   return makeStyles({
+    // Make object move in a curved path
+    // https://tobiasahlin.com/blog/curved-path-animations-in-css
     note: {
       position: 'relative',
-      top: '50%',
-      animation: `$musicXAxis ${animationDuration}ms infinite ease-out`,
+      animationName: '$musicXAxis',
+      animationTimingFunction: 'ease-out',
+      animationDuration: `${animationDuration}ms`,
+      animationIterationCount: 1,
+      animationFillMode: 'forwards',
       '&:after': {
         content: '"🎵"',
         position: 'absolute',
-        animation: `$musicYAxis ${animationDuration}ms infinite ease-in`,
+        animationName: '$musicYAxis',
+        animationTimingFunction: 'ease-in',
+        animationDuration: `${animationDuration}ms`,
+        animationIterationCount: 1,
+        animationFillMode: 'forwards',
       },
     },
     '@keyframes musicXAxis': {
@@ -45,26 +60,27 @@ const useAnimationStyles = ({
     '@keyframes musicYAxis': {
       '0%': {
         transform: `translateY(${startY}%)`,
+        opacity: 1,
       },
       '100%': {
         transform: `translateY(${startY + deltaY}%)`,
+        opacity: 0,
       },
     },
   })();
 };
 
-type Note = { id: string; startY: number; animationDuration: number };
+type Note = { id: string; animationDuration: number };
 
+// False positive: https://github.com/yannickcr/eslint-plugin-react/issues/2133
 // eslint-disable-next-line react/display-name
 const FeedbackNote = React.memo(
-  ({ startY, animationDuration }: Note) => {
+  ({ animationDuration }: Note) => {
     const classes = useAnimationStyles({
       startX: 0,
-      // 10% of parent container
-      deltaX: 10,
-      startY,
-      // 1000% of note height
-      deltaY: -500,
+      deltaX: 0,
+      startY: 0,
+      deltaY: 500,
       animationDuration,
     });
     return <div className={classes.note}></div>;
@@ -76,7 +92,6 @@ const FeedbackNote = React.memo(
 const generateRandomNote = (): Note => {
   return {
     id: uuid(),
-    startY: Math.random() * 500 - 250,
     animationDuration: 2000,
   };
 };
@@ -84,11 +99,11 @@ const generateRandomNote = (): Note => {
 export type FeedbackNotesHandle = {
   addNote: () => void;
 };
-export type FeedbackNotesRef = React.MutableRefObject<FeedbackNotesHandle | null>;
+export type FeedbackNotesHandleRef = React.MutableRefObject<FeedbackNotesHandle | null>;
 
-export const FeedbackNotes: React.FC<{ handleRef: FeedbackNotesRef }> = ({
-  handleRef,
-}) => {
+export const FeedbackNotes: React.FC<{
+  handleRef: FeedbackNotesHandleRef;
+}> = ({ handleRef }) => {
   const classes = useStyles();
   const [notes, setNotes] = useState<Set<Note>>(new Set());
 
@@ -101,16 +116,20 @@ export const FeedbackNotes: React.FC<{ handleRef: FeedbackNotesRef }> = ({
   };
 
   const addNote = () => {
-    setNotes(notes => {
-      const newNotes = new Set(notes);
-      const newNote = generateRandomNote();
+    const newNote = generateRandomNote();
+    setNotes(oldNotes => {
+      const newNotes = new Set(oldNotes);
       newNotes.add(newNote);
-      setTimeout(() => removeNote(newNote), newNote.animationDuration);
       return newNotes;
     });
+    setTimeout(() => {
+      removeNote(newNote);
+    }, newNote.animationDuration);
   };
 
-  handleRef.current = { addNote };
+  handleRef.current = {
+    addNote,
+  };
 
   return (
     <div className={classes.container}>

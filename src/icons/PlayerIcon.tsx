@@ -29,9 +29,10 @@ const playerMap = [
   icon9,
 ];
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(theme => ({
   root: {
     padding: '1px',
+    fontSize: theme.typography.h4.fontSize,
     borderRadius: '50%',
   },
   // TODO should probably define these in a theme
@@ -41,7 +42,7 @@ const useStyles = makeStyles({
   friendIcon: {
     border: `3px solid #e1a546`,
   },
-});
+}));
 
 // Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a>
 const PlayerIcon: React.FC<Props> = ({
