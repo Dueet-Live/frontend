@@ -101,7 +101,7 @@ const DuetHome: React.FC = () => {
       <Box className={classes.header}>
         <RoomHeader>
           <Button onClick={handleBack} startIcon={<ArrowBack />}>
-            Back to home
+            home
           </Button>
         </RoomHeader>
       </Box>
