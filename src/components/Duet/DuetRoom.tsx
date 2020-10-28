@@ -14,7 +14,7 @@ import socket, {
   removeRoomStateListeners,
 } from '../../utils/socket';
 import useSong from '../../utils/useSong';
-import { FeedbackNotesHandle } from '../Game/FeedbackNotes';
+import { FlyingNotesHandle } from '../Game/FlyingNotes';
 import GameView from '../Game/GameView';
 import { Score } from '../Game/types';
 import FreePlayPiano from '../Piano/TraditionalPiano/FreePlayPiano';
@@ -107,8 +107,8 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   const friendId = getFriendId(roomState, playerId);
   const myPart = getMyPart(roomState, playerId);
 
-  const myFlyingNotesHandleRef = useRef<FeedbackNotesHandle | null>(null);
-  const friendFlyingNotesHandleRef = useRef<FeedbackNotesHandle | null>(null);
+  const myFlyingNotesHandleRef = useRef<FlyingNotesHandle | null>(null);
+  const friendFlyingNotesHandleRef = useRef<FlyingNotesHandle | null>(null);
 
   const handleNotePlay = (note: number, playedBy: number) => {
     if (playedBy === playerId) {

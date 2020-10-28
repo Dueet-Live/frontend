@@ -16,7 +16,7 @@ import PlayerIcon from '../../icons/PlayerIcon';
 import SettingsIcon from '../../icons/SettingsIcon';
 import { updateReady } from '../../utils/socket';
 import useSong from '../../utils/useSong';
-import { FeedbackNotes, FeedbackNotesHandleRef } from '../Game/FeedbackNotes';
+import { FlyingNotes, FlyingNotesHandleRef } from '../Game/FlyingNotes';
 import { Score } from '../Game/types';
 import RoomHeader from '../shared/RoomHeader';
 
@@ -49,8 +49,8 @@ type Props = {
   setView: (view: RoomView) => void;
   score: Score;
   resetScore: () => void;
-  myFlyingNotesHandleRef: FeedbackNotesHandleRef;
-  friendFlyingNotesHandleRef: FeedbackNotesHandleRef;
+  myFlyingNotesHandleRef: FlyingNotesHandleRef;
+  friendFlyingNotesHandleRef: FlyingNotesHandleRef;
 };
 
 const DuetRoomHeader: React.FC<Props> = ({
@@ -71,12 +71,12 @@ const DuetRoomHeader: React.FC<Props> = ({
 
   const playerIconWithFlyingNotes = (
     num: number,
-    handleRef: FeedbackNotesHandleRef
+    handleRef: FlyingNotesHandleRef
   ) => {
     return (
       <Box>
         <PlayerIcon num={num} myPlayerId={me} className={classes.icon} />
-        <FeedbackNotes handleRef={handleRef} isMe={num === me} />
+        <FlyingNotes handleRef={handleRef} isMe={num === me} />
       </Box>
     );
   };

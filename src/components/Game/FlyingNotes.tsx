@@ -78,7 +78,7 @@ type Note = { id: string; animationDuration: number };
 
 // False positive: https://github.com/yannickcr/eslint-plugin-react/issues/2133
 // eslint-disable-next-line react/display-name
-const FeedbackNote = React.memo(
+const FlyingNote = React.memo(
   ({
     animationDuration,
     isMe,
@@ -107,13 +107,13 @@ const generateRandomNote = (): Note => {
   };
 };
 
-export type FeedbackNotesHandle = {
+export type FlyingNotesHandle = {
   addNote: () => void;
 };
-export type FeedbackNotesHandleRef = React.MutableRefObject<FeedbackNotesHandle | null>;
+export type FlyingNotesHandleRef = React.MutableRefObject<FlyingNotesHandle | null>;
 
-export const FeedbackNotes: React.FC<{
-  handleRef: FeedbackNotesHandleRef;
+export const FlyingNotes: React.FC<{
+  handleRef: FlyingNotesHandleRef;
   isMe: boolean;
 }> = ({ handleRef, isMe }) => {
   const classes = useStyles();
@@ -146,7 +146,7 @@ export const FeedbackNotes: React.FC<{
   return (
     <div className={classes.container}>
       {Array.from(notes).map(note => (
-        <FeedbackNote
+        <FlyingNote
           isMe={isMe}
           animationDuration={note.animationDuration}
           key={note.id}
