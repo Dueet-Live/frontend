@@ -46,6 +46,7 @@ const SoloRoom: React.FC = () => {
   const [view, setView] = useState<RoomView>('solo.select');
   const [songSelectionGenre, setSongSelectionGenre] = useState('');
   const [score, setScore] = useState<Score>({ correct: 0, total: 0 });
+  const [speed, setSpeed] = useState(1);
 
   const { piece } = roomState;
   const chosenSong = useSong(piece);
@@ -80,6 +81,8 @@ const SoloRoom: React.FC = () => {
           }}
           tryPiano={() => setView('solo.try')}
           chosenSong={chosenSong}
+          speed={speed}
+          setSpeed={setSpeed}
         />
       );
     }
@@ -93,7 +96,13 @@ const SoloRoom: React.FC = () => {
     }
 
     if (view === 'solo.play' && !!chosenSongMIDI) {
-      return <GameView chosenSongMIDI={chosenSongMIDI} setScore={setScore} />;
+      return (
+        <GameView
+          speed={speed}
+          chosenSongMIDI={chosenSongMIDI}
+          setScore={setScore}
+        />
+      );
     }
 
     return <></>;

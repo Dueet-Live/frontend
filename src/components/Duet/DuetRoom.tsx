@@ -145,6 +145,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
         <GameView
           chosenSongMIDI={chosenSongMIDI}
           setScore={setScore}
+          speed={1}
           myPart={myPart}
           handleNotePlay={handleNotePlay}
         />

@@ -7,22 +7,23 @@ import { PlayerContext } from '../../contexts/PlayerContext';
 import { TraditionalKeyboardDimension } from '../../types/keyboardDimension';
 import { Part } from '../../types/messages';
 import { MidiJSON, Note } from '../../types/MidiJSON';
-import { calculateSongDuration, getPlaybackNotes } from '../../utils/songInfo';
 import { calculateSmartKeyboardDimension } from '../../utils/calculateSmartKeyboardDimension';
 import { calculateTraditionalKeyboardDimensionForGame } from '../../utils/calculateTraditionalKeyboardDimension';
 import { isEqual } from '../../utils/setHelpers';
+import { calculateSongDuration, getPlaybackNotes } from '../../utils/songInfo';
 import { useDimensions } from '../../utils/useDimensions';
 import InstrumentPlayer from '../Piano/InstrumentPlayer';
 import { NullSoundFontPlayerNoteAudio } from '../Piano/InstrumentPlayer/AudioPlayer';
+import { MappedNote } from '../Piano/types/mappedNote';
+import { getIndexToNotesMap } from '../Piano/utils/getKeyToNotesMap';
+import { changeSongSpeed } from '../utils';
+import { IndexedNote } from '../Waterfall/types';
 import {
   calculateLookAheadTime,
   getIndexedNotesFromNotes,
 } from '../Waterfall/utils';
 import GameMiddleView from './GameMiddleView';
 import GameSmartPiano from './GameSmartPiano';
-import { getIndexToNotesMap } from '../Piano/utils/getKeyToNotesMap';
-import { MappedNote } from '../Piano/types/mappedNote';
-import { IndexedNote } from '../Waterfall/types';
 import GameTraditionalPiano from './GameTraditionalPiano';
 import ProgressBar from './ProgressBar';
 import { Score } from './types';
@@ -49,6 +50,7 @@ const useStyles = makeStyles(() => ({
 type Props = {
   chosenSongMIDI: MidiJSON;
   setScore: (update: (prevScore: Score) => Score) => void;
+  speed: number;
   myPart?: Part | null;
   showSmartPiano?: boolean;
   handleNotePlay?: (key: number, playerId: number) => void;
@@ -58,6 +60,7 @@ type Props = {
 const GameView: React.FC<Props> = ({
   chosenSongMIDI,
   setScore,
+  speed,
   myPart,
   showSmartPiano = true,
   handleNotePlay = noOp,
@@ -70,6 +73,7 @@ const GameView: React.FC<Props> = ({
   const countDown = 3;
   const [timeToStart, setTimeToStart] = useState(countDown);
   const pressedNotes = useRef<Set<number>>(new Set());
+  const modifiedMIDI = useRef<MidiJSON>(changeSongSpeed(chosenSongMIDI, speed));
 
   // For scoring
   const gameEndRef = useRef(false);
@@ -77,7 +81,7 @@ const GameView: React.FC<Props> = ({
   const { me } = useContext(PlayerContext);
 
   /*************** Song information *****************/
-  const { tracks, header } = chosenSongMIDI;
+  const { tracks, header } = modifiedMIDI.current;
   const songDuration = useMemo(
     () => calculateSongDuration(tracks),
     // eslint-disable-next-line react-hooks/exhaustive-deps

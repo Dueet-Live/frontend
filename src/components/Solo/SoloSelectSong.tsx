@@ -15,6 +15,7 @@ import { choosePiece } from '../../utils/socket';
 import useGenres from '../../utils/useGenres';
 import useSongs from '../../utils/useSongs';
 import GenreCard from '../GenreCard';
+import SpeedCustomization from '../shared/SpeedCustomization';
 import SongCard from '../SongCard';
 import SoloReadyButton from './SoloReadyButton';
 
@@ -62,6 +63,13 @@ const useStyles = makeStyles(theme => ({
     paddingLeft: theme.spacing(2),
     paddingRight: theme.spacing(2),
     paddingTop: theme.spacing(1),
+    display: 'flex',
+    alignItems: 'center',
+  },
+  speedContainer: {
+    flex: '1 1 auto',
+    textAlign: 'right',
+    paddingLeft: '16px',
   },
 }));
 
@@ -72,6 +80,8 @@ type Props = {
   isPieceDownloaded: boolean;
   handleStart: () => void;
   tryPiano: () => void;
+  speed: number;
+  setSpeed: (speed: number) => void;
 };
 
 const SoloSelectSong: React.FC<Props> = ({
@@ -81,6 +91,8 @@ const SoloSelectSong: React.FC<Props> = ({
   isPieceDownloaded,
   handleStart,
   tryPiano,
+  speed,
+  setSpeed,
 }) => {
   const classes = useStyles();
 
@@ -155,15 +167,20 @@ const SoloSelectSong: React.FC<Props> = ({
         {genre === '' ? pickingGenre() : pickingSong()}
       </div>
       <div className={classes.details}>
-        <Typography variant="h6" color="textPrimary">
-          Song chosen: {chosenSong === null ? 'None' : chosenSong.name}{' '}
-        </Typography>
-        <SoloReadyButton
-          disabled={chosenSong === null || downloadingSong}
-          handleStart={handleStart}
-        >
-          {downloadingSong ? 'Loading' : 'Play'}
-        </SoloReadyButton>
+        <div>
+          <Typography variant="h6" color="textPrimary" gutterBottom>
+            Song chosen: {chosenSong === null ? 'None' : chosenSong.name}{' '}
+          </Typography>
+          <SoloReadyButton
+            disabled={chosenSong === null || downloadingSong}
+            handleStart={handleStart}
+          >
+            {downloadingSong ? 'Loading' : 'Play'}
+          </SoloReadyButton>
+        </div>
+        <div className={classes.speedContainer}>
+          <SpeedCustomization speed={speed} setSpeed={setSpeed} />
+        </div>
       </div>
       <Fab aria-label="try piano" className={classes.fab} onClick={tryPiano}>
         <PianoIcon />
