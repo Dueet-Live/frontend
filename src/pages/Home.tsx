@@ -1,6 +1,9 @@
 import { makeStyles } from '@material-ui/core';
-import React from 'react';
-import { FeedbackNotes } from '../components/Game/NoteFeedback';
+import React, { useRef } from 'react';
+import {
+  FeedbackNotes,
+  FeedbackNotesHandle,
+} from '../components/Game/FeedbackNotes';
 
 const useStyles = makeStyles(theme => ({
   outer: {
@@ -22,7 +25,15 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const Home: React.FC = () => {
-  return <FeedbackNotes />;
+  const feedbackNotesRef = useRef<FeedbackNotesHandle>(null);
+  return (
+    <>
+      <button onClick={() => feedbackNotesRef.current?.addNote()}>
+        Add Note
+      </button>
+      <FeedbackNotes handleRef={feedbackNotesRef} />;
+    </>
+  );
 };
 
 export default Home;
