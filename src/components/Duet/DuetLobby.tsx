@@ -1,5 +1,4 @@
 import {
-  Fab,
   FormControlLabel,
   Grid,
   makeStyles,
@@ -11,7 +10,6 @@ import {
 import React, { useContext } from 'react';
 import { PlayerContext } from '../../contexts/PlayerContext';
 import { RoomContext } from '../../contexts/RoomContext';
-import PianoIcon from '../../icons/PianoIcon';
 import PlayerIcon from '../../icons/PlayerIcon';
 import { Part } from '../../types/messages';
 import { Song } from '../../types/song';
@@ -28,15 +26,6 @@ const useStyles = makeStyles(theme => ({
   },
   content: {
     flexGrow: 1,
-  },
-  fab: {
-    backgroundColor: '#7988FA',
-    position: 'absolute',
-    bottom: theme.spacing(2),
-    right: theme.spacing(2),
-    '&:hover': {
-      backgroundColor: '#A5AFFF',
-    },
   },
   readyButton: {
     paddingLeft: theme.spacing(2),
@@ -213,9 +202,6 @@ const DuetLobby: React.FC<Props> = ({
       <div className={classes.readyButton}>
         <DuetReadyButton isDownloadingSong={isDownloadingSong} />
       </div>
-      <Fab aria-label="try piano" className={classes.fab} onClick={tryPiano}>
-        <PianoIcon />
-      </Fab>
     </Grid>
   );
 };

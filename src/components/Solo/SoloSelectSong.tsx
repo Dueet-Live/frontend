@@ -1,5 +1,4 @@
 import {
-  Fab,
   Grid,
   List,
   ListItem,
@@ -8,7 +7,6 @@ import {
 } from '@material-ui/core';
 import React, { useContext } from 'react';
 import { RoomContext } from '../../contexts/RoomContext';
-import PianoIcon from '../../icons/PianoIcon';
 import { RoomInfo } from '../../types/roomInfo';
 import { Song } from '../../types/song';
 import { choosePiece } from '../../utils/socket';
@@ -34,15 +32,6 @@ const useStyles = makeStyles(theme => ({
     overflowY: 'auto',
     height: 0,
     flex: '1 1 auto',
-  },
-  fab: {
-    backgroundColor: '#7988FA',
-    position: 'absolute',
-    bottom: theme.spacing(2),
-    right: theme.spacing(2),
-    '&:hover': {
-      backgroundColor: '#A5AFFF',
-    },
   },
   content: {
     flexGrow: 1,
@@ -182,9 +171,6 @@ const SoloSelectSong: React.FC<Props> = ({
           <SpeedCustomization speed={speed} setSpeed={setSpeed} />
         </div>
       </div>
-      <Fab aria-label="try piano" className={classes.fab} onClick={tryPiano}>
-        <PianoIcon />
-      </Fab>
     </>
   );
 };
