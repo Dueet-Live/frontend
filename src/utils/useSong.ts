@@ -6,7 +6,7 @@ export default function useSong(id: number | undefined) {
   const [song, setSong] = useState<Song | null>(null);
 
   useEffect(() => {
-    let songSubscription: Subscription;
+    let songSubscription: Subscription | undefined;
 
     async function setupHook() {
       await localforage.ready();
@@ -25,7 +25,7 @@ export default function useSong(id: number | undefined) {
 
     setupHook();
     return () => {
-      songSubscription.unsubscribe();
+      songSubscription?.unsubscribe();
     };
   }, [id]);
 
