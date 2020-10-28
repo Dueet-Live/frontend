@@ -64,7 +64,7 @@ const FeedbackNote = React.memo(
       deltaX: 10,
       startY,
       // 1000% of note height
-      deltaY: -1000,
+      deltaY: -500,
       animationDuration,
     });
     return <div className={classes.note}></div>;

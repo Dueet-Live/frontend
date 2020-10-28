@@ -28,6 +28,7 @@ import {
 } from '../Piano/utils/InstrumentPlayer/AudioPlayer';
 import { Waterfall } from '../Waterfall';
 import { calculateLookAheadTime } from '../Waterfall/utils';
+import { FeedbackNotes, FeedbackNotesHandle } from './FeedbackNotes';
 import GameEndView from './GameEndView';
 import ProgressBar from './ProgressBar';
 import { Score } from './types';
@@ -182,12 +183,18 @@ const GameView: React.FC<Props> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tracks, lookAheadTime, playbackChannel]);
 
+  // Notes feedback
+  const feedbackNotesHandleRef = useRef<FeedbackNotesHandle | null>(null);
+
   // Scoring
   const didPlayNote = (note: number, playedBy: number) => {
     // TODO: update score
     console.log('Play', Tone.now() - delayedStartTime);
     if (playedBy === me) {
       pressedNotes.current.add(note);
+    } else {
+      console.log('friend played');
+      feedbackNotesHandleRef.current?.addNote();
     }
     handleNotePlay(note, playedBy);
   };
@@ -230,15 +237,18 @@ const GameView: React.FC<Props> = ({
 
     if (!gameEnd) {
       return (
-        <Waterfall
-          keyboardDimension={keyboardDimension}
-          startTime={startTime * 1000}
-          dimension={middleBoxDimensions}
-          bpm={bpm}
-          beatsPerBar={beatsPerBar}
-          noteDivision={noteDivision}
-          notes={playerNotes}
-        />
+        <>
+          <FeedbackNotes handleRef={feedbackNotesHandleRef} />
+          <Waterfall
+            keyboardDimension={keyboardDimension}
+            startTime={startTime * 1000}
+            dimension={middleBoxDimensions}
+            bpm={bpm}
+            beatsPerBar={beatsPerBar}
+            noteDivision={noteDivision}
+            notes={playerNotes}
+          />
+        </>
       );
     }
 
