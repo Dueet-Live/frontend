@@ -73,7 +73,7 @@ const GameView: React.FC<Props> = ({
   const countDown = 3;
   const [timeToStart, setTimeToStart] = useState(countDown);
   const pressedNotes = useRef<Set<number>>(new Set());
-  const modifiedMIDI = useRef<MidiJSON>(changeSongSpeed(chosenSongMIDI, speed));
+  const modifiedMIDI = changeSongSpeed(chosenSongMIDI, speed);
 
   // For scoring
   const gameEndRef = useRef(false);
@@ -81,7 +81,7 @@ const GameView: React.FC<Props> = ({
   const { me } = useContext(PlayerContext);
 
   /*************** Song information *****************/
-  const { tracks, header } = modifiedMIDI.current;
+  const { tracks, header } = modifiedMIDI;
   const songDuration = useMemo(
     () => calculateSongDuration(tracks),
     // eslint-disable-next-line react-hooks/exhaustive-deps
