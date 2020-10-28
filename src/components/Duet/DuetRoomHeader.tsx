@@ -21,13 +21,9 @@ import { Score } from '../Game/types';
 import RoomHeader from '../shared/RoomHeader';
 
 const useStyles = makeStyles(theme => ({
-  icon: {
-    marginRight: theme.spacing(2),
-  },
   settingIcon: {
     marginLeft: theme.spacing(1),
   },
-
   link: {
     color: '#0000EE',
   },
@@ -41,6 +37,10 @@ const useStyles = makeStyles(theme => ({
     position: 'absolute',
     left: '50%',
     transform: 'translate(-50%)',
+  },
+  avatarBox: {
+    position: 'relative',
+    marginRight: theme.spacing(2),
   },
 }));
 
@@ -74,8 +74,8 @@ const DuetRoomHeader: React.FC<Props> = ({
     handleRef: FlyingNotesHandleRef
   ) => {
     return (
-      <Box>
-        <PlayerIcon num={num} myPlayerId={me} className={classes.icon} />
+      <Box className={classes.avatarBox}>
+        <PlayerIcon num={num} myPlayerId={me} />
         <FlyingNotes handleRef={handleRef} isMe={num === me} />
       </Box>
     );
@@ -83,7 +83,6 @@ const DuetRoomHeader: React.FC<Props> = ({
 
   const roomDetails = () => {
     if (me === -1) {
-      // TODO: add a border like how it looks in the mockup
       return (
         <Typography variant="body1" color="textPrimary">
           Connecting...

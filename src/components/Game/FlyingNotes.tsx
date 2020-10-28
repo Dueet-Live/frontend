@@ -2,34 +2,22 @@ import { makeStyles } from '@material-ui/core';
 import React, { useState } from 'react';
 import { v4 as uuid } from 'uuid';
 
+const ANIMATION_DURATION = 2000;
+
 const useStyles = makeStyles({
   container: {
     position: 'absolute',
     overflow: 'hidden',
-    // FIXME: HACK
-    // This is with respect to the app bar dimensions
-    height: '400%',
-    width: '40px',
+    height: `calc(var(--vh, 1vh) * 15)`,
+    width: '100%',
   },
 });
 
 // https://github.com/mui-org/material-ui/issues/13793
 const useAnimationStyles = ({
-  startX,
-  deltaX,
-  startY,
-  deltaY,
-  animationDuration,
   isMe,
   symbol,
 }: {
-  // percent of parent container width
-  startX: number;
-  deltaX: number;
-  // percent of note height
-  startY: number;
-  deltaY: number;
-  animationDuration: number;
   isMe: boolean;
   symbol: string;
 }) => {
@@ -40,64 +28,58 @@ const useAnimationStyles = ({
       position: 'relative',
       animationName: '$musicXAxis',
       animationTimingFunction: 'ease-out',
-      animationDuration: `${animationDuration}ms`,
+      animationDuration: `${ANIMATION_DURATION}ms`,
       animationIterationCount: 1,
       animationFillMode: 'forwards',
       '&:after': {
         content: `"${symbol}"`,
-        fontSize: theme.typography.h5.fontSize,
+        [theme.breakpoints.down('sm')]: {
+          fontSize: theme.typography.body2.fontSize,
+        },
+        [theme.breakpoints.up('md')]: {
+          fontSize: theme.typography.h4.fontSize,
+        },
         color: isMe ? theme.palette.me.main : theme.palette.friend.main,
         position: 'absolute',
         animationName: '$musicYAxis',
         animationTimingFunction: 'ease-in',
-        animationDuration: `${animationDuration}ms`,
+        animationDuration: `${ANIMATION_DURATION}ms`,
         animationIterationCount: 1,
         animationFillMode: 'forwards',
       },
     },
     '@keyframes musicXAxis': {
       '0%': {
-        transform: `translateX(${startX}%)`,
+        transform: `translateX(0)`,
       },
       '100%': {
-        transform: `translateX(${startX + deltaX}%)`,
+        transform: `translateX(calc(var(--vh, 1vh) * 0))`,
       },
     },
     '@keyframes musicYAxis': {
       '0%': {
-        transform: `translateY(${startY}%)`,
+        transform: `translateY(0)`,
         opacity: 1,
       },
       '100%': {
-        transform: `translateY(${startY + deltaY}%)`,
+        transform: `translateY(calc(var(--vh, 1vh) * 10))`,
         opacity: 0,
       },
     },
   }))();
 };
 
-type Note = { id: string; animationDuration: number };
+type Note = { id: string };
 
 const musicSymbols = ['♩', '♪', '♫', '♬', '♭', '♯'];
 
 // False positive: https://github.com/yannickcr/eslint-plugin-react/issues/2133
 // eslint-disable-next-line react/display-name
 const FlyingNote = React.memo(
-  ({
-    animationDuration,
-    isMe,
-  }: {
-    animationDuration: number;
-    isMe: boolean;
-  }) => {
+  ({ isMe }: { isMe: boolean }) => {
     const symbol =
       musicSymbols[Math.floor(Math.random() * musicSymbols.length)];
     const classes = useAnimationStyles({
-      startX: 0,
-      deltaX: 0,
-      startY: 0,
-      deltaY: 500,
-      animationDuration,
       isMe,
       symbol,
     });
@@ -110,7 +92,6 @@ const FlyingNote = React.memo(
 const generateRandomNote = (): Note => {
   return {
     id: uuid(),
-    animationDuration: 2000,
   };
 };
 
@@ -143,7 +124,7 @@ export const FlyingNotes: React.FC<{
     });
     setTimeout(() => {
       removeNote(newNote);
-    }, newNote.animationDuration);
+    }, ANIMATION_DURATION);
   };
 
   handleRef.current = {
@@ -153,11 +134,7 @@ export const FlyingNotes: React.FC<{
   return (
     <div className={classes.container}>
       {Array.from(notes).map(note => (
-        <FlyingNote
-          isMe={isMe}
-          animationDuration={note.animationDuration}
-          key={note.id}
-        />
+        <FlyingNote isMe={isMe} key={note.id} />
       ))}
     </div>
   );
