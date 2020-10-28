@@ -5,28 +5,28 @@ import {
   useTheme,
 } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
-import { noOp } from 'tone/build/esm/core/util/Interface';
 import * as Tone from 'tone';
 import { Player } from 'tone';
-import { Part } from '../../types/messages';
-import {
-  AudioPlayer,
-  NullSoundFontPlayerNoteAudio,
-} from '../Piano/utils/InstrumentPlayer/AudioPlayer';
+import { noOp } from 'tone/build/esm/core/util/Interface';
 import { PianoContext } from '../../contexts/PianoContext';
+import { Part } from '../../types/messages';
+import { MidiJSON } from '../../types/MidiJSON';
 import {
   calculateGamePianoDimension,
   calculateKeyHeight,
 } from '../../utils/calculateKeyboardDimension';
 import { getKeyboardMappingWithSpecificStart } from '../../utils/getKeyboardShorcutsMapping';
+import { calculateSongDuration, getPlaybackNotes } from '../../utils/songInfo';
 import { useDimensions } from '../../utils/useDimensions';
 import useWindowDimensions from '../../utils/useWindowDimensions';
 import InteractivePiano from '../Piano/InteractivePiano';
+import {
+  AudioPlayer,
+  NullSoundFontPlayerNoteAudio,
+} from '../Piano/utils/InstrumentPlayer/AudioPlayer';
 import { Waterfall } from '../Waterfall';
 import { calculateLookAheadTime } from '../Waterfall/utils';
-import { MidiJSON } from '../../types/MidiJSON';
 import GameEndView from './GameEndView';
-import { calculateSongDuration, getPlaybackNotes } from '../../utils/songInfo';
 import ProgressBar from './ProgressBar';
 
 const useStyles = makeStyles(theme => ({

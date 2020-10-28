@@ -5,6 +5,7 @@ import { v4 as uuid } from 'uuid';
 const useStyles = makeStyles({
   container: {
     height: '100%',
+    position: 'relative',
   },
 });
 

@@ -1,9 +1,7 @@
-import { makeStyles } from '@material-ui/core';
-import React, { useRef } from 'react';
-import {
-  FeedbackNotes,
-  FeedbackNotesHandle,
-} from '../components/Game/FeedbackNotes';
+import { Button, Grid, makeStyles, Typography } from '@material-ui/core';
+import React from 'react';
+import { useHistory } from 'react-router-dom';
+import EqualizerIcon from '../icons/EqualizerIcon';
 
 const useStyles = makeStyles(theme => ({
   outer: {
@@ -25,14 +23,72 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const Home: React.FC = () => {
-  const feedbackNotesRef = useRef<FeedbackNotesHandle>(null);
+  const history = useHistory();
+  const classes = useStyles();
   return (
-    <>
-      <button onClick={() => feedbackNotesRef.current?.addNote()}>
-        Add Note
-      </button>
-      <FeedbackNotes handleRef={feedbackNotesRef} />;
-    </>
+    <Grid
+      container
+      alignItems="center"
+      justify="center"
+      className={classes.outer}
+    >
+      <Grid
+        item
+        container
+        xs={12}
+        spacing={2}
+        className={classes.inner}
+        justify="center"
+      >
+        <Grid
+          item
+          container
+          xs={12}
+          justify="center"
+          alignItems="center"
+          spacing={2}
+        >
+          <Grid item>
+            <Typography variant="h3" color="primary">
+              Dueet Live
+            </Typography>
+          </Grid>
+          <Grid item>
+            <EqualizerIcon className={classes.icon} />
+          </Grid>
+        </Grid>
+        <Grid item xs={12} className={classes.subtext}>
+          <Typography variant="body1">
+            Welcome to Dueet Live! How would you like to enjoy your musical
+            journey today?
+          </Typography>
+        </Grid>
+        <Grid item xs={12}>
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={() => {
+              history.push('/duet');
+            }}
+            className={classes.button}
+          >
+            Duet
+          </Button>
+        </Grid>
+        <Grid item xs={12}>
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={() => {
+              history.push('/solo');
+            }}
+            className={classes.button}
+          >
+            Solo
+          </Button>
+        </Grid>
+      </Grid>
+    </Grid>
   );
 };
 
