@@ -59,7 +59,7 @@ const GameView: React.FC<Props> = ({
   chosenSongMIDI,
   setScore,
   myPart,
-  showSmartPiano = true,
+  showSmartPiano = false,
   handleNotePlay = noOp,
   handleNoteStop = noOp,
 }) => {
