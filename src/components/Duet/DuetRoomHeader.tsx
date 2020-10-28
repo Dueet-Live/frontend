@@ -16,6 +16,7 @@ import PlayerIcon from '../../icons/PlayerIcon';
 import SettingsIcon from '../../icons/SettingsIcon';
 import { updateReady } from '../../utils/socket';
 import useSong from '../../utils/useSong';
+import { Score } from '../Game/types';
 import RoomHeader from '../shared/RoomHeader';
 
 const useStyles = makeStyles(theme => ({
@@ -35,14 +36,26 @@ const useStyles = makeStyles(theme => ({
   roomId: {
     marginRight: theme.spacing(1),
   },
+  header: {
+    position: 'absolute',
+    left: '50%',
+    transform: 'translate(-50%)',
+  },
 }));
 
 type Props = {
   view: RoomView;
   setView: (view: RoomView) => void;
+  score: Score;
+  resetScore: () => void;
 };
 
-const DuetRoomHeader: React.FC<Props> = ({ view, setView }) => {
+const DuetRoomHeader: React.FC<Props> = ({
+  view,
+  setView,
+  score,
+  resetScore,
+}) => {
   const classes = useStyles();
   const history = useHistory();
   const { me, friend } = useContext(PlayerContext);
@@ -111,6 +124,7 @@ const DuetRoomHeader: React.FC<Props> = ({ view, setView }) => {
       case 'duet.play': {
         handleBack = () => {
           setView('duet.lobby');
+          resetScore();
           updateReady(false);
         };
       }
@@ -129,11 +143,23 @@ const DuetRoomHeader: React.FC<Props> = ({ view, setView }) => {
 
   const centerComponents = () => {
     if (view === 'duet.play' && chosenSong !== null) {
+      const accuracy =
+        score.total === 0
+          ? 0
+          : ((score.correct / score.total) * 100).toFixed(0);
+
       return (
         <>
           <MusicNoteOutlined color="action" />
           <Typography variant="body1" color="textPrimary">
             {chosenSong.name}
+          </Typography>
+          <Typography
+            variant="h5"
+            color="textPrimary"
+            className={classes.header}
+          >
+            Accuracy: {accuracy}%
           </Typography>
         </>
       );

@@ -3,18 +3,19 @@ import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import songsAPI from '../../api/songs';
 import { PlayerContext } from '../../contexts/PlayerContext';
-import { RoomView, RoomContext } from '../../contexts/RoomContext';
+import { RoomContext, RoomView } from '../../contexts/RoomContext';
 import { MidiJSON } from '../../types/MidiJSON';
 import { RoomInfo } from '../../types/roomInfo';
 import { getFriendId, getMyPart } from '../../utils/roomInfo';
 import socket, {
   addListeners,
-  removeRoomStateListeners,
   createRoom,
   joinRoom,
+  removeRoomStateListeners,
 } from '../../utils/socket';
 import useSong from '../../utils/useSong';
 import GameView from '../Game/GameView';
+import { Score } from '../Game/types';
 import DefaultPiano from '../Piano/DefaultPiano';
 import DuetLobby from './DuetLobby';
 import DuetRoomHeader from './DuetRoomHeader';
@@ -57,6 +58,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
 
   const [chosenSongMIDI, setChosenSongMIDI] = useState<MidiJSON | undefined>();
   const [view, setView] = useState<RoomView>('duet.lobby');
+  const [score, setScore] = useState<Score>({ correct: 0, total: 0 });
 
   const { piece } = roomState;
   const chosenSong = useSong(piece);
@@ -126,9 +128,14 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
     if (view === 'duet.play' && !!chosenSongMIDI) {
       // at this point, myPart is definitely either primo or secondo, otherwise
       // game should not have started.
-      // TODO account for part in duet
 
-      return <GameView chosenSongMIDI={chosenSongMIDI} myPart={myPart} />;
+      return (
+        <GameView
+          chosenSongMIDI={chosenSongMIDI}
+          setScore={setScore}
+          myPart={myPart}
+        />
+      );
     }
   };
 
@@ -148,7 +155,12 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
         <Box className={classes.root}>
           {/* header */}
           <div className={classes.header}>
-            <DuetRoomHeader view={view} setView={setView} />
+            <DuetRoomHeader
+              view={view}
+              setView={setView}
+              score={score}
+              resetScore={() => setScore({ correct: 0, total: 0 })}
+            />
           </div>
 
           <div className={classes.body}>{mainBody()}</div>
