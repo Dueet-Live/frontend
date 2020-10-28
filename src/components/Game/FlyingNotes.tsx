@@ -21,6 +21,7 @@ const useAnimationStyles = ({
   deltaY,
   animationDuration,
   isMe,
+  symbol,
 }: {
   // percent of parent container width
   startX: number;
@@ -30,6 +31,7 @@ const useAnimationStyles = ({
   deltaY: number;
   animationDuration: number;
   isMe: boolean;
+  symbol: string;
 }) => {
   return makeStyles(theme => ({
     // Make object move in a curved path
@@ -42,8 +44,8 @@ const useAnimationStyles = ({
       animationIterationCount: 1,
       animationFillMode: 'forwards',
       '&:after': {
-        content: '"♪"',
-        fontSize: theme.typography.h3.fontSize,
+        content: `"${symbol}"`,
+        fontSize: theme.typography.h5.fontSize,
         color: isMe ? theme.palette.me.main : theme.palette.friend.main,
         position: 'absolute',
         animationName: '$musicYAxis',
@@ -76,6 +78,8 @@ const useAnimationStyles = ({
 
 type Note = { id: string; animationDuration: number };
 
+const musicSymbols = ['♩', '♪', '♫', '♬', '♭', '♯'];
+
 // False positive: https://github.com/yannickcr/eslint-plugin-react/issues/2133
 // eslint-disable-next-line react/display-name
 const FlyingNote = React.memo(
@@ -86,6 +90,8 @@ const FlyingNote = React.memo(
     animationDuration: number;
     isMe: boolean;
   }) => {
+    const symbol =
+      musicSymbols[Math.floor(Math.random() * musicSymbols.length)];
     const classes = useAnimationStyles({
       startX: 0,
       deltaX: 0,
@@ -93,6 +99,7 @@ const FlyingNote = React.memo(
       deltaY: 500,
       animationDuration,
       isMe,
+      symbol,
     });
     return <div className={classes.note}></div>;
   },
