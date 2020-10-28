@@ -4,13 +4,13 @@ import songsAPI from '../../api/songs';
 import { RoomContext, RoomView } from '../../contexts/RoomContext';
 import { MidiJSON } from '../../types/MidiJSON';
 import { RoomInfo } from '../../types/roomInfo';
-import { startAudioContext } from '../../utils/toneContext';
 import useSong from '../../utils/useSong';
+import FreePlayPiano from '../Piano/TraditionalPiano/FreePlayPiano';
+import SoloSelectSong from './SoloSelectSong';
+import { startAudioContext } from '../../utils/toneContext';
 import GameView from '../Game/GameView';
 import { Score } from '../Game/types';
-import DefaultPiano from '../Piano/DefaultPiano';
 import SoloRoomHeader from './SoloRoomHeader';
-import SoloSelectSong from './SoloSelectSong';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -87,7 +87,7 @@ const SoloRoom: React.FC = () => {
     if (view === 'solo.try') {
       return (
         <div className={classes.piano}>
-          <DefaultPiano />
+          <FreePlayPiano />
         </div>
       );
     }

@@ -17,6 +17,11 @@ type TimeSignatureEvent = {
   measures?: number;
 };
 
+export type Header = {
+  tempos: TempoEvent[]; // the tempo, e.g. 120
+  timeSignatures: TimeSignatureEvent[]; // the time signature, e.g. [4, 4],
+};
+
 export type Track = {
   smallStartNote?: number;
   regularStartNote?: number;
@@ -24,12 +29,13 @@ export type Track = {
   notes: Note[];
 };
 
+export type SmartNote = Note & {
+  smartKey: number;
+};
+
 export type MidiJSON = {
   // the transport and timing data
-  header: {
-    tempos: TempoEvent[]; // the tempo, e.g. 120
-    timeSignatures: TimeSignatureEvent[]; // the time signature, e.g. [4, 4],
-  };
+  header: Header;
 
   // an array of midi tracks
   tracks: Track[];

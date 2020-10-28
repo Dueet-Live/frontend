@@ -1,10 +1,14 @@
-import { Note } from '../../types/MidiJSON';
+import { Note, SmartNote } from '../../types/MidiJSON';
 import isAccidentalNote from '../Piano/utils/isAccidentalNote';
-import { KeyOffsetInfo } from './types';
+import {
+  KeyOffsetInfo,
+  SmartKeyOffsetInfo,
+  TraditionalKeyOffsetInfo,
+} from './types';
 
 const MARGIN = 2;
 export class FallingNote {
-  midi: number;
+  identifier: number; // Midi for normal note, smartKey for smart note
   width: number;
   horizontalPos: number;
   length: number;
@@ -12,14 +16,14 @@ export class FallingNote {
   fallingDistance: number;
 
   constructor(
-    midi: number,
+    identifier: number,
     width: number,
     horizontalPos: number,
     length: number,
     verticalPos: number,
     fallingDistance: number
   ) {
-    this.midi = midi;
+    this.identifier = identifier;
     this.width = width;
     this.horizontalPos = horizontalPos;
     this.length = length;
@@ -27,23 +31,51 @@ export class FallingNote {
     this.fallingDistance = fallingDistance;
   }
 
+  static createFromSmartNoteInfo(
+    note: SmartNote,
+    speed: number,
+    fallingDistance: number,
+    keyOffsetInfo: SmartKeyOffsetInfo,
+    currentTime: number
+  ) {
+    const { smartKey, time, duration } = note;
+    const { keyWidth, leftMarginMap } = keyOffsetInfo;
+    if (leftMarginMap[note.smartKey] === undefined) {
+      console.log('smart falling note our of range', note, leftMarginMap);
+    }
+    const width = keyWidth - MARGIN * 2;
+    const horizontalPos = leftMarginMap[smartKey] + MARGIN;
+    const length = duration * speed;
+    const verticalPos = -length + (currentTime - time) * speed;
+    return new FallingNote(
+      smartKey,
+      width,
+      horizontalPos,
+      length,
+      verticalPos,
+      fallingDistance
+    );
+  }
+
   static createFromNoteInfo(
     note: Note,
     speed: number,
     fallingDistance: number,
-    keyOffsetInfo: KeyOffsetInfo,
+    keyOffsetInfo: TraditionalKeyOffsetInfo,
     currentTime: number
   ) {
+    const { midi, time, duration } = note;
+    const { blackKeyWidth, whiteKeyWidth, leftMarginMap } = keyOffsetInfo;
+    if (leftMarginMap[note.midi] === undefined) {
+      console.log('falling note our of range', note, leftMarginMap);
+    }
     const width =
-      (isAccidentalNote(note.midi)
-        ? keyOffsetInfo.blackKeyWidth
-        : keyOffsetInfo.whiteKeyWidth) -
-      MARGIN * 2;
-    const horizontalPos = keyOffsetInfo.leftMarginMap[note.midi] + MARGIN;
-    const length = note.duration * speed;
-    const verticalPos = -length + (currentTime - note.time) * speed;
+      (isAccidentalNote(midi) ? blackKeyWidth : whiteKeyWidth) - MARGIN * 2;
+    const horizontalPos = leftMarginMap[midi] + MARGIN;
+    const length = duration * speed;
+    const verticalPos = -length + (currentTime - time) * speed;
     return new FallingNote(
-      note.midi,
+      midi,
       width,
       horizontalPos,
       length,
@@ -66,17 +98,23 @@ export class FallingNote {
     keyOffsetInfo: KeyOffsetInfo
   ) {
     const verticalDistanceChangeRatio =
-      this.fallingDistance / newFallingDistance;
+      newFallingDistance / this.fallingDistance;
     const verticalPos = this.verticalPos * verticalDistanceChangeRatio;
     const length = this.length * verticalDistanceChangeRatio;
-    const width =
-      (isAccidentalNote(this.midi)
-        ? keyOffsetInfo.blackKeyWidth
-        : keyOffsetInfo.whiteKeyWidth) -
-      MARGIN * 2;
-    const horizontalPos = keyOffsetInfo.leftMarginMap[this.midi] + MARGIN;
+    const { leftMarginMap } = keyOffsetInfo;
+    const horizontalPos = leftMarginMap[this.identifier] + MARGIN;
+    let width: number;
+    if (keyOffsetInfo.isSmart) {
+      const { keyWidth } = keyOffsetInfo;
+      width = keyWidth - MARGIN * 2;
+    } else {
+      const { blackKeyWidth, whiteKeyWidth } = keyOffsetInfo;
+      width =
+        (isAccidentalNote(this.identifier) ? blackKeyWidth : whiteKeyWidth) -
+        MARGIN * 2;
+    }
     return new FallingNote(
-      this.midi,
+      this.identifier,
       width,
       horizontalPos,
       length,

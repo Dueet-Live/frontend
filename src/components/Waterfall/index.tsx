@@ -1,26 +1,41 @@
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
-import { KeyboardDimension } from '../../types/keyboardDimension';
+import {
+  SmartKeyboardDimension,
+  TraditionalKeyboardDimension,
+} from '../../types/keyboardDimension';
+import { Dimensions } from '../../utils/useDimensions';
+import { FallingNote } from './FallingNote';
+import {
+  KeyOffsetInfo,
+  SmartKeyOffsetInfo,
+  TraditionalKeyOffsetInfo,
+} from './types';
+import { drawFallingNote } from './utils';
+import * as Tone from 'tone';
+import { Note, SmartNote } from '../../types/MidiJSON';
+import { getOffsetMapForSmartKeyboard } from '../../utils/calculateSmartKeyboardDimension';
 import {
   calculateBlackKeyWidth,
   getOffsetMap,
-} from '../../utils/calculateKeyboardDimension';
-import { Dimensions } from '../../utils/useDimensions';
-import { FallingNote } from './FallingNote';
-import { MidiInfo } from './types';
-import {
-  calculateLookAheadTime,
-  convertTimeInfoToMilliseconds,
-  drawFallingNote,
-} from './utils';
-import * as Tone from 'tone';
-import { Note } from '../../types/MidiJSON';
+} from '../../utils/calculateTraditionalKeyboardDimension';
 
-type Props = MidiInfo & {
-  keyboardDimension: KeyboardDimension;
-  startTime?: number;
-  dimension: Dimensions;
-};
+type Props = {
+  waterfallDimension: Dimensions;
+  startTime: number;
+  lookAheadTime: number;
+} & (
+  | {
+      keyboardDimension: SmartKeyboardDimension;
+      notes: SmartNote[];
+      isSmart: true;
+    }
+  | {
+      keyboardDimension: TraditionalKeyboardDimension;
+      notes: Note[];
+      isSmart: false;
+    }
+);
 
 const useStyles = makeStyles(theme => ({
   canvas: {
@@ -28,34 +43,33 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export const Waterfall: React.FC<Props> = ({
-  startTime = 0,
-  keyboardDimension,
-  dimension,
-  bpm,
-  beatsPerBar,
-  noteDivision,
-  notes,
-}) => {
+const Waterfall: React.FC<Props> = props => {
   const classes = useStyles();
-
+  const { startTime, lookAheadTime, waterfallDimension } = props;
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const notesInMs = useRef<Array<Note>>(convertTimeInfoToMilliseconds(notes));
   const animationId = useRef(0);
   const prevFrameTime = useRef(Tone.now());
   const firstHiddenNoteIndex = useRef(0);
   const fallingNotes = useRef<Array<FallingNote>>([]);
 
-  const lookAheadTime = calculateLookAheadTime(bpm, beatsPerBar, noteDivision);
-
-  const keyOffsetInfo = useMemo(() => {
-    const { start, range, keyWidth } = keyboardDimension;
-    return {
-      leftMarginMap: getOffsetMap(start, range, keyWidth),
-      whiteKeyWidth: keyWidth,
-      blackKeyWidth: calculateBlackKeyWidth(keyWidth),
-    };
-  }, [keyboardDimension]);
+  const keyOffsetInfo: KeyOffsetInfo = useMemo(() => {
+    if (props.isSmart) {
+      return {
+        isSmart: props.isSmart,
+        leftMarginMap: getOffsetMapForSmartKeyboard(props.keyboardDimension),
+        keyWidth: props.keyboardDimension.keyWidth,
+      };
+    } else {
+      const { keyWidth, start, range } = props.keyboardDimension;
+      return {
+        isSmart: props.isSmart,
+        leftMarginMap: getOffsetMap(start, range, keyWidth),
+        whiteKeyWidth: keyWidth,
+        blackKeyWidth: calculateBlackKeyWidth(keyWidth),
+      };
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.keyboardDimension]);
 
   const startAnimation = useCallback(() => {
     const canvas = canvasRef.current!;
@@ -70,22 +84,34 @@ export const Waterfall: React.FC<Props> = ({
     const speed = canvas.height / lookAheadTime;
 
     const animate = () => {
-      const timestamp = Tone.now() * 1000;
+      const timestamp = Tone.now();
 
       // check if we need to add more notes
       while (
-        firstHiddenNoteIndex.current < notesInMs.current.length &&
-        notesInMs.current[firstHiddenNoteIndex.current].time <=
-          timestamp - startTime
+        firstHiddenNoteIndex.current < props.notes.length &&
+        props.notes[firstHiddenNoteIndex.current].time <= timestamp - startTime
       ) {
-        const note = notesInMs.current[firstHiddenNoteIndex.current];
-        const newNote = FallingNote.createFromNoteInfo(
-          note,
-          speed,
-          canvas.height,
-          keyOffsetInfo,
-          prevFrameTime.current - startTime
-        );
+        let newNote: FallingNote;
+        if (props.isSmart) {
+          const note = props.notes[firstHiddenNoteIndex.current];
+          newNote = FallingNote.createFromSmartNoteInfo(
+            note,
+            speed,
+            canvas.height,
+            keyOffsetInfo as SmartKeyOffsetInfo,
+            prevFrameTime.current - startTime
+          );
+        } else {
+          const note = props.notes[firstHiddenNoteIndex.current];
+          newNote = FallingNote.createFromNoteInfo(
+            note,
+            speed,
+            canvas.height,
+            keyOffsetInfo as TraditionalKeyOffsetInfo,
+            prevFrameTime.current - startTime
+          );
+        }
+
         fallingNotes.current.push(newNote);
         firstHiddenNoteIndex.current += 1;
       }
@@ -106,7 +132,7 @@ export const Waterfall: React.FC<Props> = ({
 
       if (
         fallingNotes.current.length > 0 ||
-        firstHiddenNoteIndex.current < notesInMs.current.length
+        firstHiddenNoteIndex.current < props.notes.length
       ) {
         prevFrameTime.current = timestamp;
         animationId.current = window.requestAnimationFrame(animate);
@@ -114,15 +140,8 @@ export const Waterfall: React.FC<Props> = ({
     };
 
     animationId.current = window.requestAnimationFrame(animate);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [keyOffsetInfo, lookAheadTime, startTime]);
-
-  useEffect(() => {
-    startAnimation();
-    return () => {
-      cancelAnimationFrame(animationId.current);
-      animationId.current = 0;
-    };
-  }, [lookAheadTime, startAnimation]);
 
   useEffect(() => {
     fallingNotes.current = fallingNotes.current.map(
@@ -137,15 +156,15 @@ export const Waterfall: React.FC<Props> = ({
       cancelAnimationFrame(animationId.current);
       animationId.current = 0;
     };
-  }, [keyOffsetInfo, startAnimation]);
+  }, [keyOffsetInfo, startAnimation, waterfallDimension]);
 
   return (
     <>
       <canvas
         ref={canvasRef}
         className={classes.canvas}
-        height={dimension.height}
-        width={dimension.width}
+        height={waterfallDimension.height}
+        width={waterfallDimension.width}
       >
         Unable to render the required visuals on this browser ): Perhaps, switch
         to another browser?
@@ -153,3 +172,13 @@ export const Waterfall: React.FC<Props> = ({
     </>
   );
 };
+
+function areEqual(prevProps: Props, nextProps: Props) {
+  return (
+    prevProps.startTime === nextProps.startTime &&
+    prevProps.waterfallDimension.width === nextProps.waterfallDimension.width &&
+    prevProps.waterfallDimension.height === nextProps.waterfallDimension.height
+  );
+}
+
+export default React.memo(Waterfall, areEqual);

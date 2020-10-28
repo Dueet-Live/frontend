@@ -1,39 +1,34 @@
-import {
-  makeStyles,
-  Typography,
-  useMediaQuery,
-  useTheme,
-} from '@material-ui/core';
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import { makeStyles } from '@material-ui/core';
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import * as Tone from 'tone';
 import { Player } from 'tone';
 import { noOp } from 'tone/build/esm/core/util/Interface';
-import { PianoContext } from '../../contexts/PianoContext';
 import { PlayerContext } from '../../contexts/PlayerContext';
+import { TraditionalKeyboardDimension } from '../../types/keyboardDimension';
 import { Part } from '../../types/messages';
-import { MidiJSON } from '../../types/MidiJSON';
-import {
-  calculateGamePianoDimension,
-  calculateKeyHeight,
-} from '../../utils/calculateKeyboardDimension';
-import { getKeyboardMappingWithSpecificStart } from '../../utils/getKeyboardShorcutsMapping';
+import { MidiJSON, Note, SmartNote } from '../../types/MidiJSON';
+import { calculateSmartKeyboardDimension } from '../../utils/calculateSmartKeyboardDimension';
+import { calculateTraditionalKeyboardDimensionForGame } from '../../utils/calculateTraditionalKeyboardDimension';
 import { isEqual } from '../../utils/setHelpers';
-import { calculateSongDuration, getPlaybackNotes } from '../../utils/songInfo';
-import { useDimensions } from '../../utils/useDimensions';
-import useWindowDimensions from '../../utils/useWindowDimensions';
-import InteractivePiano from '../Piano/InteractivePiano';
 import {
-  AudioPlayer,
-  NullSoundFontPlayerNoteAudio,
-} from '../Piano/utils/InstrumentPlayer/AudioPlayer';
-import { Waterfall } from '../Waterfall';
+  calculateSongDuration,
+  getPlaybackNotes,
+  getSmartMappingChangeEvents,
+  getSmartNotes,
+  SmartMappingChangeEvent,
+} from '../../utils/songInfo';
+import { useDimensions } from '../../utils/useDimensions';
+import InstrumentPlayer from '../Piano/InstrumentPlayer';
+import { NullSoundFontPlayerNoteAudio } from '../Piano/InstrumentPlayer/AudioPlayer';
 import { calculateLookAheadTime } from '../Waterfall/utils';
-import GameEndView from './GameEndView';
+import GameMiddleView from './GameMiddleView';
+import GameSmartPiano from './GameSmartPiano';
+import GameTraditionalPiano from './GameTraditionalPiano';
 import ProgressBar from './ProgressBar';
 import { Score } from './types';
 import getNotesAtTimeFromNotes from './utils/getNotesAtTimeFromNotes';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles(() => ({
   root: {
     display: 'flex',
     flexDirection: 'column',
@@ -55,48 +50,78 @@ type Props = {
   chosenSongMIDI: MidiJSON;
   setScore: (update: (prevScore: Score) => Score) => void;
   myPart?: Part | null;
+  showSmartPiano?: boolean;
   handleNotePlay?: (key: number, playerId: number) => void;
   handleNoteStop?: (key: number, playerId: number) => void;
-  handleScoreUpdate?: (newScore: number) => void /* tentative */;
 };
 
 const GameView: React.FC<Props> = ({
   chosenSongMIDI,
   setScore,
   myPart,
+  showSmartPiano = false,
   handleNotePlay = noOp,
   handleNoteStop = noOp,
 }) => {
   const classes = useStyles();
+
   const [startTime, setStartTime] = useState(-1);
   const [gameEnd, setGameEnd] = useState(false);
   const countDown = 3;
   const [timeToStart, setTimeToStart] = useState(countDown);
   const pressedNotes = useRef<Set<number>>(new Set());
 
-  // for scoring
+  // For scoring
   const gameEndRef = useRef(false);
   const prevIndexInMIDI = useRef(0);
   const { me } = useContext(PlayerContext);
 
-  // Song information
-  const { tracks } = chosenSongMIDI;
-  const songDuration = calculateSongDuration(tracks);
+  /*************** Song information *****************/
+  const { tracks, header } = chosenSongMIDI;
+  const songDuration = useMemo(
+    () => calculateSongDuration(tracks),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
+  const lookAheadTime = useMemo(() => {
+    return calculateLookAheadTime(header);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const delayedStartTime = lookAheadTime + startTime;
+
+  /*************** Player track information *****************/
   // 0 for solo
   // 0 for primo, 1 for secondo
-  let playerTrackNum = myPart === 'secondo' ? 1 : 0;
+  const playerTrackNum = myPart === 'secondo' ? 1 : 0;
   // 1 for solo, 2 for secondo
-  let playbackChannel = myPart === undefined ? 1 : 2;
-  const playerNotes = tracks[playerTrackNum].notes;
+  const playbackChannel = myPart === undefined ? 1 : 2;
+  const playerTrack = tracks[playerTrackNum];
+  const normalPlayerNotes = playerTrack.notes;
+  const mappingChangeEvents: SmartMappingChangeEvent[] = useMemo(
+    () => getSmartMappingChangeEvents(normalPlayerNotes),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
+  const [currentMapping, setCurrentMapping] = useState<number[]>(
+    mappingChangeEvents.length === 0 ? [] : mappingChangeEvents[0].mapping
+  );
+  const playerNotes = useMemo<Note[] | SmartNote[]>(() => {
+    if (showSmartPiano) {
+      return getSmartNotes(normalPlayerNotes, mappingChangeEvents);
+    } else {
+      return normalPlayerNotes;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  /*************** Initialise instrument *****************/
   // TODO: schedule change (if have time), now take the first value only
   const keyboardVolume = playerNotes[0].velocity;
-
-  const { tempos, timeSignatures } = chosenSongMIDI.header;
-  const bpm = tempos[0].bpm;
-  const [beatsPerBar, noteDivision] = timeSignatures[0].timeSignature;
-  const lookAheadTime =
-    calculateLookAheadTime(bpm, beatsPerBar, noteDivision) / 1000;
-  const delayedStartTime = lookAheadTime + startTime;
+  const instrumentPlayer = useMemo(
+    () => new InstrumentPlayer(keyboardVolume),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
 
   useEffect(() => {
     const startTime = Tone.now() + countDown;
@@ -105,6 +130,15 @@ const GameView: React.FC<Props> = ({
     console.log('Game start', startTime);
 
     Tone.Transport.start();
+
+    // Schedule smart mapping change events (for smart piano only)
+    if (showSmartPiano) {
+      mappingChangeEvents.forEach(({ time, mapping }) => {
+        Tone.Transport.schedule(() => {
+          setCurrentMapping(mapping);
+        }, delayedStartTime + time - Tone.now());
+      });
+    }
 
     // Schedule countdown
     for (let i = 0; i < countDown; i++) {
@@ -122,23 +156,28 @@ const GameView: React.FC<Props> = ({
     // TODO: schedule keyboard volume change
 
     // Schedule playback
-    // TODO: share the same player as the keyboard
-    const audioPlayer = new AudioPlayer();
-    audioPlayer.setInstrument('acoustic_grand_piano');
+    instrumentPlayer.setInstrument('acoustic_grand_piano');
     const handlers: (Player | NullSoundFontPlayerNoteAudio)[] = [];
     const playbackNotes = getPlaybackNotes(tracks, playbackChannel);
     playbackNotes.forEach(note => {
       Tone.Transport.schedule(() => {
-        const handler = audioPlayer.playNoteWithDuration(
+        const handler = instrumentPlayer.playNoteWithDuration(
           note.midi,
           note.time + delayedStartTime,
           note.duration,
           note.velocity
         );
         handlers.push(handler);
+        // Schedule 1 sec before the note play
       }, note.time + delayedStartTime - Tone.now() - 1);
     });
 
+    // Schedule ending screen
+    Tone.Transport.schedule(() => {
+      setGameEnd(true);
+    }, delayedStartTime + songDuration - Tone.now() + 0.1);
+
+    // Score update
     const scoreHandler = setInterval(() => {
       // stop updating score if game has ended
       if (gameEndRef.current) {
@@ -180,70 +219,63 @@ const GameView: React.FC<Props> = ({
       clearInterval(scoreHandler);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tracks, lookAheadTime, playbackChannel]);
+  }, []);
 
-  // Scoring
+  /*************** Callbacks *****************/
   const didPlayNote = (note: number, playedBy: number) => {
-    // TODO: update score
-    console.log('Play', Tone.now() - delayedStartTime);
     if (playedBy === me) {
       pressedNotes.current.add(note);
     }
     handleNotePlay(note, playedBy);
   };
+
   const didStopNote = (note: number, playedBy: number) => {
-    // TODO: update score
-    console.log('Stop', Tone.now() - delayedStartTime);
     if (playedBy === me) {
       pressedNotes.current.delete(note);
     }
     handleNoteStop(note, playedBy);
   };
 
-  // Calculate keyboard dimension
+  /*************** Keyboard dimension *****************/
   const [middleBoxDimensions, middleBoxRef] = useDimensions<HTMLDivElement>();
-  const { height } = useWindowDimensions();
-  const smallStartNote = tracks[playerTrackNum].smallStartNote || 72;
-  const regularStartNote = tracks[playerTrackNum].regularStartNote || 72;
-  const keyboardDimension = calculateGamePianoDimension(
-    middleBoxDimensions.width,
-    smallStartNote,
-    regularStartNote
-  );
-  const keyHeight = calculateKeyHeight(height);
-
-  // Get custom keyboard mapping for game
-  const theme = useTheme();
-  const isDesktopView = useMediaQuery(theme.breakpoints.up('md'));
-  const keyboardMap = isDesktopView
-    ? getKeyboardMappingWithSpecificStart(regularStartNote, keyboardDimension)
-    : undefined;
-
-  const middleBox = () => {
-    if (timeToStart !== 0) {
-      return (
-        <Typography variant="h1" align="center" color="primary">
-          {timeToStart}
-        </Typography>
+  const keyboardDimension = useMemo(() => {
+    if (showSmartPiano) {
+      return calculateSmartKeyboardDimension(middleBoxDimensions.width);
+    } else {
+      return calculateTraditionalKeyboardDimensionForGame(
+        middleBoxDimensions.width,
+        playerTrack
       );
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [middleBoxDimensions.width]);
 
-    if (!gameEnd) {
+  /*************** Game piano *****************/
+  const piano = useMemo(() => {
+    if (showSmartPiano) {
       return (
-        <Waterfall
-          keyboardDimension={keyboardDimension}
-          startTime={startTime * 1000}
-          dimension={middleBoxDimensions}
-          bpm={bpm}
-          beatsPerBar={beatsPerBar}
-          noteDivision={noteDivision}
-          notes={playerNotes}
+        <GameSmartPiano
+          instrumentPlayer={instrumentPlayer}
+          keyWidth={keyboardDimension.keyWidth}
+          currentMapping={currentMapping}
+          didPlayNote={didPlayNote}
+          didStopNote={didStopNote}
+        />
+      );
+    } else {
+      return (
+        <GameTraditionalPiano
+          instrumentPlayer={instrumentPlayer}
+          keyboardVolume={keyboardVolume}
+          keyboardDimension={keyboardDimension as TraditionalKeyboardDimension}
+          playerTrack={playerTrack}
+          didPlayNote={didPlayNote}
+          didStopNote={didStopNote}
         />
       );
     }
-
-    return <GameEndView />;
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [keyboardDimension, currentMapping]);
 
   return (
     <div className={classes.root}>
@@ -255,22 +287,18 @@ const GameView: React.FC<Props> = ({
         />
       )}
       <div ref={middleBoxRef} className={classes.middleBox}>
-        {middleBox()}
+        <GameMiddleView
+          timeToStart={timeToStart}
+          gameEnd={gameEnd}
+          showSmartPiano={showSmartPiano}
+          middleBoxDimensions={middleBoxDimensions}
+          startTime={startTime}
+          lookAheadTime={lookAheadTime}
+          keyboardDimension={keyboardDimension}
+          playerNotes={playerNotes}
+        />
       </div>
-      <div className={classes.piano}>
-        {!gameEnd && (
-          <PianoContext.Provider value={{ volume: keyboardVolume }}>
-            <InteractivePiano
-              includeOctaveShift={false}
-              keyboardDimension={keyboardDimension}
-              keyHeight={keyHeight}
-              keyboardMap={keyboardMap}
-              didPlayNote={didPlayNote}
-              didStopNote={didStopNote}
-            />
-          </PianoContext.Provider>
-        )}
-      </div>
+      <div className={classes.piano}>{!gameEnd && piano}</div>
     </div>
   );
 };

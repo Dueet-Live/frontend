@@ -1,4 +1,6 @@
 import isAccidentalNote from '../components/Piano/utils/isAccidentalNote';
+import { TraditionalKeyboardDimension } from '../types/keyboardDimension';
+import { Track } from '../types/MidiJSON';
 
 const octaveShiftKeyWidth = 30; // Fixed, once updated, update the css as well
 const referenceCenterNote = 60; // C4
@@ -7,7 +9,6 @@ const referenceKeywidth = 50;
 const octageRange = 12;
 
 /********************* DEFAULT MODE **************************************/
-/* Before game play */
 /* Assumption: startNote is always C */
 function calculateKeyboardRange(totalWidth: number): number {
   const keyboardWidth = calculateKeyboardWidth(totalWidth, true);
@@ -29,7 +30,9 @@ function calculateStartNote(range: number): number {
 }
 
 // Returns the { start, range, keyWidth }
-export function calculateDefaultPianoDimension(totalWidth: number) {
+export function calculateTraditionalKeyboardDimensionForFreePlay(
+  totalWidth: number
+) {
   const range = calculateKeyboardRange(totalWidth);
   return {
     start: calculateStartNote(range),
@@ -107,11 +110,12 @@ function calculateKeyWidthWithSmallStartNote(
 
 /******************  Overall **********************/
 // Returns the { start, range, keyWidth }
-export function calculateGamePianoDimension(
+export function calculateTraditionalKeyboardDimensionForGame(
   totalWidth: number,
-  smallStartNote: number,
-  regularStartNote: number
-) {
+  playerTrack: Track
+): TraditionalKeyboardDimension {
+  const smallStartNote = playerTrack.smallStartNote || 72;
+  const regularStartNote = playerTrack.regularStartNote || 72;
   if (calculateMaxOctaves(calculateKeyboardWidth(totalWidth, false)) <= 2) {
     // Use small start note
     return {
@@ -175,7 +179,7 @@ function calculateKeyboardWidth(
   }
 }
 
-export function calculateKeyHeight(screenHeight: number): number {
+export function calculateTraditionalKeyHeight(screenHeight: number): number {
   return Math.min(screenHeight * 0.4, 180);
 }
 

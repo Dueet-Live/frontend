@@ -56,14 +56,14 @@ export class AudioPlayer {
       });
   }
 
-  playNote(note: string, volume?: number) {
+  playNote(note: number, volume?: number) {
     // console.log("Play " + note)
     if (volume === undefined) {
-      return this.soundFontPlayer.play(note, 0, {
+      return this.soundFontPlayer.play(note.toString(), 0, {
         gain: this.defaultVolume * this.maxVolume,
       });
     } else {
-      return this.soundFontPlayer.play(note, 0, {
+      return this.soundFontPlayer.play(note.toString(), 0, {
         gain: volume * this.maxVolume,
       });
     }

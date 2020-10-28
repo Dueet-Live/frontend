@@ -1,6 +1,6 @@
-import { KeyboardDimension } from '../types/keyboardDimension';
+import { TraditionalKeyboardDimension } from '../types/keyboardDimension';
 
-const shortcuts = [
+const shortcutsForTraditionalPiano = [
   ['Z'],
   ['S'],
   ['X'],
@@ -35,7 +35,7 @@ const shortcuts = [
 
 // DEFAULT MODE
 // Always center the mappings
-export function getKeyboardMapping(
+export function getTraditionalKeyboardMapping(
   startNote: number, // the leftmost note on screen
   range: number
 ): { [key: string]: number } {
@@ -54,7 +54,7 @@ export function getKeyboardMapping(
   const mapRange = Math.min(30, range - offset);
   const map: { [key: string]: number } = {};
   for (let i = 0; i < mapRange; i++) {
-    const shortcutKeys = shortcuts[i];
+    const shortcutKeys = shortcutsForTraditionalPiano[i];
     const note = firstMappedNote + i;
     shortcutKeys.forEach(shortcut => {
       map[shortcut] = note;
@@ -63,17 +63,17 @@ export function getKeyboardMapping(
   return map;
 }
 
-// GAME MODE (desktop view only)
+// GAME MODE - Traditional Piano (desktop view only)
 // Assume the start note and first mapped note are both C here
-export function getKeyboardMappingWithSpecificStart(
+export function getTraditionalKeyboardMappingWithSpecificStart(
   firstMappedNote: number,
-  keyboardDimension: KeyboardDimension
+  keyboardDimension: TraditionalKeyboardDimension
 ): { [key: string]: number } {
   const { start, range } = keyboardDimension;
   const mapRange = Math.min(30, range - (firstMappedNote - start));
   const map: { [key: string]: number } = {};
   for (let i = 0; i < mapRange; i++) {
-    const shortcutKeys = shortcuts[i];
+    const shortcutKeys = shortcutsForTraditionalPiano[i];
     const note = firstMappedNote + i;
     shortcutKeys.forEach(shortcut => {
       map[shortcut] = note;
@@ -89,3 +89,25 @@ export function getKeyboardShortcutForNote(
   const keyboardShortcuts = Object.keys(keyboardMap);
   return keyboardShortcuts.filter(shortcut => keyboardMap[shortcut] === note);
 }
+
+export const shortcutsForSmartPiano = [
+  ['A'],
+  ['S'],
+  ['D'],
+  ['F'],
+  ['J'],
+  ['K'],
+  ['L'],
+];
+
+// GAME MODE - Smart Piano (desktop view only)
+export const getSmartKeyboardMapping = () => {
+  const map: { [key: string]: number } = {};
+  for (let i = 0; i < 7; i++) {
+    const shortcutKeys = shortcutsForSmartPiano[i];
+    shortcutKeys.forEach(shortcut => {
+      map[shortcut] = i;
+    });
+  }
+  return map;
+};

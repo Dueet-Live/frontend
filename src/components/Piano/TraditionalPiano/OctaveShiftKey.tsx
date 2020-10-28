@@ -1,8 +1,8 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core';
-import './InteractivePiano.css';
-import ChevronLeftIcon from '../../icons/ChevronRightIcon';
-import ChevronRightIcon from '../../icons/ChevronLeftIcon';
+import './TraditionalPiano.css';
+import ChevronLeftIcon from '../../../icons/ChevronRightIcon';
+import ChevronRightIcon from '../../../icons/ChevronLeftIcon';
 
 type Props = {
   type: string;
@@ -33,7 +33,7 @@ const OctaveShiftKey: React.FC<Props> = ({
 
   return (
     <button
-      className={`interactive-piano__octave-shift-key`}
+      className={`traditional-piano__octave-shift-key`}
       style={{ height: keyHeight }}
       onClick={onClick}
       disabled={disabled}

@@ -1,20 +1,22 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
-import { PlayerContext } from '../../contexts/PlayerContext';
-import { PlayingNote } from '../../types/playingNote';
-import { getKeyboardShortcutForNote } from '../../utils/getKeyboardShorcutsMapping';
+import { PlayerContext } from '../../../contexts/PlayerContext';
+import { PlayingNote } from '../types/playingNote';
+import { getKeyboardShortcutForNote } from '../../../utils/getKeyboardShorcutsMapping';
 import {
   addNotePlayListener,
   playNote,
   removeNotePlayListener,
   stopNote,
-} from '../../utils/socket';
-import './InteractivePiano.css';
-import InstrumentAudio from './InstrumentAudio';
-import PianoKey from './PianoKey';
-import getNotesBetween from './utils/getNotesBetween';
+} from '../../../utils/socket';
+import './TraditionalPiano.css';
+import PianoKey from './TraditionalPianoKey';
+import getNotesBetween from '../utils/getNotesBetween';
 import { noOp } from 'tone/build/esm/core/util/Interface';
+import isRegularKey from '../utils/isRegularKey';
+import InstrumentPlayer from '../InstrumentPlayer';
 
 type Props = {
+  instrumentPlayer: InstrumentPlayer;
   startNote: number;
   endNote: number;
   keyWidth: number;
@@ -24,11 +26,8 @@ type Props = {
   didStopNote?: (note: number, playerId: number) => void;
 };
 
-function isRegularKey(event: KeyboardEvent) {
-  return !event.ctrlKey && !event.metaKey && !event.shiftKey;
-}
-
-const Piano: React.FC<Props> = ({
+const TraditionalKeyboard: React.FC<Props> = ({
+  instrumentPlayer,
   startNote,
   endNote,
   keyWidth,
@@ -54,6 +53,8 @@ const Piano: React.FC<Props> = ({
         playNote(note);
       }
 
+      instrumentPlayer.playNote(note);
+
       setPlayingNotes(playingNotes => {
         return [...playingNotes, { note, playerId }];
       });
@@ -61,7 +62,7 @@ const Piano: React.FC<Props> = ({
       // Trigger callback
       didPlayNote(note, playerId);
     },
-    [isDuetMode, me, didPlayNote]
+    [isDuetMode, me, didPlayNote, instrumentPlayer]
   );
 
   const stopPlayingNote = useCallback(
@@ -70,6 +71,8 @@ const Piano: React.FC<Props> = ({
       if (isDuetMode && playerId === me) {
         stopNote(note);
       }
+
+      instrumentPlayer.stopNote(note);
 
       setPlayingNotes(playingNotes => {
         return playingNotes.filter(
@@ -81,7 +84,7 @@ const Piano: React.FC<Props> = ({
       // Trigger callback
       didStopNote(note, playerId);
     },
-    [isDuetMode, me, didStopNote]
+    [isDuetMode, me, didStopNote, instrumentPlayer]
   );
 
   /* Handle friends' notes */
@@ -212,7 +215,7 @@ const Piano: React.FC<Props> = ({
 
   return (
     <div
-      className="interactive-piano__keyboard-container"
+      className="traditional-piano__keyboard-container"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
       onTouchMove={handleTouchMove}
@@ -237,12 +240,8 @@ const Piano: React.FC<Props> = ({
           keyboardShortcut={getKeyboardShortcutForNote(keyboardMap, note)}
         />
       ))}
-      <InstrumentAudio
-        notes={playingNotes.map(playingNote => playingNote.note.toString())}
-        instrument={'acoustic_grand_piano'}
-      />
     </div>
   );
 };
 
-export default Piano;
+export default TraditionalKeyboard;
