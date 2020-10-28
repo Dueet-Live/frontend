@@ -18,9 +18,7 @@ const SpeedCustomization: React.FC<Props> = ({ speed, setSpeed }) => {
 
   return (
     <>
-      <Typography variant="h6" gutterBottom>
-        Speed
-      </Typography>
+      <Typography>Speed</Typography>
       <Slider
         step={0.25}
         min={0.25}

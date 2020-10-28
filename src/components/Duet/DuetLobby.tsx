@@ -16,9 +16,10 @@ import PlayerIcon from '../../icons/PlayerIcon';
 import { Part } from '../../types/messages';
 import { Song } from '../../types/song';
 import { getMyPart, getPartsSelection } from '../../utils/roomInfo';
-import { choosePart } from '../../utils/socket';
-import DuetReadyButton from './DuetReadyButton';
+import { changeSpeed, choosePart } from '../../utils/socket';
 import PickASongButton from '../PickASongButton';
+import SpeedCustomization from '../shared/SpeedCustomization';
+import DuetReadyButton from './DuetReadyButton';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -103,6 +104,8 @@ const DuetLobby: React.FC<Props> = ({
   const { roomInfo } = useContext(RoomContext);
   const { primo, secondo } = getPartsSelection(roomInfo);
   const myPart = getMyPart(roomInfo, myPlayerId);
+
+  const { speed } = roomInfo;
 
   const handlePartChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const val = event.target.value;
@@ -194,6 +197,9 @@ const DuetLobby: React.FC<Props> = ({
                 label="Secondo"
               />
             </RadioGroup>
+          </Grid>
+          <Grid item>
+            <SpeedCustomization speed={speed} setSpeed={changeSpeed} />
           </Grid>
         </Grid>
         <Grid item xs={5} container justify="center" alignItems="center">
