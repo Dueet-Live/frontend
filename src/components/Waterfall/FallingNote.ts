@@ -98,7 +98,7 @@ export class FallingNote {
     keyOffsetInfo: KeyOffsetInfo
   ) {
     const verticalDistanceChangeRatio =
-      this.fallingDistance / newFallingDistance;
+      newFallingDistance / this.fallingDistance;
     const verticalPos = this.verticalPos * verticalDistanceChangeRatio;
     const length = this.length * verticalDistanceChangeRatio;
     const { leftMarginMap } = keyOffsetInfo;

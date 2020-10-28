@@ -144,14 +144,6 @@ const Waterfall: React.FC<Props> = props => {
   }, [keyOffsetInfo, lookAheadTime, startTime]);
 
   useEffect(() => {
-    startAnimation();
-    return () => {
-      cancelAnimationFrame(animationId.current);
-      animationId.current = 0;
-    };
-  }, [lookAheadTime, startAnimation]);
-
-  useEffect(() => {
     fallingNotes.current = fallingNotes.current.map(
       (fallingNote: FallingNote) =>
         fallingNote.createWithUpdatedDimensionAndProgress(
@@ -164,7 +156,7 @@ const Waterfall: React.FC<Props> = props => {
       cancelAnimationFrame(animationId.current);
       animationId.current = 0;
     };
-  }, [keyOffsetInfo, startAnimation]);
+  }, [keyOffsetInfo, startAnimation, waterfallDimension]);
 
   return (
     <>
