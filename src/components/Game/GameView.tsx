@@ -1,14 +1,15 @@
 import { makeStyles } from '@material-ui/core';
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { noOp } from 'tone/build/esm/core/util/Interface';
 import * as Tone from 'tone';
 import { Player } from 'tone';
+import { noOp } from 'tone/build/esm/core/util/Interface';
+import { PlayerContext } from '../../contexts/PlayerContext';
+import { TraditionalKeyboardDimension } from '../../types/keyboardDimension';
 import { Part } from '../../types/messages';
-import { NullSoundFontPlayerNoteAudio } from '../Piano/InstrumentPlayer/AudioPlayer';
-import { useDimensions } from '../../utils/useDimensions';
-import { calculateLookAheadTime } from '../Waterfall/utils';
 import { MidiJSON, Note, SmartNote } from '../../types/MidiJSON';
-import ProgressBar from './ProgressBar';
+import { calculateSmartKeyboardDimension } from '../../utils/calculateSmartKeyboardDimension';
+import { calculateTraditionalKeyboardDimensionForGame } from '../../utils/calculateTraditionalKeyboardDimension';
+import { isEqual } from '../../utils/setHelpers';
 import {
   calculateSongDuration,
   getPlaybackNotes,
@@ -16,16 +17,15 @@ import {
   getSmartNotes,
   SmartMappingChangeEvent,
 } from '../../utils/songInfo';
+import { useDimensions } from '../../utils/useDimensions';
 import InstrumentPlayer from '../Piano/InstrumentPlayer';
-import { calculateSmartKeyboardDimension } from '../../utils/calculateSmartKeyboardDimension';
-import { calculateTraditionalKeyboardDimensionForGame } from '../../utils/calculateTraditionalKeyboardDimension';
-import { TraditionalKeyboardDimension } from '../../types/keyboardDimension';
+import { NullSoundFontPlayerNoteAudio } from '../Piano/InstrumentPlayer/AudioPlayer';
+import { calculateLookAheadTime } from '../Waterfall/utils';
 import GameMiddleView from './GameMiddleView';
-import GameTraditionalPiano from './GameTraditionalPiano';
 import GameSmartPiano from './GameSmartPiano';
-import { PlayerContext } from '../../contexts/PlayerContext';
+import GameTraditionalPiano from './GameTraditionalPiano';
+import ProgressBar from './ProgressBar';
 import { Score } from './types';
-import { isEqual } from '../../utils/setHelpers';
 import getNotesAtTimeFromNotes from './utils/getNotesAtTimeFromNotes';
 
 const useStyles = makeStyles(() => ({
@@ -59,7 +59,7 @@ const GameView: React.FC<Props> = ({
   chosenSongMIDI,
   setScore,
   myPart,
-  showSmartPiano = true,
+  showSmartPiano = false,
   handleNotePlay = noOp,
   handleNoteStop = noOp,
 }) => {
