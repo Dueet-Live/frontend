@@ -29,7 +29,8 @@ const useStyles = makeStyles(theme => ({
   },
   readyButton: {
     paddingLeft: theme.spacing(2),
-    paddingBottom: theme.spacing(2),
+    paddingRight: theme.spacing(2),
+    paddingBottom: theme.spacing(1),
   },
   box: {
     display: 'flex',
@@ -63,12 +64,10 @@ const useStyles = makeStyles(theme => ({
   partCard: {
     height: '50%',
   },
-  heading: {
-    paddingTop: theme.spacing(1),
-  },
   form: {
     paddingLeft: theme.spacing(2),
     paddingRight: theme.spacing(2),
+    paddingTop: theme.spacing(1),
   },
   error: {
     position: 'absolute',
@@ -111,7 +110,7 @@ const DuetLobby: React.FC<Props> = ({
         container
         direction="column"
         alignItems="center"
-        spacing={2}
+        spacing={1}
         className={classes.partCard}
       >
         {/* TODO make player icon larger on larger screen sizes */}
@@ -131,7 +130,7 @@ const DuetLobby: React.FC<Props> = ({
 
   let error = '';
   if (myPart === null) {
-    error = 'Choose a part with the buttons on the left!';
+    error = 'Choose your part on the left!';
   } else if (primo.length === 2 || secondo.length === 2) {
     error = 'Both of you must play different parts!';
   } else if (primo.length === 0 || secondo.length === 0) {
@@ -140,14 +139,6 @@ const DuetLobby: React.FC<Props> = ({
 
   return (
     <Grid container direction="column" className={classes.root}>
-      <Typography
-        variant="h5"
-        color="textPrimary"
-        align="center"
-        className={classes.heading}
-      >
-        Lobby
-      </Typography>
       <Grid item container className={classes.content}>
         <Grid
           item
@@ -158,7 +149,7 @@ const DuetLobby: React.FC<Props> = ({
           justify="center"
           className={classes.form}
         >
-          <Grid item>
+          <Grid item style={{ maxWidth: '100%' }}>
             <Typography variant="body1" color="textPrimary">
               Pick a song
             </Typography>

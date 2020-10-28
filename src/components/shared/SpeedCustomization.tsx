@@ -5,6 +5,8 @@ const useStyles = makeStyles(theme => ({
   root: {
     width: 'min(300px, 70%)',
     marginRight: theme.spacing(1),
+    padding: 0,
+    paddingBottom: theme.spacing(1),
   },
 }));
 

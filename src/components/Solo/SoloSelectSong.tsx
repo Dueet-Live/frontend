@@ -53,7 +53,7 @@ const useStyles = makeStyles(theme => ({
     paddingRight: theme.spacing(2),
     paddingTop: theme.spacing(1),
     display: 'flex',
-    alignItems: 'center',
+    alignItems: 'flex-end',
   },
   speedContainer: {
     flex: '1 1 auto',
