@@ -42,9 +42,6 @@ const useStyles = makeStyles(theme => ({
     left: '50%',
     transform: 'translate(-50%)',
   },
-  flyingNotes: {
-    // position: 'absolute',
-  },
 }));
 
 type Props = {
@@ -79,7 +76,7 @@ const DuetRoomHeader: React.FC<Props> = ({
     return (
       <Box>
         <PlayerIcon num={num} myPlayerId={me} className={classes.icon} />
-        <FeedbackNotes handleRef={handleRef} />
+        <FeedbackNotes handleRef={handleRef} isMe={num === me} />
       </Box>
     );
   };

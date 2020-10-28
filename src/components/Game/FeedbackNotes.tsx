@@ -20,6 +20,7 @@ const useAnimationStyles = ({
   startY,
   deltaY,
   animationDuration,
+  isMe,
 }: {
   // percent of parent container width
   startX: number;
@@ -28,8 +29,9 @@ const useAnimationStyles = ({
   startY: number;
   deltaY: number;
   animationDuration: number;
+  isMe: boolean;
 }) => {
-  return makeStyles({
+  return makeStyles(theme => ({
     // Make object move in a curved path
     // https://tobiasahlin.com/blog/curved-path-animations-in-css
     note: {
@@ -40,7 +42,9 @@ const useAnimationStyles = ({
       animationIterationCount: 1,
       animationFillMode: 'forwards',
       '&:after': {
-        content: '"🎵"',
+        content: '"♪"',
+        fontSize: theme.typography.h3.fontSize,
+        color: isMe ? theme.palette.me.main : theme.palette.friend.main,
         position: 'absolute',
         animationName: '$musicYAxis',
         animationTimingFunction: 'ease-in',
@@ -67,7 +71,7 @@ const useAnimationStyles = ({
         opacity: 0,
       },
     },
-  })();
+  }))();
 };
 
 type Note = { id: string; animationDuration: number };
@@ -75,13 +79,20 @@ type Note = { id: string; animationDuration: number };
 // False positive: https://github.com/yannickcr/eslint-plugin-react/issues/2133
 // eslint-disable-next-line react/display-name
 const FeedbackNote = React.memo(
-  ({ animationDuration }: Note) => {
+  ({
+    animationDuration,
+    isMe,
+  }: {
+    animationDuration: number;
+    isMe: boolean;
+  }) => {
     const classes = useAnimationStyles({
       startX: 0,
       deltaX: 0,
       startY: 0,
       deltaY: 500,
       animationDuration,
+      isMe,
     });
     return <div className={classes.note}></div>;
   },
@@ -103,7 +114,8 @@ export type FeedbackNotesHandleRef = React.MutableRefObject<FeedbackNotesHandle 
 
 export const FeedbackNotes: React.FC<{
   handleRef: FeedbackNotesHandleRef;
-}> = ({ handleRef }) => {
+  isMe: boolean;
+}> = ({ handleRef, isMe }) => {
   const classes = useStyles();
   const [notes, setNotes] = useState<Set<Note>>(new Set());
 
@@ -134,7 +146,11 @@ export const FeedbackNotes: React.FC<{
   return (
     <div className={classes.container}>
       {Array.from(notes).map(note => (
-        <FeedbackNote {...note} key={note.id} />
+        <FeedbackNote
+          isMe={isMe}
+          animationDuration={note.animationDuration}
+          key={note.id}
+        />
       ))}
     </div>
   );
