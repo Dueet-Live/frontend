@@ -1,4 +1,5 @@
 import { assert } from 'console';
+import { getLetterOfNote } from '../../../utils/getLetterOfNote';
 import { MappedNote } from '../types/mappedNote';
 
 type NamedNote = {
@@ -19,7 +20,7 @@ export const getIndexToNotesMap = (notes: NamedNote[]) => {
   const map = startKeyboardNotes.map(note => [note]);
 
   for (let note of notes) {
-    const letter = noteRegExpression.exec(note.name)!.groups!.letter;
+    const letter = getLetterOfNote(note.name);
     const index = notePrefixMap.get(letter)!;
 
     const notesAtIndex = map[index];
@@ -52,8 +53,6 @@ assert(
 const FIRST_MIDI_NOTE_OF_FIRST_OCTAVE = 12;
 const ENDING_BUFFER_TIME = 10000; // determines how long the very last mapping of notes last for
 
-const noteRegExpression = /(?<letter>[A-G])/;
-
 /** Returns an initial mapping of midi notes to indices (of the array). */
 const getStartingKeyboardNotes = (notes: NamedNote[]) => {
   let numNotesLeftToFill = NUM_INDICES;
@@ -64,7 +63,7 @@ const getStartingKeyboardNotes = (notes: NamedNote[]) => {
 
   for (let i = 0; i < notes.length && numNotesLeftToFill > 0; i++) {
     const currentNote = notes[i];
-    const letter = noteRegExpression.exec(currentNote.name)!.groups!.letter;
+    const letter = getLetterOfNote(currentNote.name);
     const index = notePrefixMap.get(letter);
 
     if (mapping[index!] === null) {
