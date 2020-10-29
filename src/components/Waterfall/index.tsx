@@ -1,9 +1,16 @@
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import * as Tone from 'tone';
 import {
   SmartKeyboardDimension,
   TraditionalKeyboardDimension,
 } from '../../types/keyboardDimension';
+import { Note } from '../../types/MidiJSON';
+import { getOffsetMapForSmartKeyboard } from '../../utils/calculateSmartKeyboardDimension';
+import {
+  calculateBlackKeyWidth,
+  getOffsetMap,
+} from '../../utils/calculateTraditionalKeyboardDimension';
 import { Dimensions } from '../../utils/useDimensions';
 import { FallingNote } from './FallingNote';
 import {
@@ -13,13 +20,6 @@ import {
   TraditionalKeyOffsetInfo,
 } from './types';
 import { drawFallingNote } from './utils';
-import * as Tone from 'tone';
-import { Note } from '../../types/MidiJSON';
-import { getOffsetMapForSmartKeyboard } from '../../utils/calculateSmartKeyboardDimension';
-import {
-  calculateBlackKeyWidth,
-  getOffsetMap,
-} from '../../utils/calculateTraditionalKeyboardDimension';
 
 type Props = {
   waterfallDimension: Dimensions;

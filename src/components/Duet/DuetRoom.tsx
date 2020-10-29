@@ -54,6 +54,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   const [roomState, setRoomState] = useState({
     players: [],
     id: '',
+    speed: 1,
   } as RoomInfo);
   const [playerId, setPlayerId] = useState(-1);
 
@@ -61,7 +62,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   const [view, setView] = useState<RoomView>('duet.lobby');
   const [score, setScore] = useState<Score>({ correct: 0, total: 0 });
 
-  const { piece } = roomState;
+  const { piece, speed } = roomState;
   const chosenSong = useSong(piece);
 
   useEffect(() => {
@@ -145,6 +146,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
         <GameView
           chosenSongMIDI={chosenSongMIDI}
           setScore={setScore}
+          speed={speed}
           myPart={myPart}
           handleNotePlay={handleNotePlay}
         />
