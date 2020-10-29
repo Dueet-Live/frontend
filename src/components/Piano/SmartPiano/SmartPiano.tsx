@@ -110,7 +110,7 @@ const SmartPiano: React.FC<Props> = ({
         ];
       });
     },
-    [startPlayingNote]
+    [startPlayingNote, startTime]
   );
 
   const stopPlayingSmartKey = useCallback(
