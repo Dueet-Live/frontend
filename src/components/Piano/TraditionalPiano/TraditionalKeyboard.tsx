@@ -39,6 +39,7 @@ const TraditionalKeyboard: React.FC<Props> = ({
   const notes = getNotesBetween(startNote, endNote);
   const { me, friend } = useContext(PlayerContext);
   const isDuetMode = friend !== null;
+  // Consist of both my notes and my friend's notes
   const [playingNotes, setPlayingNotes] = useState<PlayingNote[]>([]);
 
   // Used for touchscreen input
@@ -161,25 +162,25 @@ const TraditionalKeyboard: React.FC<Props> = ({
     event.stopPropagation();
     setUseTouchEvents(true);
     setTouchedNotes(getTouchedNotes(event.touches));
-    console.log(`(Parent) Mouch start ${Array.from(touchedNotes.toString())}`);
+    console.log(`(Parent) Touch start ${Array.from(touchedNotes).toString()}`);
   };
 
   const handleTouchEnd = (event: React.TouchEvent<HTMLDivElement>) => {
     event.stopPropagation();
     setTouchedNotes(getTouchedNotes(event.touches));
-    console.log(`(Parent) Mouch end ${Array.from(touchedNotes).toString()}`);
+    console.log(`(Parent) Touch end ${Array.from(touchedNotes).toString()}`);
   };
 
   const handleTouchCancel = (event: React.TouchEvent<HTMLDivElement>) => {
     event.stopPropagation();
     setTouchedNotes(getTouchedNotes(event.touches));
-    console.log(`(Parent) Mouch cancel ${Array.from(touchedNotes).toString()}`);
+    console.log(`(Parent) Touch cancel ${Array.from(touchedNotes).toString()}`);
   };
 
   const handleTouchMove = (event: React.TouchEvent<HTMLDivElement>) => {
     event.stopPropagation();
     setTouchedNotes(getTouchedNotes(event.touches));
-    console.log(`(Parent) Mouch move ${Array.from(touchedNotes).toString()}`);
+    console.log(`(Parent) Touch move ${Array.from(touchedNotes).toString()}`);
   };
 
   const getTouchedNotes = (touches: React.TouchList) => {

@@ -7,8 +7,6 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import * as Tone from 'tone';
-import { Player } from 'tone';
 import { noOp } from 'tone/build/esm/core/util/Interface';
 import { PlayerContext } from '../../contexts/PlayerContext';
 import { TraditionalKeyboardDimension } from '../../types/keyboardDimension';
@@ -16,19 +14,17 @@ import { Part } from '../../types/messages';
 import { MidiJSON } from '../../types/MidiJSON';
 import { calculateSmartKeyboardDimension } from '../../utils/calculateSmartKeyboardDimension';
 import { calculateTraditionalKeyboardDimensionForGame } from '../../utils/calculateTraditionalKeyboardDimension';
-import { isEqual } from '../../utils/setHelpers';
 import { calculateSongDuration, getPlaybackNotes } from '../../utils/songInfo';
 import { useDimensions } from '../../utils/useDimensions';
 import InstrumentPlayer from '../Piano/InstrumentPlayer';
-import { NullSoundFontPlayerNoteAudio } from '../Piano/InstrumentPlayer/AudioPlayer';
 import { changeSongSpeed } from '../utils';
 import { calculateLookAheadTime } from '../Waterfall/utils';
 import GameMiddleView from './GameMiddleView';
 import GameSmartPiano from './GameSmartPiano';
 import GameTraditionalPiano from './GameTraditionalPiano';
+import GameManager from './Logic/GameManager';
 import ProgressBar from './ProgressBar';
 import { Score } from './types';
-import getNotesAtTimeFromNotes from './utils/getNotesAtTimeFromNotes';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -69,24 +65,21 @@ const GameView: React.FC<Props> = ({
 }) => {
   const classes = useStyles();
 
+  const gameManager = useRef<GameManager>(new GameManager());
+  const { me } = useContext(PlayerContext);
+
   // Game start time (after the countdown)
   const [startTime, setStartTime] = useState(-1);
-  const [gameEnd, setGameEnd] = useState(false);
   const countDown = 3;
   const [timeToStart, setTimeToStart] = useState(countDown);
-  const pressedNotes = useRef<Set<number>>(new Set());
+  const [gameEnd, setGameEnd] = useState(false);
+
+  /*************** Song information *****************/
   const modifiedMIDI = useMemo(
     () => changeSongSpeed(chosenSongMIDI, speed),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
-
-  // For scoring
-  const gameEndRef = useRef(false);
-  const prevIndexInMIDI = useRef(0);
-  const { me } = useContext(PlayerContext);
-
-  /*************** Song information *****************/
   const { tracks, header } = modifiedMIDI;
   const songDuration = useMemo(
     () => calculateSongDuration(tracks),
@@ -119,111 +112,47 @@ const GameView: React.FC<Props> = ({
   );
 
   useEffect(() => {
-    const startTime = Tone.now() + countDown;
-    const delayedStartTime = lookAheadTime + startTime;
-    setStartTime(startTime);
-    console.log('Game start', startTime);
-
-    Tone.Transport.start();
+    // Set up game
+    const currentGameManager = gameManager.current;
+    currentGameManager.setUpGame(
+      setStartTime,
+      lookAheadTime,
+      countDown,
+      handleNotePlay,
+      handleNoteStop
+    );
 
     // Schedule countdown
-    for (let i = 0; i < countDown; i++) {
-      Tone.Transport.schedule(() => {
-        setTimeToStart(countDown - 1 - i);
-      }, startTime - (countDown - 1 - i) - Tone.now());
-    }
-
-    // Schedule ending screen
-    Tone.Transport.schedule(() => {
-      setGameEnd(true);
-      gameEndRef.current = true;
-    }, delayedStartTime + songDuration - Tone.now() + 0.1);
-
-    // TODO: schedule keyboard volume change
+    currentGameManager.scheduleCountDown(countDown, setTimeToStart);
 
     // Schedule playback
-    instrumentPlayer.setInstrument('acoustic_grand_piano');
-    const handlers: (Player | NullSoundFontPlayerNoteAudio)[] = [];
     const playbackNotes = getPlaybackNotes(tracks, playbackChannel);
-    playbackNotes.forEach(note => {
-      Tone.Transport.schedule(() => {
-        const handler = instrumentPlayer.playNoteWithDuration(
-          note.midi,
-          note.time + delayedStartTime,
-          note.duration,
-          // TODO: this should be done in the JSON file
-          note.velocity * 0.5
-        );
-        handlers.push(handler);
-        // Schedule 1 sec before the note play
-      }, note.time + delayedStartTime - Tone.now() - 1);
-    });
+    currentGameManager.schedulePlaybackAudio(instrumentPlayer, playbackNotes);
 
-    // Score update
-    const scoreHandler = setInterval(() => {
-      // stop updating score if game has ended
-      if (gameEndRef.current) {
-        clearInterval(scoreHandler);
-        return;
-      }
+    // Set up score manager
+    currentGameManager.setUpScoreManager(playerNotes, setScore);
 
-      // game has not started, so don't increment score yet
-      if (Tone.now() - delayedStartTime < 0) {
-        return;
-      }
-
-      const currentlyPressed = new Set(pressedNotes.current);
-
-      // get set of notes that should be pressed right now from playerNotes
-      // we use refs here to reduce computation workload during each callback
-      const [correctNotes, index] = getNotesAtTimeFromNotes(
-        Tone.now() - delayedStartTime,
-        playerNotes,
-        prevIndexInMIDI.current
-      );
-
-      // if both sets of notes are equal
-      setScore((prevScore: Score) => ({
-        correct:
-          prevScore.correct + (isEqual(currentlyPressed, correctNotes) ? 1 : 0),
-        total: prevScore.total + 1,
-      }));
-      prevIndexInMIDI.current = index;
-    }, 500);
+    // Schedule ending screen
+    currentGameManager.scheduleEndingScreen(songDuration, setGameEnd);
 
     return () => {
-      Tone.Transport.cancel();
-      Tone.Transport.stop();
-      Tone.Transport.position = 0;
-      handlers.forEach(handler => {
-        handler.stop();
-      });
-      clearInterval(scoreHandler);
+      currentGameManager.cleanup();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   /*************** Callbacks *****************/
-
   const didPlayNote = useCallback(
     (note: number, playedBy: number) => {
-      if (playedBy === me) {
-        pressedNotes.current.add(note);
-      }
-      handleNotePlay(note, playedBy);
+      gameManager.current.handleNotePlay(note, playedBy, me);
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [me]
   );
 
   const didStopNote = useCallback(
     (note: number, playedBy: number) => {
-      if (playedBy === me) {
-        pressedNotes.current.delete(note);
-      }
-      handleNoteStop(note, playedBy);
+      gameManager.current.handleNoteStop(note, playedBy, me);
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [me]
   );
 

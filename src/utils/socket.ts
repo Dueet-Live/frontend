@@ -126,12 +126,10 @@ export function joinRoom(id: string) {
 }
 
 export function playNote(note: number) {
-  // console.log(`Send ${note} start`)
   socket.emit(NOTE_PLAYED, { note, event: 'keydown' });
 }
 
 export function stopNote(note: number) {
-  // console.log(`Send ${note} stop`)
   socket.emit(NOTE_PLAYED, { note, event: 'keyup' });
 }
 

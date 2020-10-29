@@ -50,6 +50,7 @@ const SmartPiano: React.FC<Props> = ({
   const notesManagersRef = useRef(
     indexToNotesMap.map(indexToNotes => new NotesManager(indexToNotes))
   );
+  // Only consist of my notes
   const [playingNotes, setPlayingNotes] = useState<PlayingNote[]>([]);
 
   // Used for touchscreen input
@@ -203,7 +204,7 @@ const SmartPiano: React.FC<Props> = ({
     setUseTouchEvents(true);
     setTouchedIndexes(getTouchedIndexes(event.touches));
     console.log(
-      `(Parent) Touch start ${Array.from(touchedIndexes.toString())}`
+      `(Parent) Touch start ${Array.from(touchedIndexes).toString()}`
     );
   };
 
