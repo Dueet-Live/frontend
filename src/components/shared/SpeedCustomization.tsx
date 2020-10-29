@@ -23,7 +23,7 @@ const SpeedCustomization: React.FC<Props> = ({ speed, setSpeed }) => {
       <Typography>Speed</Typography>
       <Slider
         step={0.25}
-        min={0.25}
+        min={0.5}
         max={1.5}
         value={speed}
         valueLabelDisplay="on"
