@@ -17,6 +17,7 @@ import useSong from '../../utils/useSong';
 import { FlyingNotesHandle } from '../Game/FlyingNotes';
 import GameView from '../Game/GameView';
 import { Score } from '../Game/types';
+import { sendGAEvent } from '../GoogleAnalytics';
 import FreePlayPiano from '../Piano/TraditionalPiano/FreePlayPiano';
 import DuetLobby from './DuetLobby';
 import DuetRoomHeader from './DuetRoomHeader';
@@ -104,6 +105,19 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
 
     fetchSongMIDI();
   }, [piece]);
+
+  useEffect(() => {
+    if (view !== 'duet.play') {
+      return;
+    }
+
+    sendGAEvent({
+      category: 'Duet',
+      action: 'Play',
+      label: chosenSong?.name,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [view]);
 
   const friendId = getFriendId(roomState, playerId);
   const myPart = getMyPart(roomState, playerId);

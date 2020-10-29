@@ -4,10 +4,12 @@ import DuetHome from '../pages/DuetHome';
 import DuetPlay from '../pages/DuetPlay';
 import Home from '../pages/Home';
 import Solo from '../pages/Solo';
+import GoogleAnalytics from './GoogleAnalytics';
 
 const AppRouter: React.FC = () => {
   return (
     <BrowserRouter>
+      <GoogleAnalytics />
       <Switch>
         <Route exact path="/">
           <Home />
