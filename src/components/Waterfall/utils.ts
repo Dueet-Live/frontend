@@ -1,5 +1,8 @@
-import { Header } from '../../types/MidiJSON';
+import { Header, Note } from '../../types/MidiJSON';
+import { getPrefixOfNote } from '../../utils/getPrefixOfNote';
+import { getNoteNamePrefixToIndexMap } from '../../utils/getNoteNamePrefixToIndexMap';
 import { FallingNote } from './FallingNote';
+import { IndexedNote } from './types';
 
 const DEFAULT_NOTE_DIVISION = 4;
 /**
@@ -67,4 +70,16 @@ const drawRoundRect = (
   ctx.closePath();
 
   ctx.fill();
+};
+
+export const getIndexedNotesFromNotes = (notes: Note[]) => {
+  const notePrefixToIndexMap = getNoteNamePrefixToIndexMap();
+  return notes.map(note => {
+    const notePrefix = getPrefixOfNote(note.name);
+    return {
+      index: notePrefixToIndexMap.get(notePrefix),
+      time: note.time,
+      duration: note.duration,
+    } as IndexedNote;
+  });
 };

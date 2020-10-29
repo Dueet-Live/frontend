@@ -1,5 +1,4 @@
-import { assert } from 'console';
-import { getLetterOfNote } from '../../../utils/getLetterOfNote';
+import { getPrefixOfNote } from '../../../utils/getPrefixOfNote';
 import { getNoteNamePrefixToIndexMap } from '../../../utils/getNoteNamePrefixToIndexMap';
 import { MappedNote } from '../types/mappedNote';
 
@@ -19,8 +18,8 @@ export const getIndexToNotesMap = (notes: NamedNote[]) => {
   const map = startKeyboardNotes.map(note => [note]);
 
   for (let note of notes) {
-    const letter = getLetterOfNote(note.name);
-    const index = notePrefixMap.get(letter)!;
+    const prefix = getPrefixOfNote(note.name);
+    const index = notePrefixMap.get(prefix)!;
 
     const notesAtIndex = map[index];
     const lastAddedNoteAtIndex = notesAtIndex[notesAtIndex.length - 1];
@@ -44,7 +43,7 @@ const NUM_UNIQUE_NOTES_IN_OCTAVE = 12;
 const NUM_INDICES = 7;
 
 const DEFAULT_MIDI_VALUE = [60, 62, 64, 65, 67, 69, 71];
-assert(
+console.assert(
   NUM_INDICES === DEFAULT_MIDI_VALUE.length,
   "Default values' length do not match"
 );
@@ -59,8 +58,8 @@ const getStartingKeyboardNotes = (notes: NamedNote[]) => {
 
   for (let i = 0; i < notes.length && numNotesLeftToFill > 0; i++) {
     const currentNote = notes[i];
-    const letter = getLetterOfNote(currentNote.name);
-    const index = notePrefixMap.get(letter);
+    const prefix = getPrefixOfNote(currentNote.name);
+    const index = notePrefixMap.get(prefix);
 
     if (mapping[index!] === null) {
       mapping[index!] = currentNote.midi;

@@ -1,4 +1,3 @@
-import { assert } from 'console';
 import { MappedNote } from '../types/mappedNote';
 import { Queue } from './Queue';
 
@@ -17,10 +16,10 @@ export class NotesManager {
    * @param timeElapsed Amount of time that has elapsed since the start of the first note.
    */
   manage(timeElapsed: number) {
-    assert(!this.notes.isEmpty(), ERROR_MSG);
+    console.assert(!this.notes.isEmpty(), ERROR_MSG);
     while (this.notes.peek()!.expiry < timeElapsed) {
       this.notes.pop();
-      assert(!this.notes.isEmpty(), ERROR_MSG);
+      console.assert(!this.notes.isEmpty(), ERROR_MSG);
     }
   }
 
@@ -30,7 +29,7 @@ export class NotesManager {
    * Note that the value returned may not be updated. To ensure that it is updated, call `manage` first.
    */
   get firstNote() {
-    assert(!this.notes.isEmpty(), ERROR_MSG);
+    console.assert(!this.notes.isEmpty(), ERROR_MSG);
     return this.notes.peek()!;
   }
 }

@@ -4,9 +4,10 @@ import {
   SmartKeyboardDimension,
   TraditionalKeyboardDimension,
 } from '../../types/keyboardDimension';
-import { Note, SmartNote } from '../../types/MidiJSON';
+import { Note } from '../../types/MidiJSON';
 import { Dimensions } from '../../utils/useDimensions';
 import Waterfall from '../Waterfall';
+import { IndexedNote } from '../Waterfall/types';
 import GameEndView from './GameEndView';
 
 type Props = {
@@ -17,7 +18,7 @@ type Props = {
   startTime: number;
   lookAheadTime: number; // Unchanged
   keyboardDimension: SmartKeyboardDimension | TraditionalKeyboardDimension;
-  playerNotes: SmartNote[] | Note[]; // Unchanged
+  playerNotes: IndexedNote[] | Note[]; // Unchanged
 };
 
 const GameMiddleView: React.FC<Props> = props => {
@@ -45,7 +46,7 @@ const GameMiddleView: React.FC<Props> = props => {
           startTime={startTime}
           lookAheadTime={lookAheadTime}
           keyboardDimension={props.keyboardDimension as SmartKeyboardDimension}
-          notes={props.playerNotes as SmartNote[]}
+          notes={props.playerNotes as IndexedNote[]}
           isSmart={showSmartPiano}
         />
       );

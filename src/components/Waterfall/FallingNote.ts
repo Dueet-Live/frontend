@@ -1,6 +1,7 @@
-import { Note, SmartNote } from '../../types/MidiJSON';
+import { Note } from '../../types/MidiJSON';
 import isAccidentalNote from '../Piano/utils/isAccidentalNote';
 import {
+  IndexedNote,
   KeyOffsetInfo,
   SmartKeyOffsetInfo,
   TraditionalKeyOffsetInfo,
@@ -31,24 +32,24 @@ export class FallingNote {
     this.fallingDistance = fallingDistance;
   }
 
-  static createFromSmartNoteInfo(
-    note: SmartNote,
+  static createFromIndexedNoteInfo(
+    note: IndexedNote,
     speed: number,
     fallingDistance: number,
     keyOffsetInfo: SmartKeyOffsetInfo,
     currentTime: number
   ) {
-    const { smartKey, time, duration } = note;
+    const { index, time, duration } = note;
     const { keyWidth, leftMarginMap } = keyOffsetInfo;
-    if (leftMarginMap[note.smartKey] === undefined) {
+    if (leftMarginMap[index] === undefined) {
       console.log('smart falling note our of range', note, leftMarginMap);
     }
     const width = keyWidth - MARGIN * 2;
-    const horizontalPos = leftMarginMap[smartKey] + MARGIN;
+    const horizontalPos = leftMarginMap[index] + MARGIN;
     const length = duration * speed;
     const verticalPos = -length + (currentTime - time) * speed;
     return new FallingNote(
-      smartKey,
+      index,
       width,
       horizontalPos,
       length,

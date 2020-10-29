@@ -6,14 +6,13 @@ import { Player } from 'tone';
 import { Part } from '../../types/messages';
 import { NullSoundFontPlayerNoteAudio } from '../Piano/InstrumentPlayer/AudioPlayer';
 import { useDimensions } from '../../utils/useDimensions';
-import { calculateLookAheadTime } from '../Waterfall/utils';
-import { MidiJSON, Note, SmartNote } from '../../types/MidiJSON';
-import ProgressBar from './ProgressBar';
 import {
-  calculateSongDuration,
-  getPlaybackNotes,
-  getSmartNotes,
-} from '../../utils/songInfo';
+  calculateLookAheadTime,
+  getIndexedNotesFromNotes,
+} from '../Waterfall/utils';
+import { MidiJSON, Note } from '../../types/MidiJSON';
+import ProgressBar from './ProgressBar';
+import { calculateSongDuration, getPlaybackNotes } from '../../utils/songInfo';
 import InstrumentPlayer from '../Piano/InstrumentPlayer';
 import { calculateSmartKeyboardDimension } from '../../utils/calculateSmartKeyboardDimension';
 import { calculateTraditionalKeyboardDimensionForGame } from '../../utils/calculateTraditionalKeyboardDimension';
@@ -23,6 +22,7 @@ import GameTraditionalPiano from './GameTraditionalPiano';
 import GameSmartPiano from './GameSmartPiano';
 import { getIndexToNotesMap } from '../Piano/utils/getKeyToNotesMap';
 import { MappedNote } from '../Piano/types/mappedNote';
+import { IndexedNote } from '../Waterfall/types';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -92,9 +92,9 @@ const GameView: React.FC<Props> = ({
     []
   );
 
-  const playerNotes = useMemo<Note[] | SmartNote[]>(() => {
+  const playerNotes = useMemo<Note[] | IndexedNote[]>(() => {
     if (showSmartPiano) {
-      return getSmartNotes(normalPlayerNotes, mappingChangeEvents);
+      return getIndexedNotesFromNotes(normalPlayerNotes);
     } else {
       return normalPlayerNotes;
     }
@@ -103,7 +103,7 @@ const GameView: React.FC<Props> = ({
 
   /*************** Initialise instrument *****************/
   // TODO: schedule change (if have time), now take the first value only
-  const keyboardVolume = playerNotes[0].velocity;
+  const keyboardVolume = normalPlayerNotes[0].velocity;
   const instrumentPlayer = useMemo(
     () => new InstrumentPlayer(keyboardVolume),
     // eslint-disable-next-line react-hooks/exhaustive-deps

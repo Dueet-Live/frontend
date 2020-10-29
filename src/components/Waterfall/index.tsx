@@ -7,13 +7,14 @@ import {
 import { Dimensions } from '../../utils/useDimensions';
 import { FallingNote } from './FallingNote';
 import {
+  IndexedNote,
   KeyOffsetInfo,
   SmartKeyOffsetInfo,
   TraditionalKeyOffsetInfo,
 } from './types';
 import { drawFallingNote } from './utils';
 import * as Tone from 'tone';
-import { Note, SmartNote } from '../../types/MidiJSON';
+import { Note } from '../../types/MidiJSON';
 import { getOffsetMapForSmartKeyboard } from '../../utils/calculateSmartKeyboardDimension';
 import {
   calculateBlackKeyWidth,
@@ -27,7 +28,7 @@ type Props = {
 } & (
   | {
       keyboardDimension: SmartKeyboardDimension;
-      notes: SmartNote[];
+      notes: IndexedNote[];
       isSmart: true;
     }
   | {
@@ -42,13 +43,6 @@ const useStyles = makeStyles(theme => ({
     display: 'block',
   },
 }));
-
-/*
-TODO:
-- remove smartnote, use isSmart as prop
-- add a function in util to determine the notes that should be used
-- pass in normal notes LOL
-*/
 
 const Waterfall: React.FC<Props> = props => {
   const classes = useStyles();
@@ -101,7 +95,7 @@ const Waterfall: React.FC<Props> = props => {
         let newNote: FallingNote;
         if (props.isSmart) {
           const note = props.notes[firstHiddenNoteIndex.current];
-          newNote = FallingNote.createFromSmartNoteInfo(
+          newNote = FallingNote.createFromIndexedNoteInfo(
             note,
             speed,
             canvas.height,
