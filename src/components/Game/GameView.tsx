@@ -299,4 +299,4 @@ const GameView: React.FC<Props> = ({
   );
 };
 
-export default GameView;
+export default React.memo(GameView, () => true);
