@@ -1,5 +1,6 @@
 import { assert } from 'console';
 import { getLetterOfNote } from '../../../utils/getLetterOfNote';
+import { getNoteNamePrefixToIndexMap } from '../../../utils/getNoteNamePrefixToIndexMap';
 import { MappedNote } from '../types/mappedNote';
 
 type NamedNote = {
@@ -11,9 +12,7 @@ type NamedNote = {
 
 /** Gets the notes that belong to each index, and returns the list of result as a map. */
 export const getIndexToNotesMap = (notes: NamedNote[]) => {
-  const notePrefixMap = new Map(
-    NOTE_NAME_PREFIXES.map((prefix, index) => [prefix, index])
-  );
+  const notePrefixMap = getNoteNamePrefixToIndexMap();
 
   // initialise map with mappings
   const startKeyboardNotes = getStartingKeyboardNotes(notes);
@@ -43,12 +42,11 @@ export const getIndexToNotesMap = (notes: NamedNote[]) => {
 
 const NUM_UNIQUE_NOTES_IN_OCTAVE = 12;
 const NUM_INDICES = 7;
-const NOTE_NAME_PREFIXES = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
+
 const DEFAULT_MIDI_VALUE = [60, 62, 64, 65, 67, 69, 71];
 assert(
-  NUM_INDICES === NOTE_NAME_PREFIXES.length &&
-    NOTE_NAME_PREFIXES.length === DEFAULT_MIDI_VALUE.length,
-  'Default values length do not match'
+  NUM_INDICES === DEFAULT_MIDI_VALUE.length,
+  "Default values' length do not match"
 );
 const FIRST_MIDI_NOTE_OF_FIRST_OCTAVE = 12;
 const ENDING_BUFFER_TIME = 10000; // determines how long the very last mapping of notes last for
@@ -56,9 +54,7 @@ const ENDING_BUFFER_TIME = 10000; // determines how long the very last mapping o
 /** Returns an initial mapping of midi notes to indices (of the array). */
 const getStartingKeyboardNotes = (notes: NamedNote[]) => {
   let numNotesLeftToFill = NUM_INDICES;
-  const notePrefixMap = new Map(
-    NOTE_NAME_PREFIXES.map((prefix, index) => [prefix, index])
-  );
+  const notePrefixMap = getNoteNamePrefixToIndexMap();
   const mapping: Array<number | null> = Array(numNotesLeftToFill).fill(null);
 
   for (let i = 0; i < notes.length && numNotesLeftToFill > 0; i++) {
