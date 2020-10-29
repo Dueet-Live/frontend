@@ -54,7 +54,7 @@ const GameSmartPiano: React.FC<Props> = ({
 function areEqual(prevProps: Props, nextProps: Props) {
   return (
     prevProps.keyWidth === nextProps.keyWidth &&
-    prevProps.indexToNotesMap === nextProps.indexToNotesMap
+    prevProps.startTime === nextProps.startTime
   );
 }
 

@@ -267,7 +267,7 @@ const GameView: React.FC<Props> = ({
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [keyboardDimension, indexToNotesMap]);
+  }, [keyboardDimension, delayedStartTime]);
 
   return (
     <div className={classes.root}>
