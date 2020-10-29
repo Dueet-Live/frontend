@@ -1,5 +1,5 @@
 import { Typography } from '@material-ui/core';
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   SmartKeyboardDimension,
   TraditionalKeyboardDimension,
@@ -8,6 +8,7 @@ import { Note } from '../../types/MidiJSON';
 import { Dimensions } from '../../utils/useDimensions';
 import Waterfall from '../Waterfall';
 import { IndexedNote } from '../Waterfall/types';
+import { getIndexedNotesFromNotes } from '../Waterfall/utils';
 import GameEndView from './GameEndView';
 
 type Props = {
@@ -18,7 +19,7 @@ type Props = {
   startTime: number;
   lookAheadTime: number; // Unchanged
   keyboardDimension: SmartKeyboardDimension | TraditionalKeyboardDimension;
-  playerNotes: IndexedNote[] | Note[]; // Unchanged
+  normalPlayerNotes: Note[]; // Unchanged
 };
 
 const GameMiddleView: React.FC<Props> = props => {
@@ -29,7 +30,18 @@ const GameMiddleView: React.FC<Props> = props => {
     middleBoxDimensions,
     startTime,
     lookAheadTime, // Unchanged
+    normalPlayerNotes, // Unchanged
   } = props;
+
+  const playerNotes = useMemo<Note[] | IndexedNote[]>(() => {
+    if (showSmartPiano) {
+      return getIndexedNotesFromNotes(normalPlayerNotes);
+    } else {
+      return normalPlayerNotes;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   if (timeToStart !== 0) {
     return (
       <Typography variant="h1" align="center" color="primary">
@@ -46,7 +58,7 @@ const GameMiddleView: React.FC<Props> = props => {
           startTime={startTime}
           lookAheadTime={lookAheadTime}
           keyboardDimension={props.keyboardDimension as SmartKeyboardDimension}
-          notes={props.playerNotes as IndexedNote[]}
+          notes={playerNotes as IndexedNote[]}
           isSmart={showSmartPiano}
         />
       );
@@ -59,7 +71,7 @@ const GameMiddleView: React.FC<Props> = props => {
           keyboardDimension={
             props.keyboardDimension as TraditionalKeyboardDimension
           }
-          notes={props.playerNotes as Note[]}
+          notes={playerNotes as Note[]}
           isSmart={showSmartPiano}
         />
       );
