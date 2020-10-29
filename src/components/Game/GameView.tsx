@@ -156,7 +156,8 @@ const GameView: React.FC<Props> = ({
           note.midi,
           note.time + delayedStartTime,
           note.duration,
-          note.velocity
+          // TODO: this should be done in the JSON file
+          note.velocity * 0.5
         );
         handlers.push(handler);
         // Schedule 1 sec before the note play
