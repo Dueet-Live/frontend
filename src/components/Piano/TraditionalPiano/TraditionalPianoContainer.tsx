@@ -16,7 +16,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const PianoContainer: React.FC<Props> = ({ children }) => {
+const TraditionalPianoContainer: React.FC<Props> = ({ children }) => {
   const classes = useStyles();
 
   return (
@@ -26,4 +26,4 @@ const PianoContainer: React.FC<Props> = ({ children }) => {
   );
 };
 
-export default PianoContainer;
+export default TraditionalPianoContainer;
