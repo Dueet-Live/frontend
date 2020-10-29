@@ -91,13 +91,13 @@ export function getKeyboardShortcutForNote(
 }
 
 export const shortcutsForSmartPiano = [
-  ['A'],
   ['S'],
   ['D'],
   ['F'],
   ['J'],
   ['K'],
   ['L'],
+  [';'],
 ];
 
 // GAME MODE - Smart Piano (desktop view only)

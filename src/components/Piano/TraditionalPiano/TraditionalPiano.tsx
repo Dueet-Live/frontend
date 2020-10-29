@@ -3,7 +3,7 @@ import { useTheme, useMediaQuery } from '@material-ui/core';
 import { getTraditionalKeyboardMapping } from '../../../utils/getKeyboardShorcutsMapping';
 import OctaveShiftKey from './OctaveShiftKey';
 import TraditionalKeyboard from './TraditionalKeyboard';
-import PianoContainer from '../PianoContainer';
+import TraditionalPianoContainer from './TraditionalPianoContainer';
 import { TraditionalKeyboardDimension } from '../../../types/keyboardDimension';
 import InstrumentPlayer from '../InstrumentPlayer';
 
@@ -63,7 +63,7 @@ const TraditionalPiano: React.FC<Props> = ({
     : {};
 
   return (
-    <PianoContainer>
+    <TraditionalPianoContainer>
       {includeOctaveShift && (
         <OctaveShiftKey
           type="left"
@@ -91,7 +91,7 @@ const TraditionalPiano: React.FC<Props> = ({
           disabled={endNote === highestMidiNote}
         />
       )}
-    </PianoContainer>
+    </TraditionalPianoContainer>
   );
 };
 
