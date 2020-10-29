@@ -17,23 +17,23 @@ export const getIndexToNotesMap = (notes: NamedNote[]) => {
   const startKeyboardNotes = getStartingKeyboardNotes(notes);
   const map = startKeyboardNotes.map(note => [note]);
 
+  let prevNote = notes[0];
   for (let note of notes) {
     const prefix = getPrefixOfNote(note.name);
     const index = notePrefixMap.get(prefix)!;
 
     const notesAtIndex = map[index];
     const lastAddedNoteAtIndex = notesAtIndex[notesAtIndex.length - 1];
-    if (lastAddedNoteAtIndex.midi === note.midi) {
-      continue;
-    }
 
-    const expiry = note.duration + note.time;
+    const expiry = prevNote.time + prevNote.duration;
     if (isMoreThanOctaveChange(lastAddedNoteAtIndex.midi, note.midi)) {
       const newOctave = getOctave(note.midi);
       updateMap(map, newOctave, expiry);
-    } else {
+    } else if (lastAddedNoteAtIndex.midi !== note.midi) {
       updateNotesAtIndex(notesAtIndex, note.midi, expiry);
     }
+
+    prevNote = note;
   }
 
   return map;
@@ -48,7 +48,7 @@ console.assert(
   "Default values' length do not match"
 );
 const FIRST_MIDI_NOTE_OF_FIRST_OCTAVE = 12;
-const ENDING_BUFFER_TIME = 10000; // determines how long the very last mapping of notes last for
+const ENDING_BUFFER_TIME = 10; // determines how long the very last mapping of notes last for
 
 /** Returns an initial mapping of midi notes to indices (of the array). */
 const getStartingKeyboardNotes = (notes: NamedNote[]) => {
@@ -82,7 +82,9 @@ const getStartingKeyboardNotes = (notes: NamedNote[]) => {
 };
 
 const getOctave = (midi: number) =>
-  (midi - FIRST_MIDI_NOTE_OF_FIRST_OCTAVE) / NUM_UNIQUE_NOTES_IN_OCTAVE;
+  Math.floor(
+    (midi - FIRST_MIDI_NOTE_OF_FIRST_OCTAVE) / NUM_UNIQUE_NOTES_IN_OCTAVE
+  );
 
 /** Changes `midi` value such that it is shifted by `numOctaves`. */
 const changeByNumOctaves = (midi: number, numOctaves: number) =>
@@ -95,7 +97,7 @@ const changeToOctave = (midi: number, octave: number) => {
 };
 
 const isMoreThanOctaveChange = (prevMidi: number, currMidi: number) =>
-  Math.abs(prevMidi - currMidi) > NUM_UNIQUE_NOTES_IN_OCTAVE;
+  Math.abs(prevMidi - currMidi) + 1 > NUM_UNIQUE_NOTES_IN_OCTAVE;
 
 /**
  * Updates `map` by adding more notes to each index such that they are found at `octave`
