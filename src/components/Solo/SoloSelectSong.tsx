@@ -13,6 +13,7 @@ import { choosePiece } from '../../utils/socket';
 import useGenres from '../../utils/useGenres';
 import useSongs from '../../utils/useSongs';
 import GenreCard from '../GenreCard';
+import { sendGAEvent } from '../GoogleAnalytics';
 import SpeedCustomization from '../shared/SpeedCustomization';
 import SongCard from '../SongCard';
 import SoloReadyButton from './SoloReadyButton';
@@ -162,7 +163,14 @@ const SoloSelectSong: React.FC<Props> = ({
           </Typography>
           <SoloReadyButton
             disabled={chosenSong === null || downloadingSong}
-            handleStart={handleStart}
+            handleStart={() => {
+              sendGAEvent({
+                category: 'Solo',
+                action: 'Play',
+                label: chosenSong?.name,
+              });
+              handleStart();
+            }}
           >
             {downloadingSong ? 'Loading' : 'Play'}
           </SoloReadyButton>
