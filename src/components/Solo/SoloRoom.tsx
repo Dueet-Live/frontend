@@ -2,14 +2,15 @@ import { Box, makeStyles } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
 import songsAPI from '../../api/songs';
 import { RoomContext, RoomView } from '../../contexts/RoomContext';
+import { MidiJSON } from '../../types/MidiJSON';
 import { RoomInfo } from '../../types/roomInfo';
 import useSong from '../../utils/useSong';
 import FreePlayPiano from '../Piano/TraditionalPiano/FreePlayPiano';
 import SoloSelectSong from './SoloSelectSong';
 import { startAudioContext } from '../../utils/toneContext';
 import GameView from '../Game/GameView';
+import { Score } from '../Game/types';
 import SoloRoomHeader from './SoloRoomHeader';
-import { MidiJSON } from '../../types/MidiJSON';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -44,6 +45,7 @@ const SoloRoom: React.FC = () => {
   const [chosenSongMIDI, setChosenSongMIDI] = useState<MidiJSON | undefined>();
   const [view, setView] = useState<RoomView>('solo.select');
   const [songSelectionGenre, setSongSelectionGenre] = useState('');
+  const [score, setScore] = useState<Score>({ correct: 0, total: 0 });
 
   const { piece } = roomState;
   const chosenSong = useSong(piece);
@@ -91,7 +93,7 @@ const SoloRoom: React.FC = () => {
     }
 
     if (view === 'solo.play' && !!chosenSongMIDI) {
-      return <GameView chosenSongMIDI={chosenSongMIDI} />;
+      return <GameView chosenSongMIDI={chosenSongMIDI} setScore={setScore} />;
     }
 
     return <></>;
@@ -108,10 +110,12 @@ const SoloRoom: React.FC = () => {
         {/* header */}
         <div className={classes.header}>
           <SoloRoomHeader
+            score={score}
             view={view}
             setView={setView}
             selectedGenre={songSelectionGenre}
             setGenre={setSongSelectionGenre}
+            resetScore={() => setScore({ correct: 0, total: 0 })}
           />
         </div>
         {/* main body */}

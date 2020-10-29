@@ -4,13 +4,15 @@ import {
   IconButton,
   makeStyles,
   Typography,
+  useMediaQuery,
 } from '@material-ui/core';
 import { ArrowBack, MusicNoteOutlined } from '@material-ui/icons';
 import React, { useContext } from 'react';
 import { useHistory } from 'react-router-dom';
-import { RoomView, RoomContext } from '../../contexts/RoomContext';
+import { RoomContext, RoomView } from '../../contexts/RoomContext';
 import SettingsIcon from '../../icons/SettingsIcon';
 import useSong from '../../utils/useSong';
+import { Score } from '../Game/types';
 import RoomHeader from '../shared/RoomHeader';
 
 const useStyles = makeStyles(theme => ({
@@ -35,17 +37,21 @@ const useStyles = makeStyles(theme => ({
 }));
 
 type Props = {
+  score: Score;
   view: RoomView;
   selectedGenre: string;
   setGenre: (genre: string) => void;
   setView: (roomView: RoomView) => void;
+  resetScore: () => void;
 };
 
 const SoloRoomHeader: React.FC<Props> = ({
+  score,
   view,
   selectedGenre,
   setGenre,
   setView,
+  resetScore,
 }) => {
   const classes = useStyles();
   const history = useHistory();
@@ -53,6 +59,7 @@ const SoloRoomHeader: React.FC<Props> = ({
     roomInfo: { piece },
   } = useContext(RoomContext);
   const chosenSong = useSong(piece);
+  const hideBackText = useMediaQuery('(min-width:400px)');
 
   const backButton = () => {
     let backText = '';
@@ -74,9 +81,16 @@ const SoloRoomHeader: React.FC<Props> = ({
         if (view === 'solo.try') {
           backText = 'Song Selection';
         }
-        handleBack = () => setView('solo.select');
+        handleBack = () => {
+          resetScore();
+          setView('solo.select');
+        };
         break;
       }
+    }
+
+    if (!hideBackText) {
+      backText = '';
     }
 
     return (
@@ -96,11 +110,23 @@ const SoloRoomHeader: React.FC<Props> = ({
     }
 
     if (view === 'solo.play' && chosenSong !== null) {
+      const accuracy =
+        score.total === 0
+          ? 0
+          : ((score.correct / score.total) * 100).toFixed(0);
       return (
         <>
           <MusicNoteOutlined color="action" />
           <Typography variant="body1" color="textPrimary">
             {chosenSong.name}
+          </Typography>
+
+          <Typography
+            variant="h5"
+            color="textPrimary"
+            className={classes.header}
+          >
+            Accuracy: {accuracy}%
           </Typography>
         </>
       );

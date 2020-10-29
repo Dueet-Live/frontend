@@ -1,30 +1,34 @@
 import { makeStyles } from '@material-ui/core';
-import React, { useEffect, useMemo, useState } from 'react';
-import { noOp } from 'tone/build/esm/core/util/Interface';
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import * as Tone from 'tone';
 import { Player } from 'tone';
+import { noOp } from 'tone/build/esm/core/util/Interface';
+import { PlayerContext } from '../../contexts/PlayerContext';
+import { TraditionalKeyboardDimension } from '../../types/keyboardDimension';
 import { Part } from '../../types/messages';
-import { NullSoundFontPlayerNoteAudio } from '../Piano/InstrumentPlayer/AudioPlayer';
+import { MidiJSON, Note } from '../../types/MidiJSON';
+import { calculateSongDuration, getPlaybackNotes } from '../../utils/songInfo';
+import { calculateSmartKeyboardDimension } from '../../utils/calculateSmartKeyboardDimension';
+import { calculateTraditionalKeyboardDimensionForGame } from '../../utils/calculateTraditionalKeyboardDimension';
+import { isEqual } from '../../utils/setHelpers';
 import { useDimensions } from '../../utils/useDimensions';
+import InstrumentPlayer from '../Piano/InstrumentPlayer';
+import { NullSoundFontPlayerNoteAudio } from '../Piano/InstrumentPlayer/AudioPlayer';
 import {
   calculateLookAheadTime,
   getIndexedNotesFromNotes,
 } from '../Waterfall/utils';
-import { MidiJSON, Note } from '../../types/MidiJSON';
-import ProgressBar from './ProgressBar';
-import { calculateSongDuration, getPlaybackNotes } from '../../utils/songInfo';
-import InstrumentPlayer from '../Piano/InstrumentPlayer';
-import { calculateSmartKeyboardDimension } from '../../utils/calculateSmartKeyboardDimension';
-import { calculateTraditionalKeyboardDimensionForGame } from '../../utils/calculateTraditionalKeyboardDimension';
-import { TraditionalKeyboardDimension } from '../../types/keyboardDimension';
 import GameMiddleView from './GameMiddleView';
-import GameTraditionalPiano from './GameTraditionalPiano';
 import GameSmartPiano from './GameSmartPiano';
 import { getIndexToNotesMap } from '../Piano/utils/getKeyToNotesMap';
 import { MappedNote } from '../Piano/types/mappedNote';
 import { IndexedNote } from '../Waterfall/types';
+import GameTraditionalPiano from './GameTraditionalPiano';
+import ProgressBar from './ProgressBar';
+import { Score } from './types';
+import getNotesAtTimeFromNotes from './utils/getNotesAtTimeFromNotes';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles(() => ({
   root: {
     display: 'flex',
     flexDirection: 'column',
@@ -44,15 +48,16 @@ const useStyles = makeStyles(theme => ({
 
 type Props = {
   chosenSongMIDI: MidiJSON;
+  setScore: (update: (prevScore: Score) => Score) => void;
   myPart?: Part | null;
   showSmartPiano?: boolean;
   handleNotePlay?: (key: number, playerId: number) => void;
   handleNoteStop?: (key: number, playerId: number) => void;
-  handleScoreUpdate?: (newScore: number) => void /* tentative */;
 };
 
 const GameView: React.FC<Props> = ({
   chosenSongMIDI,
+  setScore,
   myPart,
   showSmartPiano = true,
   handleNotePlay = noOp,
@@ -64,6 +69,12 @@ const GameView: React.FC<Props> = ({
   const [gameEnd, setGameEnd] = useState(false);
   const countDown = 3;
   const [timeToStart, setTimeToStart] = useState(countDown);
+  const pressedNotes = useRef<Set<number>>(new Set());
+
+  // For scoring
+  const gameEndRef = useRef(false);
+  const prevIndexInMIDI = useRef(0);
+  const { me } = useContext(PlayerContext);
 
   /*************** Song information *****************/
   const { tracks, header } = chosenSongMIDI;
@@ -127,6 +138,12 @@ const GameView: React.FC<Props> = ({
       }, startTime - (countDown - 1 - i) - Tone.now());
     }
 
+    // Schedule ending screen
+    Tone.Transport.schedule(() => {
+      setGameEnd(true);
+      gameEndRef.current = true;
+    }, delayedStartTime + songDuration - Tone.now() + 0.1);
+
     // TODO: schedule keyboard volume change
 
     // Schedule playback
@@ -151,6 +168,38 @@ const GameView: React.FC<Props> = ({
       setGameEnd(true);
     }, delayedStartTime + songDuration - Tone.now() + 0.1);
 
+    // Score update
+    const scoreHandler = setInterval(() => {
+      // stop updating score if game has ended
+      if (gameEndRef.current) {
+        clearInterval(scoreHandler);
+        return;
+      }
+
+      // game has not started, so don't increment score yet
+      if (Tone.now() - delayedStartTime < 0) {
+        return;
+      }
+
+      const currentlyPressed = new Set(pressedNotes.current);
+
+      // get set of notes that should be pressed right now from playerNotes
+      // we use refs here to reduce computation workload during each callback
+      const [correctNotes, index] = getNotesAtTimeFromNotes(
+        Tone.now() - delayedStartTime,
+        normalPlayerNotes,
+        prevIndexInMIDI.current
+      );
+
+      // if both sets of notes are equal
+      setScore((prevScore: Score) => ({
+        correct:
+          prevScore.correct + (isEqual(currentlyPressed, correctNotes) ? 1 : 0),
+        total: prevScore.total + 1,
+      }));
+      prevIndexInMIDI.current = index;
+    }, 500);
+
     return () => {
       Tone.Transport.cancel();
       Tone.Transport.stop();
@@ -158,19 +207,23 @@ const GameView: React.FC<Props> = ({
       handlers.forEach(handler => {
         handler.stop();
       });
+      clearInterval(scoreHandler);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   /*************** Callbacks *****************/
   const didPlayNote = (note: number, playedBy: number) => {
-    // TODO: update score
-    console.log('Play', note, playedBy, Tone.now() - delayedStartTime);
+    if (playedBy === me) {
+      pressedNotes.current.add(note);
+    }
     handleNotePlay(note, playedBy);
   };
+
   const didStopNote = (note: number, playedBy: number) => {
-    // TODO: update score
-    console.log('Stop', note, playedBy, Tone.now() - delayedStartTime);
+    if (playedBy === me) {
+      pressedNotes.current.delete(note);
+    }
     handleNoteStop(note, playedBy);
   };
 
