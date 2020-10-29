@@ -19,7 +19,7 @@ type Props = {
 const GameSmartPiano: React.FC<Props> = ({
   instrumentPlayer, // Unchanged
   keyWidth,
-  indexToNotesMap,
+  indexToNotesMap, // Unchanged
   didStopNote, // Unchanged
   didPlayNote, // Unchanged
   startTime,

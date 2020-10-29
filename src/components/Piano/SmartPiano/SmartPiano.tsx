@@ -35,13 +35,13 @@ type Props = {
 };
 
 const SmartPiano: React.FC<Props> = ({
-  instrumentPlayer,
+  instrumentPlayer, // Unchanged
   keyWidth,
   keyHeight,
-  indexToNotesMap,
-  didPlayNote = noOp,
-  didStopNote = noOp,
-  keyboardMap,
+  indexToNotesMap, // Unchanged
+  didPlayNote = noOp, // Unchanged
+  didStopNote = noOp, // Unchanged
+  keyboardMap, // Unchanged
   startTime,
 }) => {
   const numOfSmartKeys = 7;
@@ -295,4 +295,12 @@ const SmartPiano: React.FC<Props> = ({
   );
 };
 
-export default SmartPiano;
+function areEqual(prevProps: Props, nextProps: Props) {
+  return (
+    prevProps.keyWidth === nextProps.keyWidth &&
+    prevProps.keyHeight === nextProps.keyHeight &&
+    prevProps.startTime === nextProps.startTime
+  );
+}
+
+export default React.memo(SmartPiano, areEqual);
