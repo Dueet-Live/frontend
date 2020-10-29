@@ -213,6 +213,7 @@ const GameView: React.FC<Props> = ({
   }, []);
 
   /*************** Callbacks *****************/
+
   const didPlayNote = (note: number, playedBy: number) => {
     if (playedBy === me) {
       pressedNotes.current.add(note);
