@@ -19,30 +19,37 @@ import { PlayingNote } from '../types/playingNote';
 import isRegularKey from '../utils/isRegularKey';
 import { default as SmartPianoKey } from './SmartPianoKey';
 import './SmartPiano.css';
+import { MappedNote } from '../types/mappedNote';
+import { NotesManager } from './NotesManager';
+import * as Tone from 'tone';
 
 type Props = {
   instrumentPlayer: InstrumentPlayer;
   keyWidth: number;
   keyHeight: number;
-  smartMapping: number[];
+  indexToNotesMap: MappedNote[][];
   didPlayNote?: (key: number, playerId: number) => void;
   didStopNote?: (key: number, playerId: number) => void;
   keyboardMap?: { [key: string]: number };
+  startTime: number;
 };
 
 const SmartPiano: React.FC<Props> = ({
   instrumentPlayer,
   keyWidth,
   keyHeight,
-  smartMapping,
+  indexToNotesMap,
   didPlayNote = noOp,
   didStopNote = noOp,
   keyboardMap,
+  startTime,
 }) => {
-  const prevMappingRef = useRef<number[]>([]);
   const numOfSmartKeys = 7;
   const { me, friend } = useContext(PlayerContext);
   const isDuetMode = friend !== null;
+  const notesManagersRef = useRef(
+    indexToNotesMap.map(indexToNotes => new NotesManager(indexToNotes))
+  );
   const [playingNotes, setPlayingNotes] = useState<PlayingNote[]>([]);
 
   // Used for touchscreen input
@@ -79,70 +86,46 @@ const SmartPiano: React.FC<Props> = ({
     [isDuetMode, me, didStopNote, instrumentPlayer]
   );
 
-  const getIndexFromNote = (note: number, mapping: number[]) => {
-    return mapping.indexOf(note);
-  };
-
-  useEffect(() => {
-    const prevMapping = prevMappingRef.current;
-    if (playingNotes.length !== 0) {
-      setPlayingNotes(playingNotes => {
-        return playingNotes.filter(playingNote => {
-          const prevNote = playingNote.note;
-          const prevIndex = getIndexFromNote(prevNote, prevMapping);
-          // Not present in previous mapping, newly tapped notes
-          if (prevIndex === -1) {
-            return true;
-          }
-          const currentNote = smartMapping[prevIndex];
-          if (currentNote !== prevNote) {
-            stopPlayingNote(prevNote, me);
-            return false;
-          }
-          return true;
-        });
-      });
-    }
-
-    prevMappingRef.current = smartMapping;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [smartMapping, me, stopPlayingNote]);
-
   const startPlayingSmartKey = useCallback(
     (index: number, playerId: number) => {
-      const note = smartMapping[index];
+      // update mapping before getting note
+      const timeElapsed = Tone.now() - startTime;
+      notesManagersRef.current[index].manage(timeElapsed);
 
-      // Stop previous note at this index (if any)
-      playingNotes.forEach(playingNote => {
-        if (playingNote.smartKey === index && playingNote.note !== note) {
-          stopPlayingNote(playingNote.note, playerId);
-        }
-      });
+      // get note
+      const note = notesManagersRef.current[index].firstNote;
 
-      startPlayingNote(note, playerId);
+      startPlayingNote(note.midi, playerId);
       setPlayingNotes(playingNotes => {
         const filtered = playingNotes.filter(
           playingNote => playingNote.smartKey !== index
         );
-        return [...filtered, { note, playerId, smartKey: index }];
+        return [
+          ...filtered,
+          {
+            note: note.midi,
+            playerId: playerId,
+            smartKey: index,
+          } as PlayingNote,
+        ];
       });
     },
-    [startPlayingNote, stopPlayingNote, smartMapping, playingNotes]
+    [startPlayingNote, startTime]
   );
 
   const stopPlayingSmartKey = useCallback(
     (index: number, playerId: number) => {
-      const note = smartMapping[index];
-      stopPlayingNote(note, playerId);
+      const note = notesManagersRef.current[index].firstNote;
+      stopPlayingNote(note.midi, playerId);
 
       setPlayingNotes(playingNotes => {
         return playingNotes.filter(
           playingNote =>
-            playingNote.note !== note || playingNote.playerId !== playerId
+            playingNote.note !== note.midi || playingNote.playerId !== playerId
         );
       });
     },
-    [stopPlayingNote, smartMapping]
+    [stopPlayingNote]
   );
 
   /* Handle friends' notes */
@@ -285,15 +268,12 @@ const SmartPiano: React.FC<Props> = ({
     >
       {Array(numOfSmartKeys)
         .fill(0)
-        .map((_, index) => index)
-        .map(index => {
-          const note = smartMapping[index];
+        .map((_, index) => {
           return (
             <SmartPianoKey
               useTouchEvents={useTouchEvents}
               index={index}
               key={index}
-              note={note}
               keyWidth={keyWidth}
               keyHeight={keyHeight}
               playingNote={playingNotes.filter(

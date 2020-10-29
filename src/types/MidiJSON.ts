@@ -3,6 +3,7 @@ export type Note = {
   duration: number;
   midi: number;
   velocity: number;
+  name: string;
 };
 
 type TempoEvent = {

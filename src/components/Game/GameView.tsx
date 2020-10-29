@@ -6,23 +6,23 @@ import { noOp } from 'tone/build/esm/core/util/Interface';
 import { PlayerContext } from '../../contexts/PlayerContext';
 import { TraditionalKeyboardDimension } from '../../types/keyboardDimension';
 import { Part } from '../../types/messages';
-import { MidiJSON, Note, SmartNote } from '../../types/MidiJSON';
+import { MidiJSON, Note } from '../../types/MidiJSON';
+import { calculateSongDuration, getPlaybackNotes } from '../../utils/songInfo';
 import { calculateSmartKeyboardDimension } from '../../utils/calculateSmartKeyboardDimension';
 import { calculateTraditionalKeyboardDimensionForGame } from '../../utils/calculateTraditionalKeyboardDimension';
 import { isEqual } from '../../utils/setHelpers';
-import {
-  calculateSongDuration,
-  getPlaybackNotes,
-  getSmartMappingChangeEvents,
-  getSmartNotes,
-  SmartMappingChangeEvent,
-} from '../../utils/songInfo';
 import { useDimensions } from '../../utils/useDimensions';
 import InstrumentPlayer from '../Piano/InstrumentPlayer';
 import { NullSoundFontPlayerNoteAudio } from '../Piano/InstrumentPlayer/AudioPlayer';
-import { calculateLookAheadTime } from '../Waterfall/utils';
+import {
+  calculateLookAheadTime,
+  getIndexedNotesFromNotes,
+} from '../Waterfall/utils';
 import GameMiddleView from './GameMiddleView';
 import GameSmartPiano from './GameSmartPiano';
+import { getIndexToNotesMap } from '../Piano/utils/getKeyToNotesMap';
+import { MappedNote } from '../Piano/types/mappedNote';
+import { IndexedNote } from '../Waterfall/types';
 import GameTraditionalPiano from './GameTraditionalPiano';
 import ProgressBar from './ProgressBar';
 import { Score } from './types';
@@ -59,7 +59,7 @@ const GameView: React.FC<Props> = ({
   chosenSongMIDI,
   setScore,
   myPart,
-  showSmartPiano = false,
+  showSmartPiano = true,
   handleNotePlay = noOp,
   handleNoteStop = noOp,
 }) => {
@@ -97,17 +97,17 @@ const GameView: React.FC<Props> = ({
   const playbackChannel = myPart === undefined ? 1 : 2;
   const playerTrack = tracks[playerTrackNum];
   const normalPlayerNotes = playerTrack.notes;
-  const mappingChangeEvents: SmartMappingChangeEvent[] = useMemo(
-    () => getSmartMappingChangeEvents(normalPlayerNotes),
+  const indexToNotesMap: MappedNote[][] = useMemo(
+    () => getIndexToNotesMap(normalPlayerNotes),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
-  const [currentMapping, setCurrentMapping] = useState<number[]>(
-    mappingChangeEvents.length === 0 ? [] : mappingChangeEvents[0].mapping
-  );
-  const playerNotes = useMemo<Note[] | SmartNote[]>(() => {
+
+  console.log(indexToNotesMap[6]);
+
+  const playerNotes = useMemo<Note[] | IndexedNote[]>(() => {
     if (showSmartPiano) {
-      return getSmartNotes(normalPlayerNotes, mappingChangeEvents);
+      return getIndexedNotesFromNotes(normalPlayerNotes);
     } else {
       return normalPlayerNotes;
     }
@@ -116,7 +116,7 @@ const GameView: React.FC<Props> = ({
 
   /*************** Initialise instrument *****************/
   // TODO: schedule change (if have time), now take the first value only
-  const keyboardVolume = playerNotes[0].velocity;
+  const keyboardVolume = normalPlayerNotes[0].velocity;
   const instrumentPlayer = useMemo(
     () => new InstrumentPlayer(keyboardVolume),
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -130,15 +130,6 @@ const GameView: React.FC<Props> = ({
     console.log('Game start', startTime);
 
     Tone.Transport.start();
-
-    // Schedule smart mapping change events (for smart piano only)
-    if (showSmartPiano) {
-      mappingChangeEvents.forEach(({ time, mapping }) => {
-        Tone.Transport.schedule(() => {
-          setCurrentMapping(mapping);
-        }, delayedStartTime + time - Tone.now());
-      });
-    }
 
     // Schedule countdown
     for (let i = 0; i < countDown; i++) {
@@ -196,7 +187,7 @@ const GameView: React.FC<Props> = ({
       // we use refs here to reduce computation workload during each callback
       const [correctNotes, index] = getNotesAtTimeFromNotes(
         Tone.now() - delayedStartTime,
-        playerNotes,
+        normalPlayerNotes,
         prevIndexInMIDI.current
       );
 
@@ -257,9 +248,10 @@ const GameView: React.FC<Props> = ({
         <GameSmartPiano
           instrumentPlayer={instrumentPlayer}
           keyWidth={keyboardDimension.keyWidth}
-          currentMapping={currentMapping}
+          indexToNotesMap={indexToNotesMap}
           didPlayNote={didPlayNote}
           didStopNote={didStopNote}
+          startTime={delayedStartTime}
         />
       );
     } else {
@@ -275,7 +267,7 @@ const GameView: React.FC<Props> = ({
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [keyboardDimension, currentMapping]);
+  }, [keyboardDimension, delayedStartTime]);
 
   return (
     <div className={classes.root}>
