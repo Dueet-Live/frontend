@@ -28,7 +28,7 @@ const SpeedCustomization: React.FC<Props> = ({ speed, setSpeed }) => {
         value={speed}
         valueLabelDisplay="on"
         marks
-        onChange={(e, value: number | number[]) => {
+        onChangeCommitted={(e, value: number | number[]) => {
           setSpeed(value as number);
         }}
         className={classes.root}
