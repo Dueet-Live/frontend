@@ -198,13 +198,11 @@ const GameView: React.FC<Props> = ({
 
   return (
     <div className={classes.root}>
-      {!gameEnd && (
-        <ProgressBar
-          startTime={startTime}
-          delayedStartTime={delayedStartTime}
-          songDuration={songDuration}
-        />
-      )}
+      <ProgressBar
+        startTime={startTime}
+        delayedStartTime={delayedStartTime}
+        songDuration={songDuration}
+      />
       <div ref={middleBoxRef} className={classes.middleBox}>
         <GameMiddleView
           timeToStart={timeToStart}
