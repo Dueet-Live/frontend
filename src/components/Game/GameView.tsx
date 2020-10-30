@@ -8,6 +8,7 @@ import React, {
   useState,
 } from 'react';
 import { noOp } from 'tone/build/esm/core/util/Interface';
+import { NotificationContext } from '../../contexts/NotificationContext';
 import { PlayerContext } from '../../contexts/PlayerContext';
 import { RoomContext, RoomView } from '../../contexts/RoomContext';
 import { TraditionalKeyboardDimension } from '../../types/keyboardDimension';
@@ -71,6 +72,7 @@ const GameView: React.FC<Props> = ({
   const gameManager = useRef<GameManager>(new GameManager());
   const { me } = useContext(PlayerContext);
   const { view } = useContext(RoomContext);
+  const showNotif = useContext(NotificationContext);
 
   // Game start time (after the countdown)
   const [startTime, setStartTime] = useState(-1);
@@ -135,6 +137,8 @@ const GameView: React.FC<Props> = ({
 
     // Set up score manager
     currentGameManager.setUpScoreManager(playerNotes, setScore);
+    // Set up feedback manager
+    currentGameManager.setUpFeedbackManager(playerNotes, showNotif);
 
     // Schedule ending screen
     currentGameManager.scheduleEndingScreen(songDuration, () => {
