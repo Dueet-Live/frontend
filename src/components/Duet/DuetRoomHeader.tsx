@@ -1,7 +1,6 @@
 import {
   Box,
   Button,
-  IconButton,
   Link,
   makeStyles,
   Typography,
@@ -13,7 +12,6 @@ import { useHistory } from 'react-router-dom';
 import { PlayerContext } from '../../contexts/PlayerContext';
 import { RoomContext, RoomView } from '../../contexts/RoomContext';
 import PlayerIcon from '../../icons/PlayerIcon';
-import SettingsIcon from '../../icons/SettingsIcon';
 import { updateReady } from '../../utils/socket';
 import useSong from '../../utils/useSong';
 import { FlyingNotes, FlyingNotesHandleRef } from '../Game/FlyingNotes';
@@ -187,9 +185,6 @@ const DuetRoomHeader: React.FC<Props> = ({
       {centerComponents()}
       <Box component="span" className={classes.empty} />
       {roomDetails()}
-      <IconButton edge="end" size="small" className={classes.settingIcon}>
-        <SettingsIcon />
-      </IconButton>
     </RoomHeader>
   );
 };
