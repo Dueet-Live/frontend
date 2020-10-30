@@ -17,13 +17,8 @@ type Props = {
   didStopNote: (key: number, playerId: number) => void;
 };
 
-const GameTraditionalPiano: React.FC<Props> = ({
-  instrumentPlayer, // Unchanged
-  keyboardDimension,
-  playerTrack, // Unchanged
-  didStopNote, // Unchanged
-  didPlayNote, // Unchanged
-}) => {
+const GameTraditionalPiano: React.FC<Props> = props => {
+  const { playerTrack, keyboardDimension, ...pianoProps } = props;
   const { height } = useWindowDimensions();
   const keyHeight = useMemo(() => calculateTraditionalKeyHeight(height), [
     height,
@@ -44,13 +39,11 @@ const GameTraditionalPiano: React.FC<Props> = ({
 
   return (
     <TraditionalPiano
-      instrumentPlayer={instrumentPlayer}
       includeOctaveShift={false}
-      keyboardDimension={keyboardDimension as TraditionalKeyboardDimension}
       keyHeight={keyHeight}
       keyboardMap={keyboardMap}
-      didPlayNote={didPlayNote}
-      didStopNote={didStopNote}
+      keyboardDimension={keyboardDimension}
+      {...pianoProps}
     />
   );
 };

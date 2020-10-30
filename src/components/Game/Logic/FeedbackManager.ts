@@ -1,8 +1,9 @@
 import * as Tone from 'tone';
-import { NotificationContextProps } from '../../../contexts/NotificationContext';
 import { Note } from '../../../types/MidiJSON';
+import { NoteFeedback } from '../utils/NoteFeedback';
 
 type MarkedNote = Note & {
+  isMissed: boolean;
   isPlayed: boolean;
 };
 
@@ -22,7 +23,7 @@ type MarkedNotesIndexMap = {
 export default class FeedbackManager {
   private startTime: number;
   private playerNotes: Note[];
-  private showFeedback: NotificationContextProps;
+  showFeedback?: (note: number, performance: NoteFeedback) => void;
 
   // Used for scoring played notes
   private standardMidiMap: MarkedNotesMidiMap = {};
@@ -33,25 +34,11 @@ export default class FeedbackManager {
   // Maximum total difference (error tolerance)
   private DIFF_THRESHOLD: number = 0.5;
 
-  private WRONG = 0;
-  private BAD = 1;
-  private GOOD = 2;
-  private GREAT = 3;
-  private PERFECT = 4;
-  private MISSED = 5;
-
-  private feedback = ['Wrong', 'Bad', 'Good', 'Great', 'Perfect', 'Missed'];
-
   private stats = Array(6).fill(0);
 
-  constructor(
-    startTime: number,
-    playerNotes: Note[],
-    showFeedback: NotificationContextProps
-  ) {
+  constructor(startTime: number, playerNotes: Note[]) {
     this.startTime = startTime;
     this.playerNotes = playerNotes;
-    this.showFeedback = showFeedback;
     this.initialiseNoteMaps();
   }
 
@@ -59,6 +46,7 @@ export default class FeedbackManager {
     this.playerNotes.forEach((note, index) => {
       const noteCopy = Object.assign({}, note, {
         isPlayed: false,
+        isMissed: false,
       });
       if (!(note.midi in this.standardMidiMap)) {
         this.standardMidiMap[note.midi] = {
@@ -71,9 +59,10 @@ export default class FeedbackManager {
     });
   }
 
+  // This is only used for note feedback as it can be slightly inaccurate at times
+  // Actual update of stats is in `didStopNote`
   startTrackingMissedNotes() {
     this.playerNotes.forEach((note, index) => {
-      // (DIFF_THRESHOLD)s after note start / note stop time, whichever is earlier
       const { time, duration, midi } = note;
       const checkTime =
         this.getMissCheckTime(time, duration) + this.startTime - Tone.now();
@@ -85,10 +74,7 @@ export default class FeedbackManager {
           !this.standardIndexMap[index].isPlayed &&
           !(midi in this.playingNotes)
         ) {
-          // TODO: UI feedback
-          // console.log('Missed', note.midi, Tone.now() - this.startTime);
-          this.showFeedbackToUI(this.MISSED);
-          this.stats[this.MISSED]++;
+          this.showFeedbackToUI(midi, NoteFeedback.MISSED);
         }
       }, checkTime);
     });
@@ -96,6 +82,7 @@ export default class FeedbackManager {
 
   // Return time relative to start time
   private getMissCheckTime(time: number, duration: number) {
+    // (DIFF_THRESHOLD)s after note start / note stop time, whichever is earlier
     return time + Math.min(this.DIFF_THRESHOLD, duration);
   }
 
@@ -119,8 +106,19 @@ export default class FeedbackManager {
       noteStopTime
     );
 
-    this.showFeedbackToUI(performance);
+    this.showFeedbackToUI(note, performance);
     delete this.playingNotes[note];
+  }
+
+  didEndGame() {
+    // Mark all unmarked notes as missed
+    for (let i = 0; i < this.playerNotes.length; i++) {
+      const note = this.standardIndexMap[i];
+      if (!note.isMissed && !note.isPlayed) {
+        this.stats[NoteFeedback.MISSED]++;
+        note.isMissed = true;
+      }
+    }
   }
 
   private measurePerformance(
@@ -130,26 +128,33 @@ export default class FeedbackManager {
   ) {
     // This note should not appear in this piece, wrong note played
     if (!(midi in this.standardMidiMap)) {
-      this.stats[this.WRONG]++;
-      return this.WRONG;
+      this.stats[NoteFeedback.WRONG]++;
+      return NoteFeedback.WRONG;
     }
     const { prevIndex, notes } = this.standardMidiMap[midi];
 
     // A note is matched if it overlaps with the note played by the user,
     // it is not missed (see missed note criterion),
-    // and the total difference in keyup and keydown is at most DIFF_THRESHOLD
     // If multiple matching notes are found, we take the note with minimum total difference
-    let bestPerform = this.WRONG;
+    let bestPerform = NoteFeedback.WRONG;
     let bestPerformIndex = -1;
     for (let i = prevIndex; i < notes.length; i++) {
       const note = notes[i];
-      const { time: startTime, duration, isPlayed } = note;
+      const { time: startTime, duration, isPlayed, isMissed } = note;
       const stopTime = startTime + duration;
+
+      // Find the first note that start after current time, start from this index next time
+      if (keyUpTime < startTime) {
+        this.standardMidiMap[midi].prevIndex = i;
+        break;
+      }
+
       if (
-        keyUpTime >= startTime &&
         keyDownTime <= stopTime &&
         keyDownTime <= this.getMissCheckTime(startTime, duration) &&
-        !isPlayed
+        keyUpTime >= startTime &&
+        !isPlayed &&
+        !isMissed
       ) {
         const performance = this.compareWithStandardNote(
           keyDownTime,
@@ -163,19 +168,20 @@ export default class FeedbackManager {
           bestPerform = performance;
           bestPerformIndex = i;
         }
-      }
-
-      // Find the first note that start after current time, start from this index next time
-      if (keyUpTime < startTime) {
-        this.standardMidiMap[midi].prevIndex = i;
-        break;
+      } else {
+        // Mark missed notes
+        // Update the stats here, because there is slight inaccuracy in the scheduling
+        if (!isMissed) {
+          this.stats[NoteFeedback.MISSED]++;
+          this.standardMidiMap[midi].notes[i].isMissed = true;
+        }
       }
     }
 
     // Cannot find any matching notes (probably hits wrong notes)
     if (bestPerformIndex === -1) {
-      this.stats[this.WRONG]++;
-      return this.WRONG;
+      this.stats[NoteFeedback.WRONG]++;
+      return NoteFeedback.WRONG;
     }
 
     return bestPerform;
@@ -194,15 +200,15 @@ export default class FeedbackManager {
       expectedStopTime
     );
     if (diff <= 0.15) {
-      return this.PERFECT;
+      return NoteFeedback.PERFECT;
     }
     if (diff <= 0.3) {
-      return this.GREAT;
+      return NoteFeedback.GREAT;
     }
     if (diff <= this.DIFF_THRESHOLD) {
-      return this.GOOD;
+      return NoteFeedback.GOOD;
     }
-    return this.BAD;
+    return NoteFeedback.BAD;
   }
 
   private calculateTotalDifference(
@@ -217,45 +223,24 @@ export default class FeedbackManager {
     );
   }
 
-  private showFeedbackToUI(performance: number) {
-    // TODO: UI feedback
-    // console.log('Performance', note, performance);
-
-    // Skip wrong notes
-    if (performance === this.WRONG) {
+  private showFeedbackToUI(note: number, performance: NoteFeedback) {
+    // UI not set up yet
+    if (this.showFeedback === undefined) {
       return;
     }
 
-    if (performance === this.MISSED) {
-      this.showFeedback({
-        message: this.feedback[this.MISSED],
-        severity: 'error',
-      });
-      return;
-    }
-
-    if (performance === this.BAD) {
-      this.showFeedback({
-        message: this.feedback[performance],
-        severity: 'warning',
-      });
-      return;
-    }
-
-    this.showFeedback({
-      message: this.feedback[performance],
-      severity: 'success',
-    });
+    this.showFeedback(note, performance);
   }
 
+  // TODO: if needed in ending screen
   generateStats() {
     return {
-      wrong: this.stats[this.WRONG],
-      bad: this.stats[this.BAD],
-      good: this.stats[this.GOOD],
-      great: this.stats[this.GREAT],
-      perfect: this.stats[this.PERFECT],
-      missed: this.stats[this.MISSED],
+      missed: this.stats[NoteFeedback.MISSED],
+      wrong: this.stats[NoteFeedback.WRONG],
+      bad: this.stats[NoteFeedback.BAD],
+      good: this.stats[NoteFeedback.GOOD],
+      great: this.stats[NoteFeedback.GREAT],
+      perfect: this.stats[NoteFeedback.PERFECT],
       total: this.playerNotes.length,
     };
   }

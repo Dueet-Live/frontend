@@ -22,8 +22,10 @@ import './SmartPiano.css';
 import { MappedNote } from '../types/mappedNote';
 import { NotesManager } from './NotesManager';
 import * as Tone from 'tone';
+import GameManager from '../../Game/Logic/GameManager';
 
 type Props = {
+  gameManagerRef: React.MutableRefObject<GameManager>;
   instrumentPlayer: InstrumentPlayer;
   keyWidth: number;
   keyHeight: number;
@@ -35,6 +37,7 @@ type Props = {
 };
 
 const SmartPiano: React.FC<Props> = ({
+  gameManagerRef, // Unchanged
   instrumentPlayer, // Unchanged
   keyWidth,
   keyHeight,
@@ -56,6 +59,20 @@ const SmartPiano: React.FC<Props> = ({
   // Used for touchscreen input
   const [useTouchEvents, setUseTouchEvents] = useState(false);
   const [touchedIndexes, setTouchedIndexes] = useState(new Set<number>());
+
+  // Used for note feedback
+  const feedbackManager = gameManagerRef.current.feedbackManager;
+
+  useEffect(() => {
+    if (feedbackManager === undefined) {
+      return;
+    }
+
+    feedbackManager.showFeedback = (note, performance) => {
+      // TODO: enqueue feedback message
+      console.log(note, performance);
+    };
+  }, [startTime, feedbackManager]);
 
   const startPlayingNote = useCallback(
     (note: number, playerId: number) => {
@@ -97,6 +114,9 @@ const SmartPiano: React.FC<Props> = ({
       const note = notesManagersRef.current[index].firstNote;
 
       startPlayingNote(note.midi, playerId);
+      feedbackManager?.didPlayNote(note.midi);
+
+      // Update state
       setPlayingNotes(playingNotes => {
         const filtered = playingNotes.filter(
           playingNote => playingNote.smartKey !== index
@@ -111,14 +131,18 @@ const SmartPiano: React.FC<Props> = ({
         ];
       });
     },
-    [startPlayingNote, startTime]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [startPlayingNote, startTime, feedbackManager]
   );
 
   const stopPlayingSmartKey = useCallback(
     (index: number, playerId: number) => {
       const note = notesManagersRef.current[index].firstNote;
-      stopPlayingNote(note.midi, playerId);
 
+      stopPlayingNote(note.midi, playerId);
+      feedbackManager?.didStopNote(note.midi);
+
+      // Update state
       setPlayingNotes(playingNotes => {
         return playingNotes.filter(
           playingNote =>
@@ -126,7 +150,8 @@ const SmartPiano: React.FC<Props> = ({
         );
       });
     },
-    [stopPlayingNote]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [stopPlayingNote, startTime, feedbackManager]
   );
 
   /* Handle friends' notes */

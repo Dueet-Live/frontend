@@ -8,7 +8,6 @@ import React, {
   useState,
 } from 'react';
 import { noOp } from 'tone/build/esm/core/util/Interface';
-import { NotificationContext } from '../../contexts/NotificationContext';
 import { PlayerContext } from '../../contexts/PlayerContext';
 import { RoomContext, RoomView } from '../../contexts/RoomContext';
 import { TraditionalKeyboardDimension } from '../../types/keyboardDimension';
@@ -69,10 +68,9 @@ const GameView: React.FC<Props> = ({
 }) => {
   const classes = useStyles();
 
-  const gameManager = useRef<GameManager>(new GameManager());
+  const gameManagerRef = useRef<GameManager>(new GameManager());
   const { me } = useContext(PlayerContext);
   const { view } = useContext(RoomContext);
-  const showNotif = useContext(NotificationContext);
 
   // Game start time (after the countdown)
   const [startTime, setStartTime] = useState(-1);
@@ -119,8 +117,8 @@ const GameView: React.FC<Props> = ({
 
   useEffect(() => {
     // Set up game
-    const currentGameManager = gameManager.current;
-    currentGameManager.setUpGame(
+    const gameManager = gameManagerRef.current;
+    gameManager.setUpGame(
       setStartTime,
       lookAheadTime,
       countDown,
@@ -129,24 +127,24 @@ const GameView: React.FC<Props> = ({
     );
 
     // Schedule countdown
-    currentGameManager.scheduleCountDown(countDown, setTimeToStart);
+    gameManager.scheduleCountDown(countDown, setTimeToStart);
 
     // Schedule playback
     const playbackNotes = getPlaybackNotes(tracks, playbackChannel);
-    currentGameManager.schedulePlaybackAudio(instrumentPlayer, playbackNotes);
+    gameManager.schedulePlaybackAudio(instrumentPlayer, playbackNotes);
 
     // Set up score manager
-    currentGameManager.setUpScoreManager(playerNotes, setScore);
+    gameManager.setUpScoreManager(playerNotes, setScore);
     // Set up feedback manager
-    currentGameManager.setUpFeedbackManager(playerNotes, showNotif);
+    gameManager.setUpFeedbackManager(playerNotes);
 
     // Schedule ending screen
-    currentGameManager.scheduleEndingScreen(songDuration, () => {
+    gameManager.scheduleEndingScreen(songDuration, () => {
       setView(myPart === undefined ? 'solo.play.end' : 'duet.play.end');
     });
 
     return () => {
-      currentGameManager.cleanup();
+      gameManager.cleanup();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -154,14 +152,14 @@ const GameView: React.FC<Props> = ({
   /*************** Callbacks *****************/
   const didPlayNote = useCallback(
     (note: number, playedBy: number) => {
-      gameManager.current.handleNotePlay(note, playedBy, me);
+      gameManagerRef.current.handleNotePlay(note, playedBy, me);
     },
     [me]
   );
 
   const didStopNote = useCallback(
     (note: number, playedBy: number) => {
-      gameManager.current.handleNoteStop(note, playedBy, me);
+      gameManagerRef.current.handleNoteStop(note, playedBy, me);
     },
     [me]
   );
@@ -183,6 +181,7 @@ const GameView: React.FC<Props> = ({
     if (showSmartPiano) {
       return (
         <GameSmartPiano
+          gameManagerRef={gameManagerRef}
           instrumentPlayer={instrumentPlayer}
           keyWidth={keyboardDimension.keyWidth}
           normalPlayerNotes={playerNotes}
@@ -192,6 +191,7 @@ const GameView: React.FC<Props> = ({
         />
       );
     } else {
+      // TODO: show feedback for traditional piano as well
       return (
         <GameTraditionalPiano
           instrumentPlayer={instrumentPlayer}

@@ -46,6 +46,8 @@ const TraditionalKeyboard: React.FC<Props> = ({
   const [useTouchEvents, setUseTouchEvents] = useState(false);
   const [touchedNotes, setTouchedNotes] = useState(new Set<number>());
 
+  // TODO: check whether where is a ongoing game and set up feedbackManager accordingly
+
   /* Handle state change */
   const startPlayingNote = useCallback(
     (note: number, playerId: number) => {

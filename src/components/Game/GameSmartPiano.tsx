@@ -8,8 +8,10 @@ import InstrumentPlayer from '../Piano/InstrumentPlayer';
 import SmartPiano from '../Piano/SmartPiano/SmartPiano';
 import { MappedNote } from '../Piano/types/mappedNote';
 import { getIndexToNotesMap } from '../Piano/utils/getKeyToNotesMap';
+import GameManager from './Logic/GameManager';
 
 type Props = {
+  gameManagerRef: React.MutableRefObject<GameManager>;
   instrumentPlayer: InstrumentPlayer;
   keyWidth: number;
   normalPlayerNotes: Note[];
@@ -18,14 +20,8 @@ type Props = {
   didStopNote: (key: number, playerId: number) => void;
 };
 
-const GameSmartPiano: React.FC<Props> = ({
-  instrumentPlayer, // Unchanged
-  keyWidth,
-  normalPlayerNotes, // Unchanged
-  didStopNote, // Unchanged
-  didPlayNote, // Unchanged
-  startTime,
-}) => {
+const GameSmartPiano: React.FC<Props> = props => {
+  const { normalPlayerNotes, ...pianoProps } = props;
   const indexToNotesMap: MappedNote[][] = useMemo(
     () => getIndexToNotesMap(normalPlayerNotes),
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -47,14 +43,10 @@ const GameSmartPiano: React.FC<Props> = ({
 
   return (
     <SmartPiano
-      startTime={startTime}
-      instrumentPlayer={instrumentPlayer}
       keyHeight={keyHeight}
-      keyWidth={keyWidth}
       indexToNotesMap={indexToNotesMap}
       keyboardMap={keyboardMap}
-      didPlayNote={didPlayNote}
-      didStopNote={didStopNote}
+      {...pianoProps}
     />
   );
 };

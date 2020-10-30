@@ -1,6 +1,5 @@
 import * as Tone from 'tone';
 import { Player } from 'tone';
-import { NotificationContextProps } from '../../../contexts/NotificationContext';
 import { Note } from '../../../types/MidiJSON';
 import InstrumentPlayer from '../../Piano/InstrumentPlayer';
 import { NullSoundFontPlayerNoteAudio } from '../../Piano/InstrumentPlayer/AudioPlayer';
@@ -17,7 +16,7 @@ export default class GameManager {
 
   // Managers
   private scoreManager?: ScoreManager;
-  private feedbackManager?: FeedbackManager;
+  feedbackManager?: FeedbackManager;
 
   constructor() {
     this.startTime = -1;
@@ -90,26 +89,22 @@ export default class GameManager {
     Tone.Transport.schedule(() => {
       endGame();
       this.scoreManager?.didEndGame();
+      this.feedbackManager?.didEndGame();
       console.log(this.feedbackManager?.generateStats());
       // Slightly delay the ending screen
     }, this.delayedStartTime + songDuration - Tone.now() + 0.1);
   }
 
-  setUpFeedbackManager(
-    playerNotes: Note[],
-    showFeedback: NotificationContextProps
-  ) {
+  setUpFeedbackManager(playerNotes: Note[]) {
     this.feedbackManager = new FeedbackManager(
       this.delayedStartTime,
-      playerNotes,
-      showFeedback
+      playerNotes
     );
     this.feedbackManager.startTrackingMissedNotes();
   }
 
   handleNotePlay(note: number, playedBy: number, myPlayerId: number) {
     if (playedBy === myPlayerId) {
-      this.feedbackManager?.didPlayNote(note);
       this.scoreManager?.didPlayNote(note);
     }
     this.didPlayNote && this.didPlayNote(note, playedBy);
@@ -117,7 +112,6 @@ export default class GameManager {
 
   handleNoteStop(note: number, playedBy: number, myPlayerId: number) {
     if (playedBy === myPlayerId) {
-      this.feedbackManager?.didStopNote(note);
       this.scoreManager?.didStopNote(note);
     }
     this.didStopNote && this.didStopNote(note, playedBy);
