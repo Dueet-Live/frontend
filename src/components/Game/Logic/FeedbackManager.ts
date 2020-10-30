@@ -1,6 +1,13 @@
 import * as Tone from 'tone';
 import { Note } from '../../../types/MidiJSON';
+import { NoteFeedbackAreaHandleRef } from '../../Piano/types/noteFeedback';
+import { getIndexedNotesFromNotes } from '../../Waterfall/utils';
 import { NoteFeedback } from '../utils/NoteFeedback';
+
+type PlayingNote = {
+  startTime: number;
+  keyIdentifier: number;
+};
 
 type MarkedNote = Note & {
   isMissed: boolean;
@@ -23,14 +30,14 @@ type MarkedNotesIndexMap = {
 export default class FeedbackManager {
   private startTime: number;
   private playerNotes: Note[];
-  showFeedback?: (note: number, performance: NoteFeedback) => void;
+  private handlers: { [keyIdentifier: number]: NoteFeedbackAreaHandleRef } = {};
 
   // Used for scoring played notes
-  private standardMidiMap: MarkedNotesMidiMap = {};
+  private standardNoteMapByMidi: MarkedNotesMidiMap = {};
   // Used for detecting missed notes
-  private standardIndexMap: MarkedNotesIndexMap = {};
+  private standardNoteMapByIndex: MarkedNotesIndexMap = {};
   // Currently pressed notes (key: midi, value: time)
-  private playingNotes: { [midi: number]: number } = {};
+  private playingNotes: { [midi: number]: PlayingNote } = {};
   // Maximum total difference (error tolerance)
   private DIFF_THRESHOLD: number = 0.5;
 
@@ -48,22 +55,33 @@ export default class FeedbackManager {
         isPlayed: false,
         isMissed: false,
       });
-      if (!(note.midi in this.standardMidiMap)) {
-        this.standardMidiMap[note.midi] = {
+      if (!(note.midi in this.standardNoteMapByMidi)) {
+        this.standardNoteMapByMidi[note.midi] = {
           prevIndex: 0,
           notes: [],
         };
       }
-      this.standardMidiMap[note.midi].notes.push(noteCopy);
-      this.standardIndexMap[index] = noteCopy;
+      this.standardNoteMapByMidi[note.midi].notes.push(noteCopy);
+      this.standardNoteMapByIndex[index] = noteCopy;
     });
+  }
+
+  registerHandler(keyIdentifier: number, handler: NoteFeedbackAreaHandleRef) {
+    this.handlers[keyIdentifier] = handler;
+  }
+
+  unregisterHandler(keyIdentifier: number) {
+    delete this.handlers[keyIdentifier];
   }
 
   // This is only used for note feedback as it can be slightly inaccurate at times
   // Actual update of stats is in `didStopNote`
+  // TODO: get indexed notes for traditional piano as well
   startTrackingMissedNotes() {
-    this.playerNotes.forEach((note, index) => {
-      const { time, duration, midi } = note;
+    const indexedNotes = getIndexedNotesFromNotes(this.playerNotes);
+    indexedNotes.forEach((note, noteIndex) => {
+      const { time, duration, index: keyIdentifier } = note;
+      const { midi } = this.playerNotes[noteIndex];
       const checkTime =
         this.getMissCheckTime(time, duration) + this.startTime - Tone.now();
       Tone.Transport.schedule(() => {
@@ -71,10 +89,10 @@ export default class FeedbackManager {
         // - it is not currently being played
         // - it is not played before at the check time
         if (
-          !this.standardIndexMap[index].isPlayed &&
+          !this.standardNoteMapByIndex[noteIndex].isPlayed &&
           !(midi in this.playingNotes)
         ) {
-          this.showFeedbackToUI(midi, NoteFeedback.MISSED);
+          this.showFeedbackToUI(keyIdentifier, NoteFeedback.MISSED);
         }
       }, checkTime);
     });
@@ -86,34 +104,48 @@ export default class FeedbackManager {
     return time + Math.min(this.DIFF_THRESHOLD, duration);
   }
 
-  didPlayNote(note: number) {
-    this.playingNotes[note] = Tone.now() - this.startTime;
+  didPlayNote(midi: number, keyIdentifier: number) {
+    this.playingNotes[midi] = {
+      startTime: Tone.now() - this.startTime,
+      keyIdentifier,
+    };
   }
 
-  didStopNote(note: number) {
-    const noteStopTime = Tone.now() - this.startTime;
-    const noteStartTime = this.playingNotes[note];
-    if (!(note in this.playingNotes)) {
+  didStopNote(midi: number, keyIdentifier: number) {
+    if (!(midi in this.playingNotes)) {
       console.log(
         'Error, found note stop without corresponding note start event'
       );
       return;
     }
 
+    const noteStopTime = Tone.now() - this.startTime;
+    const {
+      startTime: noteStartTime,
+      keyIdentifier: keyboardIndex,
+    } = this.playingNotes[midi];
+
+    if (keyIdentifier !== keyboardIndex) {
+      console.log(
+        'Error, found note stop has different key identifier with the corresponding note start event'
+      );
+      return;
+    }
+
     const performance = this.measurePerformance(
-      note,
+      midi,
       noteStartTime,
       noteStopTime
     );
 
-    this.showFeedbackToUI(note, performance);
-    delete this.playingNotes[note];
+    this.showFeedbackToUI(keyboardIndex, performance);
+    delete this.playingNotes[midi];
   }
 
   didEndGame() {
     // Mark all unmarked notes as missed
     for (let i = 0; i < this.playerNotes.length; i++) {
-      const note = this.standardIndexMap[i];
+      const note = this.standardNoteMapByIndex[i];
       if (!note.isMissed && !note.isPlayed) {
         this.stats[NoteFeedback.MISSED]++;
         note.isMissed = true;
@@ -127,11 +159,11 @@ export default class FeedbackManager {
     keyUpTime: number
   ) {
     // This note should not appear in this piece, wrong note played
-    if (!(midi in this.standardMidiMap)) {
+    if (!(midi in this.standardNoteMapByMidi)) {
       this.stats[NoteFeedback.WRONG]++;
       return NoteFeedback.WRONG;
     }
-    const { prevIndex, notes } = this.standardMidiMap[midi];
+    const { prevIndex, notes } = this.standardNoteMapByMidi[midi];
 
     // A note is matched if it overlaps with the note played by the user,
     // it is not missed (see missed note criterion),
@@ -145,7 +177,7 @@ export default class FeedbackManager {
 
       // Find the first note that start after current time, start from this index next time
       if (keyUpTime < startTime) {
-        this.standardMidiMap[midi].prevIndex = i;
+        this.standardNoteMapByMidi[midi].prevIndex = i;
         break;
       }
 
@@ -163,7 +195,7 @@ export default class FeedbackManager {
           stopTime
         );
         this.stats[performance]++;
-        this.standardMidiMap[midi].notes[i].isPlayed = true;
+        this.standardNoteMapByMidi[midi].notes[i].isPlayed = true;
         if (performance > bestPerform) {
           bestPerform = performance;
           bestPerformIndex = i;
@@ -173,7 +205,7 @@ export default class FeedbackManager {
         // Update the stats here, because there is slight inaccuracy in the scheduling
         if (!isMissed) {
           this.stats[NoteFeedback.MISSED]++;
-          this.standardMidiMap[midi].notes[i].isMissed = true;
+          this.standardNoteMapByMidi[midi].notes[i].isMissed = true;
         }
       }
     }
@@ -223,13 +255,19 @@ export default class FeedbackManager {
     );
   }
 
-  private showFeedbackToUI(note: number, performance: NoteFeedback) {
-    // UI not set up yet
-    if (this.showFeedback === undefined) {
+  private showFeedbackToUI(keyIdentifier: number, feedback: NoteFeedback) {
+    // UI handlers not set up yet
+    if (!(keyIdentifier in this.handlers)) {
       return;
     }
 
-    this.showFeedback(note, performance);
+    // Hide wrong/good feedback
+    if (feedback === NoteFeedback.WRONG || feedback === NoteFeedback.GOOD) {
+      return;
+    }
+
+    const handler = this.handlers[keyIdentifier];
+    handler.current?.enqueueFeedback(feedback);
   }
 
   // TODO: if needed in ending screen

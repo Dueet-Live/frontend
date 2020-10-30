@@ -17,12 +17,12 @@ import {
 import InstrumentPlayer from '../InstrumentPlayer';
 import { PlayingNote } from '../types/playingNote';
 import isRegularKey from '../utils/isRegularKey';
-import { default as SmartPianoKey } from './SmartPianoKey';
 import './SmartPiano.css';
 import { MappedNote } from '../types/mappedNote';
 import { NotesManager } from './NotesManager';
 import * as Tone from 'tone';
 import GameManager from '../../Game/Logic/GameManager';
+import SmartPianoKeyWithFeedback from './SmartPianoKeyWithFeedback';
 
 type Props = {
   gameManagerRef: React.MutableRefObject<GameManager>;
@@ -62,17 +62,6 @@ const SmartPiano: React.FC<Props> = ({
 
   // Used for note feedback
   const feedbackManager = gameManagerRef.current.feedbackManager;
-
-  useEffect(() => {
-    if (feedbackManager === undefined) {
-      return;
-    }
-
-    feedbackManager.showFeedback = (note, performance) => {
-      // TODO: enqueue feedback message
-      console.log(note, performance);
-    };
-  }, [startTime, feedbackManager]);
 
   const startPlayingNote = useCallback(
     (note: number, playerId: number) => {
@@ -114,7 +103,7 @@ const SmartPiano: React.FC<Props> = ({
       const note = notesManagersRef.current[index].firstNote;
 
       startPlayingNote(note.midi, playerId);
-      feedbackManager?.didPlayNote(note.midi);
+      feedbackManager?.didPlayNote(note.midi, index);
 
       // Update state
       setPlayingNotes(playingNotes => {
@@ -140,7 +129,7 @@ const SmartPiano: React.FC<Props> = ({
       const note = notesManagersRef.current[index].firstNote;
 
       stopPlayingNote(note.midi, playerId);
-      feedbackManager?.didStopNote(note.midi);
+      feedbackManager?.didStopNote(note.midi, index);
 
       // Update state
       setPlayingNotes(playingNotes => {
@@ -296,7 +285,8 @@ const SmartPiano: React.FC<Props> = ({
         .fill(0)
         .map((_, index) => {
           return (
-            <SmartPianoKey
+            <SmartPianoKeyWithFeedback
+              gameManagerRef={gameManagerRef}
               useTouchEvents={useTouchEvents}
               index={index}
               key={index}

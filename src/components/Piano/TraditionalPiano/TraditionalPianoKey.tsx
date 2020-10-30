@@ -20,7 +20,7 @@ type Props = {
   useTouchEvents: boolean;
 };
 
-const PianoKey: React.FC<Props> = ({
+const TraditionalPianoKey: React.FC<Props> = ({
   note,
   keyWidth,
   keyHeight,
@@ -101,4 +101,4 @@ const PianoKey: React.FC<Props> = ({
   );
 };
 
-export default PianoKey;
+export default TraditionalPianoKey;
