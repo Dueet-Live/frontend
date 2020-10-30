@@ -39,7 +39,7 @@ export default class FeedbackManager {
   // Currently pressed notes (key: midi, value: time)
   private playingNotes: { [midi: number]: PlayingNote } = {};
   // Maximum total difference (error tolerance)
-  private DIFF_THRESHOLD: number = 0.5;
+  private DIFF_THRESHOLD: number = 0.4;
 
   private stats = Array(6).fill(0);
 
@@ -231,10 +231,10 @@ export default class FeedbackManager {
       expectedStartTime,
       expectedStopTime
     );
-    if (diff <= 0.15) {
+    if (diff <= 0.1) {
       return NoteFeedback.PERFECT;
     }
-    if (diff <= 0.3) {
+    if (diff <= 0.25) {
       return NoteFeedback.GREAT;
     }
     if (diff <= this.DIFF_THRESHOLD) {
