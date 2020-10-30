@@ -87,10 +87,7 @@ export default class FeedbackManager {
         ) {
           // TODO: UI feedback
           // console.log('Missed', note.midi, Tone.now() - this.startTime);
-          this.showFeedback({
-            message: this.feedback[this.MISSED],
-            severity: 'error',
-          });
+          this.showFeedbackToUI(this.MISSED);
           this.stats[this.MISSED]++;
         }
       }, checkTime);
@@ -103,14 +100,12 @@ export default class FeedbackManager {
   }
 
   didPlayNote(note: number) {
-    console.log('Start', note, Tone.now() - this.startTime);
     this.playingNotes[note] = Tone.now() - this.startTime;
   }
 
   didStopNote(note: number) {
     const noteStopTime = Tone.now() - this.startTime;
     const noteStartTime = this.playingNotes[note];
-    console.log('Stop', note, noteStopTime);
     if (!(note in this.playingNotes)) {
       console.log(
         'Error, found note stop without corresponding note start event'
@@ -186,7 +181,6 @@ export default class FeedbackManager {
     return bestPerform;
   }
 
-  // 0: bad (treated as wrong note); 1: not bad, 2: good, 3: great, 4: perfect
   private compareWithStandardNote(
     actualStartTime: number,
     actualStopTime: number,
@@ -227,8 +221,24 @@ export default class FeedbackManager {
     // TODO: UI feedback
     // console.log('Performance', note, performance);
 
-    // Do not show feedback for wrong and bad notes
-    if (performance === this.WRONG || performance === this.BAD) {
+    // Skip wrong notes
+    if (performance === this.WRONG) {
+      return;
+    }
+
+    if (performance === this.MISSED) {
+      this.showFeedback({
+        message: this.feedback[this.MISSED],
+        severity: 'error',
+      });
+      return;
+    }
+
+    if (performance === this.BAD) {
+      this.showFeedback({
+        message: this.feedback[performance],
+        severity: 'warning',
+      });
       return;
     }
 
