@@ -11,6 +11,7 @@
     "localforage": "^1.9.0",
     "localforage-observable": "^2.1.1",
     "react": "^16.13.1",
+    "react-circular-progressbar": "^2.0.3",
     "react-dom": "^16.13.1",
     "react-ga": "^3.2.0",
     "react-router-dom": "^5.2.0",

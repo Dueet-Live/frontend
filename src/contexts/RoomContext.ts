@@ -1,4 +1,5 @@
 import React from 'react';
+import { Score } from '../components/Game/types';
 import { RoomInfo } from '../types/roomInfo';
 
 export type RoomView =
@@ -11,6 +12,7 @@ export type RoomView =
 
 type RoomContextProps = {
   roomInfo: RoomInfo;
+  score: Score;
   setRoomInfo: (usingPrevState: (prevState: RoomInfo) => RoomInfo) => void;
 };
 
@@ -22,5 +24,6 @@ export const RoomContext = React.createContext<RoomContextProps>({
     speed: 1,
     players: [],
   },
+  score: { total: 0, correct: 0 },
   setRoomInfo: () => {},
 });

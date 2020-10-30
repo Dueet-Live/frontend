@@ -172,6 +172,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
     <RoomContext.Provider
       value={{
         roomInfo: roomState,
+        score: score,
         setRoomInfo: setRoomState,
       }}
     >
