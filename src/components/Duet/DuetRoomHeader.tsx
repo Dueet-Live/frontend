@@ -9,6 +9,7 @@ import {
 import { ArrowBack, MusicNoteOutlined } from '@material-ui/icons';
 import React, { useContext } from 'react';
 import { useHistory } from 'react-router-dom';
+import { NotificationContext } from '../../contexts/NotificationContext';
 import { PlayerContext } from '../../contexts/PlayerContext';
 import { RoomContext, RoomView } from '../../contexts/RoomContext';
 import PlayerIcon from '../../icons/PlayerIcon';
@@ -63,6 +64,7 @@ const DuetRoomHeader: React.FC<Props> = ({
   const history = useHistory();
   const { me, friend } = useContext(PlayerContext);
   const { roomInfo } = useContext(RoomContext);
+  const setNotification = useContext(NotificationContext);
   const { piece } = roomInfo;
   const chosenSong = useSong(piece);
   const hideBackText = useMediaQuery('(min-width:400px)');
@@ -106,10 +108,13 @@ const DuetRoomHeader: React.FC<Props> = ({
               component="button"
               variant="body1"
               className={classes.link}
-              onClick={
-                async () => navigator.clipboard.writeText(window.location.href)
-                // TODO add a notification
-              }
+              onClick={() => {
+                navigator.clipboard.writeText(window.location.href);
+                setNotification({
+                  message: 'Link copied to clipboard.',
+                  severity: 'success',
+                });
+              }}
             >
               (Copy link)
             </Link>
