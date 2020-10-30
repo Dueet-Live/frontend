@@ -45,6 +45,14 @@ export type ChoosePieceRequest = {
   id: string;
 };
 
+/****************** Change speed **********************/
+
+// Request
+export const CHANGE_SPEED_REQUEST = 'changeSpeedRequest';
+export type changeSpeedRequest = {
+  speed: number;
+};
+
 /****************** Choose part **********************/
 
 // Request

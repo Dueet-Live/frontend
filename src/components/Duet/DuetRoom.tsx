@@ -1,5 +1,5 @@
 import { Box, makeStyles } from '@material-ui/core';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import songsAPI from '../../api/songs';
 import { PlayerContext } from '../../contexts/PlayerContext';
@@ -14,9 +14,11 @@ import socket, {
   removeRoomStateListeners,
 } from '../../utils/socket';
 import useSong from '../../utils/useSong';
+import { FlyingNotesHandle } from '../Game/FlyingNotes';
 import GameView from '../Game/GameView';
-import FreePlayPiano from '../Piano/TraditionalPiano/FreePlayPiano';
 import { Score } from '../Game/types';
+import { sendGAEvent } from '../GoogleAnalytics';
+import FreePlayPiano from '../Piano/TraditionalPiano/FreePlayPiano';
 import DuetLobby from './DuetLobby';
 import DuetRoomHeader from './DuetRoomHeader';
 
@@ -53,6 +55,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   const [roomState, setRoomState] = useState({
     players: [],
     id: '',
+    speed: 1,
   } as RoomInfo);
   const [playerId, setPlayerId] = useState(-1);
 
@@ -60,7 +63,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   const [view, setView] = useState<RoomView>('duet.lobby');
   const [score, setScore] = useState<Score>({ correct: 0, total: 0 });
 
-  const { piece } = roomState;
+  const { piece, speed } = roomState;
   const chosenSong = useSong(piece);
 
   useEffect(() => {
@@ -103,8 +106,32 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
     fetchSongMIDI();
   }, [piece]);
 
+  useEffect(() => {
+    if (view !== 'duet.play') {
+      return;
+    }
+
+    sendGAEvent({
+      category: 'Duet',
+      action: 'Play',
+      label: chosenSong?.name,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [view]);
+
   const friendId = getFriendId(roomState, playerId);
   const myPart = getMyPart(roomState, playerId);
+
+  const myFlyingNotesHandleRef = useRef<FlyingNotesHandle | null>(null);
+  const friendFlyingNotesHandleRef = useRef<FlyingNotesHandle | null>(null);
+
+  const handleNotePlay = (note: number, playedBy: number) => {
+    if (playedBy === playerId) {
+      myFlyingNotesHandleRef.current?.addNote();
+    } else {
+      friendFlyingNotesHandleRef.current?.addNote();
+    }
+  };
 
   const mainBody = () => {
     if (view === 'duet.lobby') {
@@ -120,7 +147,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
     if (view === 'duet.try') {
       return (
         <div className={classes.piano}>
-          <FreePlayPiano />
+          <FreePlayPiano handleNotePlay={handleNotePlay} />
         </div>
       );
     }
@@ -133,7 +160,9 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
         <GameView
           chosenSongMIDI={chosenSongMIDI}
           setScore={setScore}
+          speed={speed}
           myPart={myPart}
+          handleNotePlay={handleNotePlay}
         />
       );
     }
@@ -160,6 +189,8 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
               setView={setView}
               score={score}
               resetScore={() => setScore({ correct: 0, total: 0 })}
+              myFlyingNotesHandleRef={myFlyingNotesHandleRef}
+              friendFlyingNotesHandleRef={friendFlyingNotesHandleRef}
             />
           </div>
 

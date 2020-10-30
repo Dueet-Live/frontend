@@ -1,16 +1,18 @@
 import { useTheme, useMediaQuery } from '@material-ui/core';
 import React, { useMemo } from 'react';
+import { Note } from '../../types/MidiJSON';
 import { calculateSmartKeyHeight } from '../../utils/calculateSmartKeyboardDimension';
 import { getSmartKeyboardMapping } from '../../utils/getKeyboardShorcutsMapping';
 import useWindowDimensions from '../../utils/useWindowDimensions';
 import InstrumentPlayer from '../Piano/InstrumentPlayer';
 import SmartPiano from '../Piano/SmartPiano/SmartPiano';
 import { MappedNote } from '../Piano/types/mappedNote';
+import { getIndexToNotesMap } from '../Piano/utils/getKeyToNotesMap';
 
 type Props = {
   instrumentPlayer: InstrumentPlayer;
   keyWidth: number;
-  indexToNotesMap: MappedNote[][];
+  normalPlayerNotes: Note[];
   startTime: number;
   didPlayNote: (key: number, playerId: number) => void;
   didStopNote: (key: number, playerId: number) => void;
@@ -19,11 +21,17 @@ type Props = {
 const GameSmartPiano: React.FC<Props> = ({
   instrumentPlayer, // Unchanged
   keyWidth,
-  indexToNotesMap,
+  normalPlayerNotes, // Unchanged
   didStopNote, // Unchanged
   didPlayNote, // Unchanged
   startTime,
 }) => {
+  const indexToNotesMap: MappedNote[][] = useMemo(
+    () => getIndexToNotesMap(normalPlayerNotes),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
+
   const { height } = useWindowDimensions();
   const keyHeight = useMemo(() => calculateSmartKeyHeight(height), [height]);
 

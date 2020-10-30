@@ -2,6 +2,7 @@ import { History } from 'history';
 import io from 'socket.io-client';
 import { RoomView } from '../contexts/RoomContext';
 import {
+  CHANGE_SPEED_REQUEST,
   CHOOSE_PART_REQUEST,
   CHOOSE_PIECE_REQUEST,
   CREATE_ROOM_REQUEST,
@@ -125,12 +126,10 @@ export function joinRoom(id: string) {
 }
 
 export function playNote(note: number) {
-  // console.log(`Send ${note} start`)
   socket.emit(NOTE_PLAYED, { note, event: 'keydown' });
 }
 
 export function stopNote(note: number) {
-  // console.log(`Send ${note} stop`)
   socket.emit(NOTE_PLAYED, { note, event: 'keyup' });
 }
 
@@ -140,6 +139,10 @@ export const choosePart = (id: Part) => {
 
 export function choosePiece(id: number) {
   socket.emit(CHOOSE_PIECE_REQUEST, { id });
+}
+
+export function changeSpeed(speed: number) {
+  socket.emit(CHANGE_SPEED_REQUEST, { speed });
 }
 
 export function updateReady(isReady: boolean) {

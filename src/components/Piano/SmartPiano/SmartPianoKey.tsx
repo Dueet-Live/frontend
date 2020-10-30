@@ -1,5 +1,4 @@
-import React, { useContext, useState } from 'react';
-import { PlayerContext } from '../../../contexts/PlayerContext';
+import React, { useState } from 'react';
 import { PlayingNote } from '../types/playingNote';
 import './SmartPiano.css';
 
@@ -18,13 +17,12 @@ const SmartPianoKey: React.FC<Props> = ({
   index,
   keyWidth,
   keyHeight,
-  startPlayingNote,
-  stopPlayingNote,
-  keyboardShortcut,
+  startPlayingNote, // Unchanged
+  stopPlayingNote, // Unchanged
+  keyboardShortcut, // Unchanged
   useTouchEvents: useTouchscreen,
   playingNote,
 }) => {
-  const { me } = useContext(PlayerContext);
   const [useTouchEvents, setUseTouchEvents] = useState(useTouchscreen);
 
   const handleMouseDown = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -85,11 +83,7 @@ const SmartPianoKey: React.FC<Props> = ({
     if (playingNote.length === 0) {
       return '';
     } else {
-      if (playingNote[0].playerId === me) {
-        return 'smart-piano__key--playing-by-me';
-      } else {
-        return 'smart-piano__key--playing-by-others';
-      }
+      return 'smart-piano__key--playing-by-me';
     }
   };
 
@@ -107,4 +101,14 @@ const SmartPianoKey: React.FC<Props> = ({
   );
 };
 
-export default React.memo(SmartPianoKey);
+function areEqual(prevProps: Props, nextProps: Props) {
+  return (
+    prevProps.keyWidth === nextProps.keyWidth &&
+    prevProps.keyHeight === nextProps.keyHeight &&
+    prevProps.index === nextProps.index &&
+    prevProps.useTouchEvents === nextProps.useTouchEvents &&
+    prevProps.playingNote.length === nextProps.playingNote.length // For smart piano, only my playing notes are included
+  );
+}
+
+export default React.memo(SmartPianoKey, areEqual);

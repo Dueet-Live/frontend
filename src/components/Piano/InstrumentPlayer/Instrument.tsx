@@ -1,4 +1,3 @@
-import { difference } from '../utils/arrayHelpers';
 import { Player } from 'soundfont-player';
 import { NullSoundFontPlayerNoteAudio, AudioPlayer } from './AudioPlayer';
 
@@ -9,31 +8,6 @@ export default class Instrument {
   constructor(audioPlayer: AudioPlayer) {
     this.audioPlayer = audioPlayer;
     this.activeNoteMap = {};
-  }
-
-  playNotes(activeNotes: string[]) {
-    this.stopPlayingInactiveNotes(activeNotes);
-    this.startPlayingNewlyActiveNotes(activeNotes);
-  }
-
-  stopPlayingInactiveNotes(activeNotes: string[]) {
-    const previouslyActiveNotes = this.getActiveNotes();
-    const inactiveNotes = difference(previouslyActiveNotes, activeNotes);
-
-    inactiveNotes.forEach(note => {
-      this.activeNoteMap[note].stop();
-      // console.log("Stop " + note);
-      delete this.activeNoteMap[note];
-    });
-  }
-
-  startPlayingNewlyActiveNotes(activeNotes: string[]) {
-    const previouslyActiveNotes = this.getActiveNotes();
-    const newlyActiveNotes = difference(activeNotes, previouslyActiveNotes);
-
-    newlyActiveNotes.forEach(note => {
-      this.activeNoteMap[note] = this.audioPlayer.playNote(parseInt(note));
-    });
   }
 
   playNote(note: number) {
@@ -49,9 +23,5 @@ export default class Instrument {
     }
     this.activeNoteMap[note.toString()].stop();
     delete this.activeNoteMap[note.toString()];
-  }
-
-  getActiveNotes() {
-    return Object.keys(this.activeNoteMap);
   }
 }

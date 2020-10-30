@@ -41,13 +41,14 @@ const SoloRoom: React.FC = () => {
   const [roomState, setRoomState] = useState({
     players: [],
     id: '',
+    speed: 1,
   } as RoomInfo);
   const [chosenSongMIDI, setChosenSongMIDI] = useState<MidiJSON | undefined>();
   const [view, setView] = useState<RoomView>('solo.select');
   const [songSelectionGenre, setSongSelectionGenre] = useState('');
   const [score, setScore] = useState<Score>({ correct: 0, total: 0 });
 
-  const { piece } = roomState;
+  const { piece, speed } = roomState;
   const chosenSong = useSong(piece);
 
   useEffect(() => {
@@ -80,6 +81,10 @@ const SoloRoom: React.FC = () => {
           }}
           tryPiano={() => setView('solo.try')}
           chosenSong={chosenSong}
+          speed={speed}
+          setSpeed={(speed: number) =>
+            setRoomState((prevState: RoomInfo) => ({ ...prevState, speed }))
+          }
         />
       );
     }
@@ -93,7 +98,13 @@ const SoloRoom: React.FC = () => {
     }
 
     if (view === 'solo.play' && !!chosenSongMIDI) {
-      return <GameView chosenSongMIDI={chosenSongMIDI} setScore={setScore} />;
+      return (
+        <GameView
+          speed={speed}
+          chosenSongMIDI={chosenSongMIDI}
+          setScore={setScore}
+        />
+      );
     }
 
     return <></>;

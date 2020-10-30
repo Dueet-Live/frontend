@@ -1,35 +1,12 @@
-import {
-  createMuiTheme,
-  CssBaseline,
-  responsiveFontSizes,
-  ThemeProvider,
-} from '@material-ui/core';
+import { CssBaseline, ThemeProvider } from '@material-ui/core';
 import localforage from 'localforage';
 import React, { useEffect } from 'react';
 import genresAPI from './api/genres';
 import songsAPI from './api/songs';
 import AppRouter from './components/AppRouter';
 import NotificationShell from './components/NotificationShell';
+import theme from './theme';
 import { GENRES, SONGS } from './utils/extendedLocalForage';
-
-let theme = createMuiTheme({
-  palette: {
-    primary: {
-      main: '#904AE9',
-    },
-  },
-  overrides: {
-    MuiCssBaseline: {
-      '@global': {
-        body: {
-          height: 'calc(var(--vh, 1vh) * 100)',
-        },
-      },
-    },
-  },
-});
-
-theme = responsiveFontSizes(theme);
 
 const App: React.FC = () => {
   // retrieve songs and genres from API on startup

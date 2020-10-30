@@ -32,6 +32,7 @@ const useStyles = makeStyles(theme => ({
   },
   pickASongButton: {
     backgroundColor: '#c0b3d8de',
+    maxWidth: '100%',
   },
   closeButton: {
     position: 'absolute',
@@ -194,12 +195,16 @@ const PickASongButton: React.FC = () => {
         {chosenSong === null ? (
           <>
             <PickASongIcon className={classes.icon} />
-            <Typography variant="body1">No song selected</Typography>
+            <Typography noWrap variant="body1">
+              No song selected
+            </Typography>
           </>
         ) : (
           <>
             <MusicNoteOutlined className={classes.icon} />
-            <Typography variant="body1">{chosenSong.name}</Typography>
+            <Typography noWrap variant="body1">
+              {chosenSong.name}
+            </Typography>
           </>
         )}
       </Button>

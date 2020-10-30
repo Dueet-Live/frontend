@@ -19,6 +19,7 @@ export const RoomContext = React.createContext<RoomContextProps>({
   roomInfo: {
     id: '',
     piece: undefined,
+    speed: 1,
     players: [],
   },
   setRoomInfo: () => {},

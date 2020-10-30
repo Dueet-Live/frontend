@@ -57,7 +57,6 @@ export class AudioPlayer {
   }
 
   playNote(note: number, volume?: number) {
-    // console.log("Play " + note)
     if (volume === undefined) {
       return this.soundFontPlayer.play(note.toString(), 0, {
         gain: this.defaultVolume * this.maxVolume,
@@ -75,7 +74,6 @@ export class AudioPlayer {
     duration: number,
     volume: number
   ) {
-    // console.log("Play " + note)
     return this.soundFontPlayer.play(note.toString(), time, {
       duration,
       gain: volume * this.maxVolume,

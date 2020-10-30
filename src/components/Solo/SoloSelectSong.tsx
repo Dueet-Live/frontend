@@ -1,5 +1,4 @@
 import {
-  Fab,
   Grid,
   List,
   ListItem,
@@ -8,13 +7,14 @@ import {
 } from '@material-ui/core';
 import React, { useContext } from 'react';
 import { RoomContext } from '../../contexts/RoomContext';
-import PianoIcon from '../../icons/PianoIcon';
 import { RoomInfo } from '../../types/roomInfo';
 import { Song } from '../../types/song';
 import { choosePiece } from '../../utils/socket';
 import useGenres from '../../utils/useGenres';
 import useSongs from '../../utils/useSongs';
 import GenreCard from '../GenreCard';
+import { sendGAEvent } from '../GoogleAnalytics';
+import SpeedCustomization from '../shared/SpeedCustomization';
 import SongCard from '../SongCard';
 import SoloReadyButton from './SoloReadyButton';
 
@@ -33,15 +33,6 @@ const useStyles = makeStyles(theme => ({
     overflowY: 'auto',
     height: 0,
     flex: '1 1 auto',
-  },
-  fab: {
-    backgroundColor: '#7988FA',
-    position: 'absolute',
-    bottom: theme.spacing(2),
-    right: theme.spacing(2),
-    '&:hover': {
-      backgroundColor: '#A5AFFF',
-    },
   },
   content: {
     flexGrow: 1,
@@ -62,6 +53,13 @@ const useStyles = makeStyles(theme => ({
     paddingLeft: theme.spacing(2),
     paddingRight: theme.spacing(2),
     paddingTop: theme.spacing(1),
+    display: 'flex',
+    alignItems: 'flex-end',
+  },
+  speedContainer: {
+    flex: '1 1 auto',
+    textAlign: 'right',
+    paddingLeft: '16px',
   },
 }));
 
@@ -72,6 +70,8 @@ type Props = {
   isPieceDownloaded: boolean;
   handleStart: () => void;
   tryPiano: () => void;
+  speed: number;
+  setSpeed: (speed: number) => void;
 };
 
 const SoloSelectSong: React.FC<Props> = ({
@@ -81,6 +81,8 @@ const SoloSelectSong: React.FC<Props> = ({
   isPieceDownloaded,
   handleStart,
   tryPiano,
+  speed,
+  setSpeed,
 }) => {
   const classes = useStyles();
 
@@ -155,19 +157,28 @@ const SoloSelectSong: React.FC<Props> = ({
         {genre === '' ? pickingGenre() : pickingSong()}
       </div>
       <div className={classes.details}>
-        <Typography variant="h6" color="textPrimary">
-          Song chosen: {chosenSong === null ? 'None' : chosenSong.name}{' '}
-        </Typography>
-        <SoloReadyButton
-          disabled={chosenSong === null || downloadingSong}
-          handleStart={handleStart}
-        >
-          {downloadingSong ? 'Loading' : 'Play'}
-        </SoloReadyButton>
+        <div>
+          <Typography variant="h6" color="textPrimary" gutterBottom>
+            Song chosen: {chosenSong === null ? 'None' : chosenSong.name}{' '}
+          </Typography>
+          <SoloReadyButton
+            disabled={chosenSong === null || downloadingSong}
+            handleStart={() => {
+              sendGAEvent({
+                category: 'Solo',
+                action: 'Play',
+                label: chosenSong?.name,
+              });
+              handleStart();
+            }}
+          >
+            {downloadingSong ? 'Loading' : 'Play'}
+          </SoloReadyButton>
+        </div>
+        <div className={classes.speedContainer}>
+          <SpeedCustomization speed={speed} setSpeed={setSpeed} />
+        </div>
       </div>
-      <Fab aria-label="try piano" className={classes.fab} onClick={tryPiano}>
-        <PianoIcon />
-      </Fab>
     </>
   );
 };

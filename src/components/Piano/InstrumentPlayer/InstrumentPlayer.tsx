@@ -24,10 +24,6 @@ export default class InstrumentPlayer {
     return this.audioPlayer.playNoteWithDuration(note, time, duration, volume);
   }
 
-  playNotes(notes: string[]) {
-    this.instrument.playNotes(notes);
-  }
-
   playNote(note: number) {
     this.instrument.playNote(note);
   }

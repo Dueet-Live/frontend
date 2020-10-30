@@ -129,7 +129,6 @@ const DuetHome: React.FC = () => {
                 placeholder="XXXX"
                 onChange={handleRoomIdInput}
                 value={roomId}
-                autoFocus
                 onKeyPress={handleKeyPress}
                 onPaste={handleRoomIdPaste}
               />

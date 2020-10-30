@@ -35,13 +35,13 @@ type Props = {
 };
 
 const SmartPiano: React.FC<Props> = ({
-  instrumentPlayer,
+  instrumentPlayer, // Unchanged
   keyWidth,
   keyHeight,
-  indexToNotesMap,
-  didPlayNote = noOp,
-  didStopNote = noOp,
-  keyboardMap,
+  indexToNotesMap, // Unchanged
+  didPlayNote = noOp, // Unchanged
+  didStopNote = noOp, // Unchanged
+  keyboardMap, // Unchanged
   startTime,
 }) => {
   const numOfSmartKeys = 7;
@@ -50,6 +50,7 @@ const SmartPiano: React.FC<Props> = ({
   const notesManagersRef = useRef(
     indexToNotesMap.map(indexToNotes => new NotesManager(indexToNotes))
   );
+  // Only consist of my notes
   const [playingNotes, setPlayingNotes] = useState<PlayingNote[]>([]);
 
   // Used for touchscreen input
@@ -203,7 +204,7 @@ const SmartPiano: React.FC<Props> = ({
     setUseTouchEvents(true);
     setTouchedIndexes(getTouchedIndexes(event.touches));
     console.log(
-      `(Parent) Touch start ${Array.from(touchedIndexes.toString())}`
+      `(Parent) Touch start ${Array.from(touchedIndexes).toString()}`
     );
   };
 
@@ -295,4 +296,12 @@ const SmartPiano: React.FC<Props> = ({
   );
 };
 
-export default SmartPiano;
+function areEqual(prevProps: Props, nextProps: Props) {
+  return (
+    prevProps.keyWidth === nextProps.keyWidth &&
+    prevProps.keyHeight === nextProps.keyHeight &&
+    prevProps.startTime === nextProps.startTime
+  );
+}
+
+export default React.memo(SmartPiano, areEqual);
