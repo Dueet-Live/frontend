@@ -103,8 +103,6 @@ const GameView: React.FC<Props> = ({
     []
   );
 
-  console.log(indexToNotesMap[6]);
-
   const playerNotes = useMemo<Note[] | IndexedNote[]>(() => {
     if (showSmartPiano) {
       return getIndexedNotesFromNotes(normalPlayerNotes);

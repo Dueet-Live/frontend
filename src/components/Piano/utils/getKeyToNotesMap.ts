@@ -18,19 +18,30 @@ export const getIndexToNotesMap = (notes: NamedNote[]) => {
   const map = startKeyboardNotes.map(note => [note]);
 
   let prevNote = notes[0];
-  for (let note of notes) {
+  for (let i = 0; i < notes.length; i++) {
+    const note = notes[i];
     const prefix = getPrefixOfNote(note.name);
     const index = notePrefixMap.get(prefix)!;
 
     const notesAtIndex = map[index];
     const lastAddedNoteAtIndex = notesAtIndex[notesAtIndex.length - 1];
 
-    const expiry = prevNote.time + prevNote.duration;
     if (isMoreThanOctaveChange(lastAddedNoteAtIndex.midi, note.midi)) {
       const newOctave = getOctave(note.midi);
-      updateMap(map, newOctave, expiry);
+      updateMap(
+        map,
+        newOctave,
+        index,
+        note.midi,
+        prevNote.time,
+        prevNote.duration
+      );
     } else if (lastAddedNoteAtIndex.midi !== note.midi) {
-      updateNotesAtIndex(notesAtIndex, note.midi, expiry);
+      updateNotesAtIndex(
+        notesAtIndex,
+        note.midi,
+        prevNote.time + prevNote.duration / 2 // to mitigate issues with early playing
+      );
     }
 
     prevNote = note;
@@ -101,17 +112,35 @@ const isMoreThanOctaveChange = (prevMidi: number, currMidi: number) =>
 
 /**
  * Updates `map` by adding more notes to each index such that they are found at `octave`
- * and each of the last added note's expiry is also updated to `expiry`.
+ * and each of the last added note's expiry is also updated. Last added notes that are not
+ * located at `affectedIndex` will have their expiry updated to `prevTime + 1.5 prevDuration`
+ * (so that the playing will sound more natural if the user plays the previous note too late)
+ * while the notes located at `affectedIndex` will have an earlier expiry of `prevTime + 0.5
+ * prevDuration` (so that the playing will sound more natural if the user plays the note too
+ * early).
  *
  * Note that this function directly modifies `map`.
  */
-const updateMap = (map: MappedNote[][], octave: number, expiry: number) => {
+const updateMap = (
+  map: MappedNote[][],
+  octave: number,
+  affectedIndex: number,
+  midiAtAffectedIndex: number,
+  prevTime: number,
+  prevDuration: number
+) => {
   for (let i = 0; i < map.length; i++) {
     const notesAtIndex = map[i];
     const lastAddedNoteAtIndex = notesAtIndex[notesAtIndex.length - 1];
+    const expiry =
+      (affectedIndex === i ? prevDuration * 0.5 : prevDuration * 1.5) +
+      prevTime;
     lastAddedNoteAtIndex.expiry = expiry;
     notesAtIndex.push({
-      midi: changeToOctave(lastAddedNoteAtIndex.midi, octave),
+      midi:
+        affectedIndex === i
+          ? changeToOctave(lastAddedNoteAtIndex.midi, octave)
+          : midiAtAffectedIndex,
       expiry: expiry + ENDING_BUFFER_TIME,
     } as MappedNote);
   }
