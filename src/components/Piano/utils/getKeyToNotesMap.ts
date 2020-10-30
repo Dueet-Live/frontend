@@ -28,14 +28,7 @@ export const getIndexToNotesMap = (notes: NamedNote[]) => {
 
     if (isMoreThanOctaveChange(lastAddedNoteAtIndex.midi, note.midi)) {
       const newOctave = getOctave(note.midi);
-      updateMap(
-        map,
-        newOctave,
-        index,
-        note.midi,
-        prevNote.time,
-        prevNote.duration
-      );
+      updateMap(map, newOctave, index, note, prevNote);
     } else if (lastAddedNoteAtIndex.midi !== note.midi) {
       updateNotesAtIndex(
         notesAtIndex,
@@ -125,22 +118,22 @@ const updateMap = (
   map: MappedNote[][],
   octave: number,
   affectedIndex: number,
-  midiAtAffectedIndex: number,
-  prevTime: number,
-  prevDuration: number
+  currentNote: NamedNote,
+  prevNote: NamedNote
 ) => {
   for (let i = 0; i < map.length; i++) {
     const notesAtIndex = map[i];
     const lastAddedNoteAtIndex = notesAtIndex[notesAtIndex.length - 1];
     const expiry =
-      (affectedIndex === i ? prevDuration * 0.5 : prevDuration * 1.5) +
-      prevTime;
+      (affectedIndex === i ? -prevNote.duration * 0.5 : currentNote.duration) +
+      prevNote.duration +
+      prevNote.time;
     lastAddedNoteAtIndex.expiry = expiry;
     notesAtIndex.push({
       midi:
         affectedIndex === i
           ? changeToOctave(lastAddedNoteAtIndex.midi, octave)
-          : midiAtAffectedIndex,
+          : currentNote.midi,
       expiry: expiry + ENDING_BUFFER_TIME,
     } as MappedNote);
   }
