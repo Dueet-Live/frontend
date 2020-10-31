@@ -5,7 +5,6 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { noOp } from 'tone/build/esm/core/util/Interface';
 import { PlayerContext } from '../../../contexts/PlayerContext';
 import { shortcutsForSmartPiano } from '../../../utils/getKeyboardShorcutsMapping';
 import {
@@ -14,33 +13,27 @@ import {
   removeNotePlayListener,
   stopNote,
 } from '../../../utils/socket';
-import InstrumentPlayer from '../InstrumentPlayer';
 import { PlayingNote } from '../types/playingNote';
 import isRegularKey from '../utils/isRegularKey';
-import { default as SmartPianoKey } from './SmartPianoKey';
 import './SmartPiano.css';
 import { MappedNote } from '../types/mappedNote';
 import { NotesManager } from './NotesManager';
 import * as Tone from 'tone';
+import SmartPianoKeyWithFeedback from './SmartPianoKeyWithFeedback';
+import { GameContext } from '../../../contexts/GameContext';
 
 type Props = {
-  instrumentPlayer: InstrumentPlayer;
   keyWidth: number;
   keyHeight: number;
   indexToNotesMap: MappedNote[][];
-  didPlayNote?: (key: number, playerId: number) => void;
-  didStopNote?: (key: number, playerId: number) => void;
   keyboardMap?: { [key: string]: number };
   startTime: number;
 };
 
 const SmartPiano: React.FC<Props> = ({
-  instrumentPlayer, // Unchanged
   keyWidth,
   keyHeight,
   indexToNotesMap, // Unchanged
-  didPlayNote = noOp, // Unchanged
-  didStopNote = noOp, // Unchanged
   keyboardMap, // Unchanged
   startTime,
 }) => {
@@ -57,6 +50,10 @@ const SmartPiano: React.FC<Props> = ({
   const [useTouchEvents, setUseTouchEvents] = useState(false);
   const [touchedIndexes, setTouchedIndexes] = useState(new Set<number>());
 
+  // Used for note feedback
+  const { gameManagerRef, instrumentPlayer } = useContext(GameContext);
+  const feedbackManager = gameManagerRef?.current.feedbackManager;
+
   const startPlayingNote = useCallback(
     (note: number, playerId: number) => {
       // Relay to server
@@ -67,9 +64,9 @@ const SmartPiano: React.FC<Props> = ({
       instrumentPlayer.playNote(note);
 
       // Trigger callback
-      didPlayNote(note, playerId);
+      gameManagerRef?.current.handleNotePlay(note, playerId, me);
     },
-    [isDuetMode, me, didPlayNote, instrumentPlayer]
+    [isDuetMode, me, instrumentPlayer, gameManagerRef]
   );
 
   const stopPlayingNote = useCallback(
@@ -82,9 +79,9 @@ const SmartPiano: React.FC<Props> = ({
       instrumentPlayer.stopNote(note);
 
       // Trigger callback
-      didStopNote(note, playerId);
+      gameManagerRef?.current.handleNoteStop(note, playerId, me);
     },
-    [isDuetMode, me, didStopNote, instrumentPlayer]
+    [isDuetMode, me, instrumentPlayer, gameManagerRef]
   );
 
   const startPlayingSmartKey = useCallback(
@@ -97,6 +94,9 @@ const SmartPiano: React.FC<Props> = ({
       const note = notesManagersRef.current[index].firstNote;
 
       startPlayingNote(note.midi, playerId);
+      feedbackManager?.didPlayNote(note.midi, index);
+
+      // Update state
       setPlayingNotes(playingNotes => {
         const filtered = playingNotes.filter(
           playingNote => playingNote.smartKey !== index
@@ -111,14 +111,18 @@ const SmartPiano: React.FC<Props> = ({
         ];
       });
     },
-    [startPlayingNote, startTime]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [startPlayingNote, startTime, feedbackManager]
   );
 
   const stopPlayingSmartKey = useCallback(
     (index: number, playerId: number) => {
       const note = notesManagersRef.current[index].firstNote;
-      stopPlayingNote(note.midi, playerId);
 
+      stopPlayingNote(note.midi, playerId);
+      feedbackManager?.didStopNote(note.midi, index);
+
+      // Update state
       setPlayingNotes(playingNotes => {
         return playingNotes.filter(
           playingNote =>
@@ -126,7 +130,8 @@ const SmartPiano: React.FC<Props> = ({
         );
       });
     },
-    [stopPlayingNote]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [stopPlayingNote, startTime, feedbackManager]
   );
 
   /* Handle friends' notes */
@@ -271,7 +276,7 @@ const SmartPiano: React.FC<Props> = ({
         .fill(0)
         .map((_, index) => {
           return (
-            <SmartPianoKey
+            <SmartPianoKeyWithFeedback
               useTouchEvents={useTouchEvents}
               index={index}
               key={index}

@@ -1,5 +1,4 @@
 import * as Tone from 'tone';
-import { noOp } from 'tone/build/esm/core/util/Interface';
 import { Note } from '../../../types/MidiJSON';
 import { isEqual } from '../../../utils/setHelpers';
 import { Score } from '../types';
@@ -15,9 +14,9 @@ export default class ScoreManager {
   private scoreHandler?: NodeJS.Timeout;
 
   constructor(
-    startTime: number = -1,
-    playerNotes: Note[] = [],
-    setScore: (update: (prevScore: Score) => Score) => void = noOp
+    startTime: number,
+    playerNotes: Note[],
+    setScore: (update: (prevScore: Score) => Score) => void
   ) {
     this.isGameEnded = false;
     this.pressedNotes = new Set<number>();

@@ -14,7 +14,7 @@ import socket, {
   removeRoomStateListeners,
 } from '../../utils/socket';
 import useSong from '../../utils/useSong';
-import { FlyingNotesHandle } from '../Game/FlyingNotes';
+import { FlyingNotesHandle } from './FlyingNotes';
 import GameView from '../Game/GameView';
 import { Score } from '../Game/types';
 import { sendGAEvent } from '../GoogleAnalytics';
