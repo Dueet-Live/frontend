@@ -11,6 +11,8 @@ const useStyles = makeStyles(theme => ({
   toolBar: {
     [theme.breakpoints.down('xs')]: {
       paddingLeft: 0,
+      minHeight: 36,
+      height: 36,
     },
   },
 }));
@@ -25,7 +27,7 @@ const RoomHeader: React.FC<ToolbarProps> = ({ children, ...props }) => {
           {children}
         </Toolbar>
       </AppBar>
-      <Toolbar /> {/* To take up space */}
+      <Toolbar className={classes.toolBar} /> {/* To take up space */}
     </div>
   );
 };

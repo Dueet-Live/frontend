@@ -49,7 +49,7 @@ type Props = {
   setScore: (update: (prevScore: Score) => Score) => void;
   speed: number;
   myPart?: Part | null;
-  showSmartPiano?: boolean;
+  showSmartPiano: boolean;
   handleNotePlay?: (key: number, playerId: number) => void;
   handleNoteStop?: (key: number, playerId: number) => void;
 };
@@ -59,7 +59,7 @@ const GameView: React.FC<Props> = ({
   setScore,
   speed,
   myPart,
-  showSmartPiano = true,
+  showSmartPiano,
   handleNotePlay = noOp,
   handleNoteStop = noOp,
 }) => {

@@ -1,5 +1,4 @@
 import {
-  Button,
   Dialog,
   DialogTitle,
   DialogTitleProps,
@@ -12,28 +11,17 @@ import {
   useMediaQuery,
   useTheme,
 } from '@material-ui/core';
-import { ArrowBack, Close, MusicNoteOutlined } from '@material-ui/icons';
+import { ArrowBack, Close } from '@material-ui/icons';
 import React, { useContext, useState } from 'react';
-import { PlayerContext } from '../contexts/PlayerContext';
 import { RoomContext } from '../contexts/RoomContext';
-import PickASongIcon from '../icons/PickASongIcon';
 import { RoomInfo } from '../types/roomInfo';
-import { getReady } from '../utils/roomInfo';
 import { choosePiece } from '../utils/socket';
 import useGenres from '../utils/useGenres';
-import useSong from '../utils/useSong';
 import useSongs from '../utils/useSongs';
 import GenreCard from './GenreCard';
 import SongCard from './SongCard';
 
 const useStyles = makeStyles(theme => ({
-  icon: {
-    marginRight: theme.spacing(1),
-  },
-  pickASongButton: {
-    backgroundColor: '#c0b3d8de',
-    maxWidth: '100%',
-  },
   closeButton: {
     position: 'absolute',
     right: theme.spacing(1),
@@ -108,30 +96,21 @@ const DialogTitleWithButtons: React.FC<DialogTitleWithButtonsProps> = ({
   );
 };
 
-const PickASongButton: React.FC = () => {
-  const [open, setOpen] = useState(false);
+type Props = {
+  open: boolean;
+  handleClose: () => void;
+};
+
+const SongSelectionDialog: React.FC<Props> = ({ open, handleClose }) => {
   const [genre, setGenre] = useState('');
 
   const classes = useStyles();
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('xs'));
-  const { roomInfo, setRoomInfo } = useContext(RoomContext);
-
-  const { me } = useContext(PlayerContext);
-  const { me: iAmReady } = getReady(roomInfo, me);
-  const { piece } = roomInfo;
+  const { setRoomInfo } = useContext(RoomContext);
 
   const genres = useGenres();
   const songs = useSongs('duet');
-  const chosenSong = useSong(piece);
-
-  const handleOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
 
   const pickingGenre = () => {
     return (
@@ -186,41 +165,16 @@ const PickASongButton: React.FC = () => {
   };
 
   return (
-    <>
-      <Button
-        className={classes.pickASongButton}
-        onClick={handleOpen}
-        disabled={iAmReady}
-      >
-        {chosenSong === null ? (
-          <>
-            <PickASongIcon className={classes.icon} />
-            <Typography noWrap variant="body1">
-              No song selected
-            </Typography>
-          </>
-        ) : (
-          <>
-            <MusicNoteOutlined className={classes.icon} />
-            <Typography noWrap variant="body1">
-              {chosenSong.name}
-            </Typography>
-          </>
-        )}
-      </Button>
-      <Dialog
-        fullScreen={fullScreen}
-        fullWidth
-        open={open}
-        onClose={handleClose}
-        PaperProps={
-          fullScreen ? {} : { className: classes.dialogNotFullscreen }
-        }
-      >
-        {genre === '' ? pickingGenre() : pickingSong()}
-      </Dialog>
-    </>
+    <Dialog
+      fullScreen={fullScreen}
+      fullWidth
+      open={open}
+      onClose={handleClose}
+      PaperProps={fullScreen ? {} : { className: classes.dialogNotFullscreen }}
+    >
+      {genre === '' ? pickingGenre() : pickingSong()}
+    </Dialog>
   );
 };
 
-export default PickASongButton;
+export default SongSelectionDialog;

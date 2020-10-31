@@ -6,7 +6,7 @@ import { PlayerContext } from '../../contexts/PlayerContext';
 import { RoomContext, RoomView } from '../../contexts/RoomContext';
 import { MidiJSON } from '../../types/MidiJSON';
 import { RoomInfo } from '../../types/roomInfo';
-import { getFriendId, getMyPart } from '../../utils/roomInfo';
+import { getFriendId, getParts } from '../../utils/roomInfo';
 import socket, {
   addListeners,
   createRoom,
@@ -62,6 +62,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   const [chosenSongMIDI, setChosenSongMIDI] = useState<MidiJSON | undefined>();
   const [view, setView] = useState<RoomView>('duet.lobby');
   const [score, setScore] = useState<Score>({ correct: 0, total: 0 });
+  const [useSmartPiano, setUseSmartPiano] = useState(true);
 
   const { piece, speed } = roomState;
   const chosenSong = useSong(piece);
@@ -120,7 +121,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   }, [view]);
 
   const friendId = getFriendId(roomState, playerId);
-  const myPart = getMyPart(roomState, playerId);
+  const { me: myPart } = getParts(roomState, playerId);
 
   const myFlyingNotesHandleRef = useRef<FlyingNotesHandle | null>(null);
   const friendFlyingNotesHandleRef = useRef<FlyingNotesHandle | null>(null);
@@ -139,7 +140,8 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
         <DuetLobby
           isPieceDownloaded={!!chosenSongMIDI}
           chosenSong={chosenSong}
-          tryPiano={() => setView('duet.try')}
+          useSmartPiano={useSmartPiano}
+          setUseSmartPiano={setUseSmartPiano}
         />
       );
     }
@@ -163,6 +165,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
           speed={speed}
           myPart={myPart}
           handleNotePlay={handleNotePlay}
+          showSmartPiano={useSmartPiano}
         />
       );
     }

@@ -11,9 +11,10 @@ type ReadyButtonProps = ButtonProps & {
 const ReadyButton: React.FC<ReadyButtonProps> = ({ handleReady, ...props }) => {
   return (
     <Button
-      variant="outlined"
+      variant="contained"
       color="primary"
-      style={{ width: '110px' }}
+      size="large"
+      style={{ width: '150px' }}
       onClick={handleReady}
       {...props}
     />

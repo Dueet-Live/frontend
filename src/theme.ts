@@ -25,6 +25,9 @@ const theme = createMuiTheme({
     primary: {
       main: '#904AE9',
     },
+    secondary: {
+      main: '#7B66FC',
+    },
     me: {
       main: '#904AE9',
     },
@@ -42,5 +45,21 @@ const theme = createMuiTheme({
     },
   },
 });
+
+// `responsizeFontSize` only makes headers responsive
+// Make body font size smaller for small screens
+theme.typography.body1 = {
+  fontSize: '0.8rem',
+  [theme.breakpoints.up('sm')]: {
+    fontSize: '1rem',
+  },
+};
+
+theme.typography.body2 = {
+  fontSize: '0.7rem',
+  [theme.breakpoints.up('sm')]: {
+    fontSize: '0.875rem',
+  },
+};
 
 export default responsiveFontSizes(theme);

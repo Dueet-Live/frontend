@@ -20,9 +20,6 @@ import { Score } from '../Game/types';
 import RoomHeader from '../shared/RoomHeader';
 
 const useStyles = makeStyles(theme => ({
-  settingIcon: {
-    marginLeft: theme.spacing(1),
-  },
   link: {
     color: '#0000EE',
   },
@@ -40,6 +37,8 @@ const useStyles = makeStyles(theme => ({
   avatarBox: {
     position: 'relative',
     marginRight: theme.spacing(2),
+    height: '2em',
+    width: '2em',
   },
 }));
 

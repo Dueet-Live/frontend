@@ -1,3 +1,4 @@
+import { Part } from '../types/messages';
 import { RoomInfo } from '../types/roomInfo';
 
 export function getFriendId(roomState: RoomInfo, myId: number) {
@@ -13,37 +14,21 @@ export function getFriendId(roomState: RoomInfo, myId: number) {
   }
 }
 
-export function getPartsSelection(roomState: RoomInfo) {
-  const primo: number[] = [];
-  const secondo: number[] = [];
-
+export function getParts(roomState: RoomInfo, myId: number) {
   const players = roomState.players;
-  if (!players) {
-    return { primo, secondo };
-  }
-
-  for (const player of roomState.players) {
-    if (player.assignedPart === 'primo') {
-      primo.push(player.id);
-    } else if (player.assignedPart === 'secondo') {
-      secondo.push(player.id);
-    }
-  }
-  return { primo, secondo };
-}
-
-export function getMyPart(roomState: RoomInfo, myId: number) {
-  const players = roomState.players;
-  if (!players) return null;
+  let me: Part | null = null;
+  let friend: Part | null = null;
+  if (!players) return { me, friend };
 
   for (const player of players) {
+    const part = player.assignedPart || null;
     if (player.id === myId) {
-      const part = player.assignedPart;
-      return part === undefined ? null : part;
+      me = part;
+    } else {
+      friend = part;
     }
   }
-  // this should never happen
-  return null;
+  return { me, friend };
 }
 
 export function getReady(roomState: RoomInfo, myId: number) {

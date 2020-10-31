@@ -32,9 +32,11 @@ const playerMap = [
 const useStyles = makeStyles(theme => ({
   root: {
     padding: '1px',
-    fontSize: theme.typography.h4.fontSize,
     borderRadius: '50%',
+    height: '100%',
+    width: '100%',
   },
+
   myIcon: {
     border: `3px solid ${theme.palette.me.main}`,
   },
