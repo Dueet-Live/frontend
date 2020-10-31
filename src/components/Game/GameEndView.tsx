@@ -1,6 +1,6 @@
 import { Grid, Typography, useMediaQuery, useTheme } from '@material-ui/core';
 import makeStyles from '@material-ui/core/styles/makeStyles';
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import { RoomContext } from '../../contexts/RoomContext';
@@ -13,7 +13,8 @@ const useStyles = makeStyles(theme => ({
     flexDirection: 'column',
   },
   heading: {
-    paddingTop: theme.spacing(1),
+    padding: theme.spacing(1),
+    paddingBottom: 0,
   },
   content: {
     flex: '1 1 auto',
@@ -44,8 +45,18 @@ const GameEndView = () => {
   const landscape = useMediaQuery('(min-width: 450px)');
 
   const song = useSong(piece);
+  const finalAccuracy =
+    score.total === 0 ? 0 : (score.correct / score.total) * 100;
+  const [accuracy, setAccuracy] = useState(0);
 
-  const accuracy = score.total === 0 ? 0 : (score.correct / score.total) * 100;
+  useEffect(() => {
+    const handler = setTimeout(() => setAccuracy(finalAccuracy), 100);
+
+    return () => {
+      clearTimeout(handler);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   let text = '';
   let subtext = '';
@@ -105,6 +116,7 @@ const GameEndView = () => {
               styles={{
                 path: {
                   stroke: primaryColor,
+                  transitionDuration: '1s',
                 },
                 text: {
                   fill: primaryColor,
