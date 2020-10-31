@@ -6,8 +6,14 @@ import { Part } from '../../types/messages';
 const useStyles = makeStyles(theme => ({
   root: {
     backgroundColor: '#F0F0F0',
+  },
+  rootPortrait: {
     height: 'calc(1vw * 40)',
     width: 'calc(1vw * 40)',
+  },
+  rootLandscape: {
+    height: 'calc(1vw * 20)',
+    width: 'calc(1vw * 20)',
   },
   mainBox: {
     [theme.breakpoints.down('sm')]: {
@@ -38,6 +44,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 type Props = {
+  isPortrait: boolean;
   myPlayerId: number;
 } & (
   | { playerId: null }
@@ -78,14 +85,14 @@ const PlayerCard: React.FC<Props> = props => {
           visibility={part === null ? 'hidden' : 'visible'}
         >
           {/* part pill */}
-          <Box flexGrow={1} display="flex" justifyContent="center">
-            <Box width="80%" className={`${classes.pill} ${classes.partPill}`}>
+          <Box flexGrow={5} display="flex" justifyContent="center">
+            <Box width="90%" className={`${classes.pill} ${classes.partPill}`}>
               <Typography variant="body2">{part}</Typography>
             </Box>
           </Box>
           {/* ready pill */}
           <Box
-            flexGrow={1}
+            flexGrow={2}
             display="flex"
             justifyContent="center"
             visibility={isReady ? 'visible' : 'hidden'}
@@ -105,7 +112,12 @@ const PlayerCard: React.FC<Props> = props => {
   };
 
   return (
-    <Paper elevation={3} className={classes.root}>
+    <Paper
+      elevation={3}
+      className={`${classes.root} ${
+        props.isPortrait ? classes.rootPortrait : classes.rootLandscape
+      }`}
+    >
       <Box
         display="flex"
         flexDirection="column"

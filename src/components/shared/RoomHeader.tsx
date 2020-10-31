@@ -9,7 +9,7 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: '#FFF',
   },
   toolBar: {
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('sm')]: {
       paddingLeft: 0,
       minHeight: 36,
       height: 36,

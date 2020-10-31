@@ -4,10 +4,14 @@ declare module '@material-ui/core/styles/createPalette' {
   interface Palette {
     me: Palette['primary'];
     friend: Palette['primary'];
+    complementary: Palette['primary'];
+    secondaryComplementary: Palette['primary'];
   }
   interface PaletteOptions {
     me: PaletteOptions['primary'];
     friend: PaletteOptions['primary'];
+    complementary: PaletteOptions['primary'];
+    secondaryComplementary: PaletteOptions['primary'];
   }
 }
 
@@ -27,6 +31,12 @@ const theme = createMuiTheme({
     },
     secondary: {
       main: '#7B66FC',
+    },
+    complementary: {
+      main: '#FC7B66',
+    },
+    secondaryComplementary: {
+      main: '#FEB3A5',
     },
     me: {
       main: '#904AE9',
@@ -50,14 +60,14 @@ const theme = createMuiTheme({
 // Make body font size smaller for small screens
 theme.typography.body1 = {
   fontSize: '0.8rem',
-  [theme.breakpoints.up('sm')]: {
+  [theme.breakpoints.up('md')]: {
     fontSize: '1rem',
   },
 };
 
 theme.typography.body2 = {
   fontSize: '0.7rem',
-  [theme.breakpoints.up('sm')]: {
+  [theme.breakpoints.up('md')]: {
     fontSize: '0.875rem',
   },
 };

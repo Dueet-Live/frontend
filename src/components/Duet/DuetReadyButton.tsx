@@ -9,7 +9,8 @@ import ReadyButton from '../shared/ReadyButton';
 
 const useStyles = makeStyles(theme => ({
   readyButtonMessage: {
-    color: 'red',
+    color: theme.palette.complementary.main,
+    marginBottom: theme.spacing(1),
   },
   hidden: {
     visibility: 'hidden',

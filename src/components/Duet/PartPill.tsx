@@ -6,12 +6,14 @@ const useStyles = makeStyles(theme => ({
   pill: {
     borderRadius: '9999px',
     textAlign: 'center',
-    background: '#FC7B66',
+    background: theme.palette.complementary.main,
     color: 'white',
-    height: '2rem',
+    [theme.breakpoints.down('sm')]: {
+      height: '1.5rem',
+    },
     width: '40%',
     '&:disabled': {
-      background: '#FEB3A5',
+      background: theme.palette.secondaryComplementary.main,
     },
   },
 }));
