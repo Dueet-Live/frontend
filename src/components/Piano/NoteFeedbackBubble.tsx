@@ -2,40 +2,23 @@ import { makeStyles } from '@material-ui/core';
 import React from 'react';
 import { NoteFeedback } from '../Game/utils/NoteFeedback';
 
-export const FEEDBACK_BUBBLE_ANIMATION_DURATION = 800;
+export const FEEDBACK_BUBBLE_ANIMATION_DURATION = 1000;
 
 const useAnimationStyles = ({ feedback }: { feedback: NoteFeedback }) => {
   const getFeedbackContent = (feedback: NoteFeedback) => {
     switch (feedback) {
-      case NoteFeedback.MISSED:
-        return 'Missed';
-      case NoteFeedback.WRONG:
+      case NoteFeedback.MISS:
+        return '❌';
+      case NoteFeedback.WRONG: // Not shown
         return 'Wrong';
       case NoteFeedback.BAD:
-        return 'Bad';
-      case NoteFeedback.GOOD:
-        return 'Not Bad';
+        return '👎';
+      case NoteFeedback.GOOD: // Not shown
+        return 'Good';
       case NoteFeedback.GREAT:
-        return 'Great';
+        return '👍';
       case NoteFeedback.PERFECT:
-        return 'Perfect';
-    }
-  };
-
-  const getFeedbackColor = (feedback: NoteFeedback) => {
-    switch (feedback) {
-      case NoteFeedback.MISSED:
-        return '#8B0000';
-      case NoteFeedback.WRONG:
-        return '#F08080';
-      case NoteFeedback.BAD:
-        return '#F0E68C';
-      case NoteFeedback.GOOD:
-        return '#DAA520';
-      case NoteFeedback.GREAT:
-        return '#8FBC8F';
-      case NoteFeedback.PERFECT:
-        return '#006400';
+        return '⭐️';
     }
   };
 
@@ -44,19 +27,19 @@ const useAnimationStyles = ({ feedback }: { feedback: NoteFeedback }) => {
     // https://tobiasahlin.com/blog/curved-path-animations-in-css
     feedback: {
       position: 'relative',
+      display: 'flex',
+      justifyContent: 'center',
       '&:after': {
         content: `"${getFeedbackContent(feedback)}"`,
         [theme.breakpoints.down('sm')]: {
-          fontSize: theme.typography.body2.fontSize,
+          fontSize: theme.typography.body1.fontSize,
         },
         [theme.breakpoints.up('md')]: {
-          fontSize: theme.typography.h4.fontSize,
+          fontSize: theme.typography.h3.fontSize,
         },
-        color: `${getFeedbackColor(feedback)}`,
         position: 'absolute',
-        textAlign: 'center',
         animationName: '$feedbackYAxis',
-        animationTimingFunction: 'ease-in',
+        animationTimingFunction: 'ease-out',
         animationDuration: `${FEEDBACK_BUBBLE_ANIMATION_DURATION}ms`,
         animationIterationCount: 1,
         animationFillMode: 'forwards',
@@ -64,9 +47,11 @@ const useAnimationStyles = ({ feedback }: { feedback: NoteFeedback }) => {
     },
     '@keyframes feedbackYAxis': {
       '0%': {
+        transform: `translateY(100%)`,
         opacity: 1,
       },
       '100%': {
+        transform: `translateY(0)`,
         opacity: 0,
       },
     },

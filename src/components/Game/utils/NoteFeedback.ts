@@ -1,5 +1,5 @@
 export enum NoteFeedback {
-  MISSED = 0,
+  MISS = 0,
   WRONG = 1,
   BAD,
   GOOD,

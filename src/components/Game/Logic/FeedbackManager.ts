@@ -92,7 +92,7 @@ export default class FeedbackManager {
           !this.standardNoteMapByIndex[noteIndex].isPlayed &&
           !(midi in this.playingNotes)
         ) {
-          this.showFeedbackToUI(keyIdentifier, NoteFeedback.MISSED);
+          this.showFeedbackToUI(keyIdentifier, NoteFeedback.MISS);
         }
       }, checkTime);
     });
@@ -147,7 +147,7 @@ export default class FeedbackManager {
     for (let i = 0; i < this.playerNotes.length; i++) {
       const note = this.standardNoteMapByIndex[i];
       if (!note.isMissed && !note.isPlayed) {
-        this.stats[NoteFeedback.MISSED]++;
+        this.stats[NoteFeedback.MISS]++;
         note.isMissed = true;
       }
     }
@@ -204,7 +204,7 @@ export default class FeedbackManager {
         // Mark missed notes
         // Update the stats here, because there is slight inaccuracy in the scheduling
         if (!isMissed) {
-          this.stats[NoteFeedback.MISSED]++;
+          this.stats[NoteFeedback.MISS]++;
           this.standardNoteMapByMidi[midi].notes[i].isMissed = true;
         }
       }
@@ -273,7 +273,7 @@ export default class FeedbackManager {
   // TODO: if needed in ending screen
   generateStats() {
     return {
-      missed: this.stats[NoteFeedback.MISSED],
+      missed: this.stats[NoteFeedback.MISS],
       wrong: this.stats[NoteFeedback.WRONG],
       bad: this.stats[NoteFeedback.BAD],
       good: this.stats[NoteFeedback.GOOD],
