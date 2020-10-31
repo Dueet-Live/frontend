@@ -42,7 +42,6 @@ const TraditionalKeyboard: React.FC<Props> = ({
   // Used for note feedback
   const { gameManagerRef, instrumentPlayer } = useContext(GameContext);
   const feedbackManager = gameManagerRef?.current.feedbackManager;
-  // TODO: check whether where is a ongoing game and set up feedbackManager accordingly
 
   /* Handle state change */
   const startPlayingNote = useCallback(

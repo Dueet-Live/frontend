@@ -160,7 +160,6 @@ const GameView: React.FC<Props> = ({
         />
       );
     } else {
-      // TODO: show feedback for traditional piano as well
       return (
         <GameTraditionalPiano
           keyboardVolume={keyboardVolume}

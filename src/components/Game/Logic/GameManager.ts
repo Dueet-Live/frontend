@@ -91,7 +91,7 @@ export default class GameManager {
       endGame();
       this.scoreManager?.didEndGame();
       this.feedbackManager?.didEndGame();
-      // TODO
+      // TODO: game stats
       console.log(this.feedbackManager?.generateStats());
       // Slightly delay the ending screen
     }, this.delayedStartTime + songDuration - Tone.now() + 0.1);

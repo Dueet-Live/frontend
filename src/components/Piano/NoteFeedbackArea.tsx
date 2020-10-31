@@ -36,11 +36,12 @@ const NoteFeedbackArea: React.FC<{
   const [feedbackQueue, setFeedbackQueue] = useState<Set<NoteFeedbackMessage>>(
     new Set()
   );
-  const timeoutIDs = useRef<Set<NodeJS.Timeout>>(new Set());
+  const timeoutIDsRef = useRef<Set<NodeJS.Timeout>>(new Set());
 
   useEffect(() => {
     return () => {
-      timeoutIDs.current.forEach(timeoutId => {
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      timeoutIDsRef.current.forEach(timeoutId => {
         clearTimeout(timeoutId);
       });
     };
@@ -63,9 +64,9 @@ const NoteFeedbackArea: React.FC<{
     });
     const timeoutID = setTimeout(() => {
       dequeueFeedback(newFeedback);
-      timeoutIDs.current.delete(timeoutID);
+      timeoutIDsRef.current.delete(timeoutID);
     }, FEEDBACK_BUBBLE_ANIMATION_DURATION);
-    timeoutIDs.current.add(timeoutID);
+    timeoutIDsRef.current.add(timeoutID);
   };
 
   handleRef.current = {
