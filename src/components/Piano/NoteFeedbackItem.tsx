@@ -1,5 +1,5 @@
 import { makeStyles } from '@material-ui/core';
-import React, { useCallback } from 'react';
+import React from 'react';
 import CrossIcon from '../../icons/CrossIcon';
 import StarIcon from '../../icons/StarIcon';
 import ThumbDownIcon from '../../icons/ThumbDownIcon';
@@ -37,31 +37,25 @@ const useStyles = makeStyles(theme => ({
 }));
 
 // eslint-disable-next-line react/display-name
-const NoteFeedbackBubble = React.memo(
-  ({ feedback }: { feedback: NoteFeedback }) => {
-    const classes = useStyles();
-    const getFeedbackContent = useCallback((feedback: NoteFeedback) => {
-      switch (feedback) {
-        case NoteFeedback.MISS:
-          return <CrossIcon className={classes.icon} />;
-        case NoteFeedback.WRONG: // Not shown
-          return 'Wrong';
-        case NoteFeedback.BAD:
-          return <ThumbDownIcon className={classes.icon} />;
-        case NoteFeedback.GOOD: // Not shown
-          return 'Good';
-        case NoteFeedback.GREAT:
-          return <ThumbUpIcon className={classes.icon} />;
-        case NoteFeedback.PERFECT:
-          return <StarIcon className={classes.icon} />;
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-    return (
-      <div className={classes.feedback}>{getFeedbackContent(feedback)}</div>
-    );
-  },
-  () => true
-);
+const NoteFeedbackItem = ({ feedback }: { feedback: NoteFeedback }) => {
+  const classes = useStyles();
+  const getFeedbackContent = (feedback: NoteFeedback) => {
+    switch (feedback) {
+      case NoteFeedback.MISS:
+        return <CrossIcon className={classes.icon} />;
+      case NoteFeedback.WRONG: // Not shown
+        return 'Wrong';
+      case NoteFeedback.BAD:
+        return <ThumbDownIcon className={classes.icon} />;
+      case NoteFeedback.GOOD: // Not shown
+        return 'Good';
+      case NoteFeedback.GREAT:
+        return <ThumbUpIcon className={classes.icon} />;
+      case NoteFeedback.PERFECT:
+        return <StarIcon className={classes.icon} />;
+    }
+  };
+  return <div className={classes.feedback}>{getFeedbackContent(feedback)}</div>;
+};
 
-export default NoteFeedbackBubble;
+export default React.memo(NoteFeedbackItem, () => true);

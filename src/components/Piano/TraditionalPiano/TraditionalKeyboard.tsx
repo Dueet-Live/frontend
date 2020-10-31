@@ -9,32 +9,25 @@ import {
   stopNote,
 } from '../../../utils/socket';
 import './TraditionalPiano.css';
-import PianoKey from './TraditionalPianoKey';
 import getNotesBetween from '../utils/getNotesBetween';
-import { noOp } from 'tone/build/esm/core/util/Interface';
 import isRegularKey from '../utils/isRegularKey';
-import InstrumentPlayer from '../InstrumentPlayer';
+import TraditionalPianoKey from './TraditionalPianoKey';
+import { GameContext } from '../../../contexts/GameContext';
 
 type Props = {
-  instrumentPlayer: InstrumentPlayer;
   startNote: number;
   endNote: number;
   keyWidth: number;
   keyHeight: number;
   keyboardMap: { [key: string]: number };
-  didPlayNote?: (note: number, playerId: number) => void;
-  didStopNote?: (note: number, playerId: number) => void;
 };
 
 const TraditionalKeyboard: React.FC<Props> = ({
-  instrumentPlayer,
   startNote,
   endNote,
   keyWidth,
   keyHeight,
   keyboardMap,
-  didPlayNote = noOp,
-  didStopNote = noOp,
 }) => {
   const notes = getNotesBetween(startNote, endNote);
   const { me, friend } = useContext(PlayerContext);
@@ -46,6 +39,9 @@ const TraditionalKeyboard: React.FC<Props> = ({
   const [useTouchEvents, setUseTouchEvents] = useState(false);
   const [touchedNotes, setTouchedNotes] = useState(new Set<number>());
 
+  // Used for note feedback
+  const { gameManagerRef, instrumentPlayer } = useContext(GameContext);
+  const feedbackManager = gameManagerRef?.current.feedbackManager;
   // TODO: check whether where is a ongoing game and set up feedbackManager accordingly
 
   /* Handle state change */
@@ -58,14 +54,18 @@ const TraditionalKeyboard: React.FC<Props> = ({
 
       instrumentPlayer.playNote(note);
 
+      if (playerId === me) {
+        feedbackManager?.didPlayNote(note, note);
+      }
+
       setPlayingNotes(playingNotes => {
         return [...playingNotes, { note, playerId }];
       });
 
       // Trigger callback
-      didPlayNote(note, playerId);
+      gameManagerRef?.current.handleNotePlay(note, playerId, me);
     },
-    [isDuetMode, me, didPlayNote, instrumentPlayer]
+    [isDuetMode, me, gameManagerRef, instrumentPlayer, feedbackManager]
   );
 
   const stopPlayingNote = useCallback(
@@ -73,9 +73,14 @@ const TraditionalKeyboard: React.FC<Props> = ({
       // Relay to server
       if (isDuetMode && playerId === me) {
         stopNote(note);
+        feedbackManager?.didPlayNote(note, note);
       }
 
       instrumentPlayer.stopNote(note);
+
+      if (playerId === me) {
+        feedbackManager?.didStopNote(note, note);
+      }
 
       setPlayingNotes(playingNotes => {
         return playingNotes.filter(
@@ -85,9 +90,9 @@ const TraditionalKeyboard: React.FC<Props> = ({
       });
 
       // Trigger callback
-      didStopNote(note, playerId);
+      gameManagerRef?.current.handleNoteStop(note, playerId, me);
     },
-    [isDuetMode, me, didStopNote, instrumentPlayer]
+    [isDuetMode, me, gameManagerRef, instrumentPlayer, feedbackManager]
   );
 
   /* Handle friends' notes */
@@ -225,7 +230,7 @@ const TraditionalKeyboard: React.FC<Props> = ({
       onTouchCancel={handleTouchCancel}
     >
       {notes.map(note => (
-        <PianoKey
+        <TraditionalPianoKey
           useTouchEvents={useTouchEvents}
           key={note}
           note={note}

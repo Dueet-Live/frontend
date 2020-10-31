@@ -1,10 +1,12 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { noOp } from 'tone/build/esm/core/util/Interface';
+import { GameContext } from '../../../contexts/GameContext';
 import {
   calculateTraditionalKeyboardDimensionForFreePlay,
   calculateTraditionalKeyHeight,
 } from '../../../utils/calculateTraditionalKeyboardDimension';
 import useWindowDimensions from '../../../utils/useWindowDimensions';
+import GameManager from '../../Game/Logic/GameManager';
 import InstrumentPlayer from '../InstrumentPlayer';
 import TraditionalPiano from './TraditionalPiano';
 
@@ -32,15 +34,18 @@ const FreePlayPiano: React.FC<Props> = ({
     []
   );
 
+  const gameManagerRef = useRef<GameManager>(
+    new GameManager(handleNotePlay, handleNoteStop)
+  );
+
   return (
-    <TraditionalPiano
-      instrumentPlayer={instrumentPlayer}
-      includeOctaveShift={true}
-      keyboardDimension={keyboardDimension}
-      keyHeight={keyHeight}
-      didPlayNote={handleNotePlay}
-      didStopNote={handleNoteStop}
-    />
+    <GameContext.Provider value={{ gameManagerRef, instrumentPlayer }}>
+      <TraditionalPiano
+        includeOctaveShift={true}
+        keyboardDimension={keyboardDimension}
+        keyHeight={keyHeight}
+      />
+    </GameContext.Provider>
   );
 };
 

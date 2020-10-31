@@ -18,28 +18,29 @@ export default class GameManager {
   private scoreManager?: ScoreManager;
   feedbackManager?: FeedbackManager;
 
-  constructor() {
+  constructor(
+    didPlayNote?: (key: number, playerId: number) => void,
+    didStopNote?: (key: number, playerId: number) => void
+  ) {
     this.startTime = -1;
     this.delayedStartTime = -1;
     this.audioHandlers = [];
+
+    this.didPlayNote = didPlayNote;
+    this.didStopNote = didStopNote;
   }
 
   // Must set up game before start scheduling the various events
   setUpGame(
     setStartTime: (value: React.SetStateAction<number>) => void,
     lookAheadTime: number,
-    countDown: number,
-    didPlayNote?: (key: number, playerId: number) => void,
-    didStopNote?: (key: number, playerId: number) => void
+    countDown: number
   ) {
     this.startTime = Tone.now() + countDown;
     this.delayedStartTime = this.startTime + lookAheadTime;
     setStartTime(this.startTime);
     console.log('Game start', this.startTime);
     Tone.Transport.start();
-
-    this.didPlayNote = didPlayNote;
-    this.didStopNote = didStopNote;
   }
 
   scheduleCountDown(
@@ -90,17 +91,18 @@ export default class GameManager {
       endGame();
       this.scoreManager?.didEndGame();
       this.feedbackManager?.didEndGame();
+      // TODO
       console.log(this.feedbackManager?.generateStats());
       // Slightly delay the ending screen
     }, this.delayedStartTime + songDuration - Tone.now() + 0.1);
   }
 
-  setUpFeedbackManager(playerNotes: Note[]) {
+  setUpFeedbackManager(playerNotes: Note[], isSmartPiano: boolean) {
     this.feedbackManager = new FeedbackManager(
       this.delayedStartTime,
       playerNotes
     );
-    this.feedbackManager.startTrackingMissedNotes();
+    this.feedbackManager.startTrackingMissedNotes(isSmartPiano);
   }
 
   handleNotePlay(note: number, playedBy: number, myPlayerId: number) {

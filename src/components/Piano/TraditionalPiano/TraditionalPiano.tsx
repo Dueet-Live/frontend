@@ -5,26 +5,19 @@ import OctaveShiftKey from './OctaveShiftKey';
 import TraditionalKeyboard from './TraditionalKeyboard';
 import TraditionalPianoContainer from './TraditionalPianoContainer';
 import { TraditionalKeyboardDimension } from '../../../types/keyboardDimension';
-import InstrumentPlayer from '../InstrumentPlayer';
 
 type Props = {
-  instrumentPlayer: InstrumentPlayer;
   includeOctaveShift: boolean;
   keyboardDimension: TraditionalKeyboardDimension;
   keyHeight: number;
   keyboardMap?: { [key: string]: number };
-  didPlayNote?: (key: number, playerId: number) => void;
-  didStopNote?: (key: number, playerId: number) => void;
 };
 
 const TraditionalPiano: React.FC<Props> = ({
-  instrumentPlayer,
-  includeOctaveShift = true,
+  includeOctaveShift = true, // Unchanged
   keyboardDimension,
   keyHeight,
   keyboardMap,
-  didPlayNote,
-  didStopNote,
 }) => {
   const { start, range, keyWidth } = keyboardDimension;
   const [startNote, setStartNote] = useState(start);
@@ -74,14 +67,11 @@ const TraditionalPiano: React.FC<Props> = ({
       )}
 
       <TraditionalKeyboard
-        instrumentPlayer={instrumentPlayer}
         startNote={startNote}
         endNote={endNote}
         keyWidth={keyWidth}
         keyHeight={keyHeight}
         keyboardMap={keyboardMap ? keyboardMap : defaultKeyboardMap}
-        didPlayNote={didPlayNote}
-        didStopNote={didStopNote}
       />
       {includeOctaveShift && (
         <OctaveShiftKey

@@ -4,20 +4,14 @@ import { Note } from '../../types/MidiJSON';
 import { calculateSmartKeyHeight } from '../../utils/calculateSmartKeyboardDimension';
 import { getSmartKeyboardMapping } from '../../utils/getKeyboardShorcutsMapping';
 import useWindowDimensions from '../../utils/useWindowDimensions';
-import InstrumentPlayer from '../Piano/InstrumentPlayer';
 import SmartPiano from '../Piano/SmartPiano/SmartPiano';
 import { MappedNote } from '../Piano/types/mappedNote';
 import { getIndexToNotesMap } from '../Piano/utils/getKeyToNotesMap';
-import GameManager from './Logic/GameManager';
 
 type Props = {
-  gameManagerRef: React.MutableRefObject<GameManager>;
-  instrumentPlayer: InstrumentPlayer;
   keyWidth: number;
   normalPlayerNotes: Note[];
   startTime: number;
-  didPlayNote: (key: number, playerId: number) => void;
-  didStopNote: (key: number, playerId: number) => void;
 };
 
 const GameSmartPiano: React.FC<Props> = props => {

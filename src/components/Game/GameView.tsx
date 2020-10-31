@@ -1,14 +1,7 @@
 import { makeStyles } from '@material-ui/core';
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { noOp } from 'tone/build/esm/core/util/Interface';
-import { PlayerContext } from '../../contexts/PlayerContext';
+import { GameContext } from '../../contexts/GameContext';
 import { RoomContext, RoomView } from '../../contexts/RoomContext';
 import { TraditionalKeyboardDimension } from '../../types/keyboardDimension';
 import { Part } from '../../types/messages';
@@ -68,8 +61,9 @@ const GameView: React.FC<Props> = ({
 }) => {
   const classes = useStyles();
 
-  const gameManagerRef = useRef<GameManager>(new GameManager());
-  const { me } = useContext(PlayerContext);
+  const gameManagerRef = useRef<GameManager>(
+    new GameManager(handleNotePlay, handleNoteStop)
+  );
   const { view } = useContext(RoomContext);
 
   // Game start time (after the countdown)
@@ -118,13 +112,7 @@ const GameView: React.FC<Props> = ({
   useEffect(() => {
     // Set up game
     const gameManager = gameManagerRef.current;
-    gameManager.setUpGame(
-      setStartTime,
-      lookAheadTime,
-      countDown,
-      handleNotePlay,
-      handleNoteStop
-    );
+    gameManager.setUpGame(setStartTime, lookAheadTime, countDown);
 
     // Schedule countdown
     gameManager.scheduleCountDown(countDown, setTimeToStart);
@@ -136,7 +124,7 @@ const GameView: React.FC<Props> = ({
     // Set up score manager
     gameManager.setUpScoreManager(playerNotes, setScore);
     // Set up feedback manager
-    gameManager.setUpFeedbackManager(playerNotes);
+    gameManager.setUpFeedbackManager(playerNotes, showSmartPiano);
 
     // Schedule ending screen
     gameManager.scheduleEndingScreen(songDuration, () => {
@@ -148,21 +136,6 @@ const GameView: React.FC<Props> = ({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  /*************** Callbacks *****************/
-  const didPlayNote = useCallback(
-    (note: number, playedBy: number) => {
-      gameManagerRef.current.handleNotePlay(note, playedBy, me);
-    },
-    [me]
-  );
-
-  const didStopNote = useCallback(
-    (note: number, playedBy: number) => {
-      gameManagerRef.current.handleNoteStop(note, playedBy, me);
-    },
-    [me]
-  );
 
   /*************** Keyboard dimension *****************/
   const [middleBoxDimensions, middleBoxRef] = useDimensions<HTMLDivElement>();
@@ -181,12 +154,8 @@ const GameView: React.FC<Props> = ({
     if (showSmartPiano) {
       return (
         <GameSmartPiano
-          gameManagerRef={gameManagerRef}
-          instrumentPlayer={instrumentPlayer}
           keyWidth={keyboardDimension.keyWidth}
           normalPlayerNotes={playerNotes}
-          didPlayNote={didPlayNote}
-          didStopNote={didStopNote}
           startTime={delayedStartTime}
         />
       );
@@ -194,12 +163,9 @@ const GameView: React.FC<Props> = ({
       // TODO: show feedback for traditional piano as well
       return (
         <GameTraditionalPiano
-          instrumentPlayer={instrumentPlayer}
           keyboardVolume={keyboardVolume}
           keyboardDimension={keyboardDimension as TraditionalKeyboardDimension}
           playerTrack={playerTrack}
-          didPlayNote={didPlayNote}
-          didStopNote={didStopNote}
         />
       );
     }
@@ -213,19 +179,21 @@ const GameView: React.FC<Props> = ({
         delayedStartTime={delayedStartTime}
         songDuration={songDuration}
       />
-      <div ref={middleBoxRef} className={classes.middleBox}>
-        <GameMiddleView
-          timeToStart={timeToStart}
-          gameEnd={gameEnd}
-          showSmartPiano={showSmartPiano}
-          middleBoxDimensions={middleBoxDimensions}
-          startTime={startTime}
-          lookAheadTime={lookAheadTime}
-          keyboardDimension={keyboardDimension}
-          normalPlayerNotes={playerNotes}
-        />
-      </div>
-      <div className={classes.piano}>{!gameEnd && piano}</div>
+      <GameContext.Provider value={{ gameManagerRef, instrumentPlayer }}>
+        <div ref={middleBoxRef} className={classes.middleBox}>
+          <GameMiddleView
+            timeToStart={timeToStart}
+            gameEnd={gameEnd}
+            showSmartPiano={showSmartPiano}
+            middleBoxDimensions={middleBoxDimensions}
+            startTime={startTime}
+            lookAheadTime={lookAheadTime}
+            keyboardDimension={keyboardDimension}
+            normalPlayerNotes={playerNotes}
+          />
+        </div>
+        <div className={classes.piano}>{!gameEnd && piano}</div>
+      </GameContext.Provider>
     </div>
   );
 };

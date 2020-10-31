@@ -5,16 +5,12 @@ import { Track } from '../../types/MidiJSON';
 import { calculateTraditionalKeyHeight } from '../../utils/calculateTraditionalKeyboardDimension';
 import { getTraditionalKeyboardMappingWithSpecificStart } from '../../utils/getKeyboardShorcutsMapping';
 import useWindowDimensions from '../../utils/useWindowDimensions';
-import InstrumentPlayer from '../Piano/InstrumentPlayer';
 import TraditionalPiano from '../Piano/TraditionalPiano/TraditionalPiano';
 
 type Props = {
-  instrumentPlayer: InstrumentPlayer;
   keyboardVolume: number;
   keyboardDimension: TraditionalKeyboardDimension;
   playerTrack: Track;
-  didPlayNote: (key: number, playerId: number) => void;
-  didStopNote: (key: number, playerId: number) => void;
 };
 
 const GameTraditionalPiano: React.FC<Props> = props => {

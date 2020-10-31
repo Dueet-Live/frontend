@@ -1,13 +1,11 @@
 import { makeStyles, Box } from '@material-ui/core';
-import React, { useEffect, useRef } from 'react';
-import GameManager from '../../Game/Logic/GameManager';
+import React, { useContext, useEffect, useRef } from 'react';
+import { GameContext } from '../../../contexts/GameContext';
 import NoteFeedbackArea from '../NoteFeedbackArea';
 import { NoteFeedbackAreaHandle } from '../types/noteFeedback';
 import SmartPianoKey from './SmartPianoKey';
 
-type Props = React.ComponentProps<typeof SmartPianoKey> & {
-  gameManagerRef: React.MutableRefObject<GameManager>;
-};
+type Props = React.ComponentProps<typeof SmartPianoKey>;
 
 const useStyles = makeStyles(() => ({
   pianoKeyContainer: {
@@ -17,11 +15,11 @@ const useStyles = makeStyles(() => ({
 
 const SmartPianoKeyWithFeedback: React.FC<Props> = props => {
   const classes = useStyles();
-  const feedbackHandleRef = useRef<NoteFeedbackAreaHandle | null>(null);
-  const { gameManagerRef, ...pianoKeyProps } = props;
 
   // Used for note feedback
-  const feedbackManager = gameManagerRef.current.feedbackManager;
+  const { gameManagerRef } = useContext(GameContext);
+  const feedbackManager = gameManagerRef?.current.feedbackManager;
+  const feedbackHandleRef = useRef<NoteFeedbackAreaHandle | null>(null);
 
   useEffect(() => {
     if (feedbackManager === undefined) {
@@ -39,7 +37,7 @@ const SmartPianoKeyWithFeedback: React.FC<Props> = props => {
   return (
     <Box className={classes.pianoKeyContainer}>
       <NoteFeedbackArea handleRef={feedbackHandleRef} />
-      <SmartPianoKey {...pianoKeyProps} />
+      <SmartPianoKey {...props} />
     </Box>
   );
 };

@@ -1,14 +1,14 @@
 import { makeStyles } from '@material-ui/core';
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 import { NoteFeedback } from '../Game/utils/NoteFeedback';
 import {
   NoteFeedbackAreaHandleRef,
   NoteFeedbackMessage,
 } from './types/noteFeedback';
-import NoteFeedbackBubble, {
+import NoteFeedbackItem, {
   FEEDBACK_BUBBLE_ANIMATION_DURATION,
-} from './NoteFeedbackBubble';
+} from './NoteFeedbackItem';
 
 const useStyles = makeStyles({
   container: {
@@ -36,6 +36,15 @@ const NoteFeedbackArea: React.FC<{
   const [feedbackQueue, setFeedbackQueue] = useState<Set<NoteFeedbackMessage>>(
     new Set()
   );
+  const timeoutIDs = useRef<Set<NodeJS.Timeout>>(new Set());
+
+  useEffect(() => {
+    return () => {
+      timeoutIDs.current.forEach(timeoutId => {
+        clearTimeout(timeoutId);
+      });
+    };
+  }, []);
 
   const dequeueFeedback = (note: NoteFeedbackMessage) => {
     setFeedbackQueue(oldFeedbackQueue => {
@@ -52,9 +61,11 @@ const NoteFeedbackArea: React.FC<{
       newFeedbackQueue.add(newFeedback);
       return newFeedbackQueue;
     });
-    setTimeout(() => {
+    const timeoutID = setTimeout(() => {
       dequeueFeedback(newFeedback);
+      timeoutIDs.current.delete(timeoutID);
     }, FEEDBACK_BUBBLE_ANIMATION_DURATION);
+    timeoutIDs.current.add(timeoutID);
   };
 
   handleRef.current = {
@@ -64,7 +75,7 @@ const NoteFeedbackArea: React.FC<{
   return (
     <div className={classes.container}>
       {Array.from(feedbackQueue).map(feedback => (
-        <NoteFeedbackBubble key={feedback.id} feedback={feedback.num} />
+        <NoteFeedbackItem key={feedback.id} feedback={feedback.num} />
       ))}
     </div>
   );

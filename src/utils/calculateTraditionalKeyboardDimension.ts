@@ -5,7 +5,7 @@ import { Track } from '../types/MidiJSON';
 const octaveShiftKeyWidth = 30; // Fixed, once updated, update the css as well
 const referenceCenterNote = 60; // C4
 const minRange = 25; // 2 Octaves
-const referenceKeywidth = 50;
+const referenceKeywidth = 60;
 const octageRange = 12;
 
 /********************* DEFAULT MODE **************************************/

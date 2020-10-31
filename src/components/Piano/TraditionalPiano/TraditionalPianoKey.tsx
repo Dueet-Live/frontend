@@ -1,10 +1,6 @@
 import React, { useState } from 'react';
 import * as Tone from 'tone';
 import { PlayingNote } from '../types/playingNote';
-import {
-  calculateBlackKeyHeight,
-  calculateBlackKeyWidth,
-} from '../../../utils/calculateTraditionalKeyboardDimension';
 import AccidentalKey from './AccidentalKey';
 import NaturalKey from './NaturalKey';
 import isAccidentalNote from '../utils/isAccidentalNote';
@@ -92,10 +88,8 @@ const TraditionalPianoKey: React.FC<Props> = ({
       playingNote={playingNote}
       topText={note % 12 === 0 ? Tone.Frequency(note, 'midi').toNote() : ''}
       bottomText={getBottomText()}
-      keyWidth={isNoteAccidental ? calculateBlackKeyWidth(keyWidth) : keyWidth}
-      keyHeight={
-        isNoteAccidental ? calculateBlackKeyHeight(keyHeight) : keyHeight
-      }
+      keyWidth={keyWidth}
+      keyHeight={keyHeight}
       eventHandlers={!useTouchEvents ? eventHandlers : {}}
     />
   );

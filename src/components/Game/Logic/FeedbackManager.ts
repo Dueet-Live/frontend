@@ -1,12 +1,13 @@
 import * as Tone from 'tone';
 import { Note } from '../../../types/MidiJSON';
 import { NoteFeedbackAreaHandleRef } from '../../Piano/types/noteFeedback';
+import { IndexedNote } from '../../Waterfall/types';
 import { getIndexedNotesFromNotes } from '../../Waterfall/utils';
 import { NoteFeedback } from '../utils/NoteFeedback';
 
 type PlayingNote = {
   startTime: number;
-  keyIdentifier: number;
+  keyIdentifier: number; // used to identify a unique key, keyboard index for smart keyboard, midi note for traditional piano
 };
 
 type MarkedNote = Note & {
@@ -36,7 +37,7 @@ export default class FeedbackManager {
   private standardNoteMapByMidi: MarkedNotesMidiMap = {};
   // Used for detecting missed notes
   private standardNoteMapByIndex: MarkedNotesIndexMap = {};
-  // Currently pressed notes (key: midi, value: time)
+  // Currently pressed notes
   private playingNotes: { [midi: number]: PlayingNote } = {};
   // Maximum total difference (error tolerance)
   private DIFF_THRESHOLD: number = 0.4;
@@ -76,12 +77,14 @@ export default class FeedbackManager {
 
   // This is only used for note feedback as it can be slightly inaccurate at times
   // Actual update of stats is in `didStopNote`
-  // TODO: get indexed notes for traditional piano as well
-  startTrackingMissedNotes() {
-    const indexedNotes = getIndexedNotesFromNotes(this.playerNotes);
-    indexedNotes.forEach((note, noteIndex) => {
-      const { time, duration, index: keyIdentifier } = note;
+  startTrackingMissedNotes(isSmartPiano: boolean) {
+    const indexedNotes = isSmartPiano
+      ? getIndexedNotesFromNotes(this.playerNotes)
+      : this.playerNotes;
+    indexedNotes.forEach((note: Note | IndexedNote, noteIndex: number) => {
+      const { time, duration } = note;
       const { midi } = this.playerNotes[noteIndex];
+      const keyIdentifier = isSmartPiano ? (note as IndexedNote).index : midi;
       const checkTime =
         this.getMissCheckTime(time, duration) + this.startTime - Tone.now();
       Tone.Transport.schedule(() => {
@@ -113,7 +116,7 @@ export default class FeedbackManager {
 
   didStopNote(midi: number, keyIdentifier: number) {
     if (!(midi in this.playingNotes)) {
-      console.log(
+      console.error(
         'Error, found note stop without corresponding note start event'
       );
       return;
@@ -126,7 +129,7 @@ export default class FeedbackManager {
     } = this.playingNotes[midi];
 
     if (keyIdentifier !== keyboardIndex) {
-      console.log(
+      console.error(
         'Error, found note stop has different key identifier with the corresponding note start event'
       );
       return;
