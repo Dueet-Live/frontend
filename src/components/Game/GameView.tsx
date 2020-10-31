@@ -9,6 +9,7 @@ import React, {
 } from 'react';
 import { noOp } from 'tone/build/esm/core/util/Interface';
 import { PlayerContext } from '../../contexts/PlayerContext';
+import { RoomContext, RoomView } from '../../contexts/RoomContext';
 import { TraditionalKeyboardDimension } from '../../types/keyboardDimension';
 import { Part } from '../../types/messages';
 import { MidiJSON } from '../../types/MidiJSON';
@@ -46,7 +47,8 @@ const useStyles = makeStyles(() => ({
 
 type Props = {
   chosenSongMIDI: MidiJSON;
-  setScore: (update: (prevScore: Score) => Score) => void;
+  setScore: (score: React.SetStateAction<Score>) => void;
+  setView: (view: RoomView) => void;
   speed: number;
   myPart?: Part | null;
   showSmartPiano?: boolean;
@@ -57,6 +59,7 @@ type Props = {
 const GameView: React.FC<Props> = ({
   chosenSongMIDI,
   setScore,
+  setView,
   speed,
   myPart,
   showSmartPiano = true,
@@ -67,12 +70,13 @@ const GameView: React.FC<Props> = ({
 
   const gameManager = useRef<GameManager>(new GameManager());
   const { me } = useContext(PlayerContext);
+  const { view } = useContext(RoomContext);
 
   // Game start time (after the countdown)
   const [startTime, setStartTime] = useState(-1);
   const countDown = 3;
   const [timeToStart, setTimeToStart] = useState(countDown);
-  const [gameEnd, setGameEnd] = useState(false);
+  const gameEnd = view.includes('play.end');
 
   /*************** Song information *****************/
   const modifiedMIDI = useMemo(
@@ -133,7 +137,9 @@ const GameView: React.FC<Props> = ({
     currentGameManager.setUpScoreManager(playerNotes, setScore);
 
     // Schedule ending screen
-    currentGameManager.scheduleEndingScreen(songDuration, setGameEnd);
+    currentGameManager.scheduleEndingScreen(songDuration, () => {
+      setView(myPart === undefined ? 'solo.play.end' : 'duet.play.end');
+    });
 
     return () => {
       currentGameManager.cleanup();

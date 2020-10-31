@@ -12,13 +12,10 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     flexDirection: 'column',
   },
-  heading: {
-    padding: theme.spacing(1),
-    paddingBottom: 0,
-  },
   content: {
     flex: '1 1 auto',
-    paddingTop: theme.spacing(2),
+    padding: theme.spacing(2),
+    paddingBottom: 0,
   },
   progressBar: {
     width: '50%',
