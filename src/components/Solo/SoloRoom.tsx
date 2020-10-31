@@ -4,13 +4,13 @@ import songsAPI from '../../api/songs';
 import { RoomContext, RoomView } from '../../contexts/RoomContext';
 import { MidiJSON } from '../../types/MidiJSON';
 import { RoomInfo } from '../../types/roomInfo';
-import useSong from '../../utils/useSong';
-import FreePlayPiano from '../Piano/TraditionalPiano/FreePlayPiano';
-import SoloSelectSong from './SoloSelectSong';
 import { startAudioContext } from '../../utils/toneContext';
+import useSong from '../../utils/useSong';
 import GameView from '../Game/GameView';
 import { Score } from '../Game/types';
+import FreePlayPiano from '../Piano/TraditionalPiano/FreePlayPiano';
 import SoloRoomHeader from './SoloRoomHeader';
+import SoloSelectSong from './SoloSelectSong';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -97,10 +97,11 @@ const SoloRoom: React.FC = () => {
       );
     }
 
-    if (view === 'solo.play' && !!chosenSongMIDI) {
+    if (view.includes('solo.play') && !!chosenSongMIDI) {
       return (
         <GameView
           speed={speed}
+          setView={setView}
           chosenSongMIDI={chosenSongMIDI}
           setScore={setScore}
         />
@@ -114,6 +115,8 @@ const SoloRoom: React.FC = () => {
     <RoomContext.Provider
       value={{
         roomInfo: roomState,
+        score: score,
+        view: view,
         setRoomInfo: setRoomState,
       }}
     >

@@ -77,7 +77,8 @@ const SoloRoomHeader: React.FC<Props> = ({
         break;
       }
       case 'solo.try':
-      case 'solo.play': {
+      case 'solo.play':
+      case 'solo.play.end': {
         if (view === 'solo.try') {
           backText = 'Song Selection';
         }

@@ -83,12 +83,9 @@ export default class GameManager {
     this.scoreManager.startChecking();
   }
 
-  scheduleEndingScreen(
-    songDuration: number,
-    setGameEnd: (value: React.SetStateAction<boolean>) => void
-  ) {
+  scheduleEndingScreen(songDuration: number, endGame: () => void) {
     Tone.Transport.schedule(() => {
-      setGameEnd(true);
+      endGame();
       this.scoreManager?.didEndGame();
       // Slightly delay the ending screen
     }, this.delayedStartTime + songDuration - Tone.now() + 0.1);

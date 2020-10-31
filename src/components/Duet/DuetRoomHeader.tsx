@@ -136,7 +136,8 @@ const DuetRoomHeader: React.FC<Props> = ({
         handleBack = () => setView('duet.lobby');
         break;
       }
-      case 'duet.play': {
+      case 'duet.play':
+      case 'duet.play.end': {
         handleBack = () => {
           setView('duet.lobby');
           resetScore();
