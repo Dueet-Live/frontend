@@ -17,6 +17,11 @@ const useStyles = makeStyles(theme => ({
     padding: theme.spacing(2),
     paddingBottom: 0,
   },
+  progressBarContainer: {
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+  },
   progressBar: {
     width: '50%',
     margin: theme.spacing(3),
@@ -105,7 +110,13 @@ const GameEndView = () => {
           className={classes.center}
           xs={landscape ? 6 : 'auto'}
         >
-          <Grid item>
+          <Grid
+            item
+            container
+            direction="column"
+            justify="center"
+            className={classes.progressBarContainer}
+          >
             <CircularProgressbar
               value={accuracy}
               text={`${accuracy.toFixed(0)}%`}

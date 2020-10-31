@@ -14,8 +14,8 @@ const useStyles = makeStyles({
   container: {
     position: 'absolute',
     overflow: 'hidden',
-    height: `120%`,
-    transform: 'translateY(-100%)',
+    height: `100%`,
+    top: '-100%',
     width: '100%',
   },
 });
