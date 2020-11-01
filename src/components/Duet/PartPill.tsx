@@ -33,7 +33,7 @@ const PartPill: React.FC<Props> = ({ part, selected, onClick }) => {
       disabled={selected}
       size="small"
     >
-      <Typography variant="body1">{part}</Typography>
+      <Typography variant="body2">{part}</Typography>
     </Button>
   );
 };
