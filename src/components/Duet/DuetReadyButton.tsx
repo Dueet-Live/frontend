@@ -10,7 +10,7 @@ import ReadyButton from '../shared/ReadyButton';
 const useStyles = makeStyles(theme => ({
   readyButtonMessage: {
     color: theme.palette.complementary.main,
-    marginBottom: theme.spacing(1),
+    marginTop: theme.spacing(1),
   },
   hidden: {
     visibility: 'hidden',
@@ -66,7 +66,7 @@ const DuetReadyButton: React.FC<Props> = ({ isDownloadingSong, ...props }) => {
 
   let message: string | null = null;
   if (friend === null) {
-    message = '';
+    message = 'Waiting for your partner to join the room...';
   } else if (piece === undefined) {
     message = 'Please select a piece to play';
   } else if (parts.me === null) {
@@ -79,6 +79,13 @@ const DuetReadyButton: React.FC<Props> = ({ isDownloadingSong, ...props }) => {
 
   return (
     <>
+      <ReadyButton
+        handleReady={() => handleReady(!ready.me)}
+        disabled={disabled}
+        {...props}
+      >
+        {readyButtonText}
+      </ReadyButton>
       <Typography
         variant="body1"
         noWrap
@@ -88,13 +95,6 @@ const DuetReadyButton: React.FC<Props> = ({ isDownloadingSong, ...props }) => {
       >
         {message || 'PLACEHOLDER'}
       </Typography>
-      <ReadyButton
-        handleReady={() => handleReady(!ready.me)}
-        disabled={disabled}
-        {...props}
-      >
-        {readyButtonText}
-      </ReadyButton>
     </>
   );
 };
