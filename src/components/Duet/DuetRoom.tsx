@@ -1,7 +1,8 @@
 import { Box, makeStyles } from '@material-ui/core';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import songsAPI from '../../api/songs';
+import { NotificationContext } from '../../contexts/NotificationContext';
 import { PlayerContext } from '../../contexts/PlayerContext';
 import { RoomContext, RoomView } from '../../contexts/RoomContext';
 import { MidiJSON } from '../../types/MidiJSON';
@@ -14,13 +15,13 @@ import socket, {
   removeRoomStateListeners,
 } from '../../utils/socket';
 import useSong from '../../utils/useSong';
-import { FlyingNotesHandle } from './FlyingNotes';
 import GameView from '../Game/GameView';
 import { Score } from '../Game/types';
 import { sendGAEvent } from '../GoogleAnalytics';
 import FreePlayPiano from '../Piano/TraditionalPiano/FreePlayPiano';
 import DuetLobby from './DuetLobby';
 import DuetRoomHeader from './DuetRoomHeader';
+import { FlyingNotesHandle } from './FlyingNotes';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -62,6 +63,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   const [chosenSongMIDI, setChosenSongMIDI] = useState<MidiJSON | undefined>();
   const [view, setView] = useState<RoomView>('duet.lobby');
   const [score, setScore] = useState<Score>({ correct: 0, total: 0 });
+  const displayNotification = useContext(NotificationContext);
 
   const { piece, speed } = roomState;
   const chosenSong = useSong(piece);
@@ -70,7 +72,13 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
     // connect to ws server
     socket.open();
 
-    addListeners(setPlayerId, setRoomState, setView, history);
+    addListeners(
+      setPlayerId,
+      setRoomState,
+      setView,
+      displayNotification,
+      history
+    );
     return () => {
       removeRoomStateListeners();
       socket.close();
@@ -98,12 +106,15 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
 
         setChosenSongMIDI(JSON.parse(song.content) as MidiJSON);
       } catch (err) {
-        // TODO set a notification that it failed to retrieve song
-        // from server
+        displayNotification({
+          message: 'Failed to connect to Song server, please try again later',
+          severity: 'error',
+        });
       }
     }
 
     fetchSongMIDI();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [piece]);
 
   useEffect(() => {
