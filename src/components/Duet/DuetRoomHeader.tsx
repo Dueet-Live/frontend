@@ -1,11 +1,11 @@
 import {
   Box,
   Button,
-  IconButton,
   Link,
   makeStyles,
   Typography,
   useMediaQuery,
+  useTheme,
 } from '@material-ui/core';
 import { ArrowBack, MusicNoteOutlined } from '@material-ui/icons';
 import React, { useContext } from 'react';
@@ -14,16 +14,12 @@ import { NotificationContext } from '../../contexts/NotificationContext';
 import { PlayerContext } from '../../contexts/PlayerContext';
 import { RoomContext, RoomView } from '../../contexts/RoomContext';
 import PlayerIcon from '../../icons/PlayerIcon';
-import SettingsIcon from '../../icons/SettingsIcon';
 import useSong from '../../utils/useSong';
 import { Score } from '../Game/types';
 import RoomHeader from '../shared/RoomHeader';
 import { FlyingNotes, FlyingNotesHandleRef } from './FlyingNotes';
 
 const useStyles = makeStyles(theme => ({
-  settingIcon: {
-    marginLeft: theme.spacing(1),
-  },
   link: {
     color: '#0000EE',
   },
@@ -37,6 +33,15 @@ const useStyles = makeStyles(theme => ({
     position: 'absolute',
     left: '50%',
     transform: 'translate(-50%)',
+  },
+  accuracy: {
+    position: 'absolute',
+    left: '50%',
+    transform: 'translate(-50%)',
+  },
+  accuracyOnMobile: {
+    textAlign: 'right',
+    flexGrow: 1,
   },
   avatarBox: {
     position: 'relative',
@@ -67,7 +72,8 @@ const DuetRoomHeader: React.FC<Props> = ({
   const { roomInfo } = useContext(RoomContext);
   const { piece } = roomInfo;
   const chosenSong = useSong(piece);
-  const hideBackText = useMediaQuery('(min-width:400px)');
+  const theme = useTheme();
+  const isOnMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const displayNotification = useContext(NotificationContext);
 
   const playerIconWithFlyingNotes = (
@@ -149,7 +155,7 @@ const DuetRoomHeader: React.FC<Props> = ({
       }
     }
 
-    if (!hideBackText) {
+    if (isOnMobile) {
       backText = '';
     }
 
@@ -174,9 +180,9 @@ const DuetRoomHeader: React.FC<Props> = ({
             {chosenSong.name}
           </Typography>
           <Typography
-            variant="h5"
+            variant={isOnMobile ? 'body1' : 'h5'}
             color="textPrimary"
-            className={classes.header}
+            className={isOnMobile ? classes.accuracyOnMobile : classes.accuracy}
           >
             Accuracy: {accuracy}%
           </Typography>
@@ -189,11 +195,8 @@ const DuetRoomHeader: React.FC<Props> = ({
     <RoomHeader>
       {backButton()}
       {centerComponents()}
-      <Box component="span" className={classes.empty} />
+      {!isOnMobile && <Box component="span" className={classes.empty} />}
       {roomDetails()}
-      <IconButton edge="end" size="small" className={classes.settingIcon}>
-        <SettingsIcon />
-      </IconButton>
     </RoomHeader>
   );
 };
