@@ -130,7 +130,7 @@ export function addListeners(
         !curFriend.ready
       ) {
         message = {
-          message: 'Your partner has unreadied',
+          message: 'Your partner is not ready anymore',
           severity: 'info',
         };
       } else if (
@@ -140,7 +140,7 @@ export function addListeners(
         curFriend.ready
       ) {
         message = {
-          message: 'Your partner has readied',
+          message: 'Your partner is ready now',
           severity: 'info',
         };
       } else {

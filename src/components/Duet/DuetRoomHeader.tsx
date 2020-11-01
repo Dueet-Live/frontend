@@ -113,7 +113,7 @@ const DuetRoomHeader: React.FC<Props> = ({
                 navigator.clipboard.writeText(window.location.href);
                 displayNotification({
                   message: 'Copied to clipboard',
-                  severity: 'info',
+                  severity: 'success',
                 });
               }}
             >
