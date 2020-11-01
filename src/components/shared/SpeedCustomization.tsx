@@ -1,10 +1,6 @@
-import { Slider } from '@material-ui/core';
+import { Box, BoxProps, Slider, Typography } from '@material-ui/core';
 import React from 'react';
-
-type Props = {
-  speed: number;
-  setSpeed: (speed: number) => void;
-};
+import useSharedLobbyStyles from './LobbySharedStyles';
 
 const marks = [
   {
@@ -29,21 +25,40 @@ const marks = [
   },
 ];
 
-const SpeedCustomization: React.FC<Props> = ({ speed, setSpeed }) => {
+type Props = BoxProps & {
+  speed: number;
+  setSpeed: (speed: number) => void;
+};
+
+const SpeedCustomization: React.FC<Props> = ({
+  speed,
+  setSpeed,
+  ...boxProps
+}) => {
+  const sharedLobbyStyles = useSharedLobbyStyles();
   return (
-    <Slider
-      step={0.25}
-      min={0.5}
-      max={1.5}
-      value={speed}
-      valueLabelDisplay="off"
-      marks={marks}
-      onChange={(e, value: number | number[]) => {
-        if (speed !== value) {
-          setSpeed(value as number);
-        }
-      }}
-    />
+    <Box display="flex" justifyContent="space-between" {...boxProps}>
+      <Box flex="0 0 30%" display="flex" alignItems="center">
+        <Typography variant="body1" className={sharedLobbyStyles.optionLabel}>
+          Speed
+        </Typography>
+      </Box>
+      <Box flexGrow={2} px={2} display="flex" alignItems="center">
+        <Slider
+          step={0.25}
+          min={0.5}
+          max={1.5}
+          value={speed}
+          valueLabelDisplay="off"
+          marks={marks}
+          onChange={(e, value: number | number[]) => {
+            if (speed !== value) {
+              setSpeed(value as number);
+            }
+          }}
+        />
+      </Box>
+    </Box>
   );
 };
 

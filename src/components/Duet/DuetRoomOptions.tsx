@@ -1,17 +1,11 @@
-import {
-  Box,
-  Button,
-  ButtonBase,
-  makeStyles,
-  SvgIcon,
-  Typography,
-} from '@material-ui/core';
+import { Box, makeStyles, Typography } from '@material-ui/core';
 import React, { useState } from 'react';
-import { ReactComponent as RealisticPiano } from '../../svg/realistic-piano.svg';
-import { ReactComponent as SmartPianoIcon } from '../../svg/smart-piano.svg';
 import { Part } from '../../types/messages';
 import { Song } from '../../types/song';
 import { changeSpeed, choosePart } from '../../utils/socket';
+import LobbyKeyboardTypeSelector from '../shared/LobbyKeyboardTypeSelector';
+import useSharedLobbyStyles from '../shared/LobbySharedStyles';
+import LobbySongSelection from '../shared/LobbySongSelection';
 import SpeedCustomization from '../shared/SpeedCustomization';
 import SongSelectionDialog from '../SongSelectionDialog';
 import PartPill from './PartPill';
@@ -22,62 +16,6 @@ const useStyles = makeStyles(theme => ({
     borderStyle: 'solid',
     borderRadius: '3vh',
     borderWidth: '2px',
-    height: '100%',
-    width: '100%',
-  },
-  songCard: {
-    display: 'flex',
-  },
-  songName: {
-    [theme.breakpoints.up('md')]: {
-      fontSize: theme.typography.h4.fontSize,
-    },
-  },
-  pickSongButtonText: {
-    [theme.breakpoints.up('md')]: {
-      fontSize: theme.typography.h5.fontSize,
-    },
-  },
-  optionLabel: {
-    [theme.breakpoints.up('md')]: {
-      fontSize: theme.typography.h5.fontSize,
-    },
-  },
-  imageContainer: {
-    position: 'relative',
-    width: 'calc(1vh * 20)',
-    height: 'calc(1vh * 20)',
-    '@media (orientation: portrait)': {
-      width: 'calc(1vw * 20)',
-      height: 'calc(1vw * 20)',
-    },
-  },
-  imageSrc: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
-    backgroundSize: 'cover',
-    backgroundPosition: 'center 40%',
-    borderRadius: 15,
-  },
-  pianoIcon: {
-    height: '100%',
-    width: '100%',
-  },
-  pianoIconSelected: {
-    borderRadius: '10px',
-    backgroundColor: '#C4C4C4',
-  },
-  selectPianoButtonBase: {
-    display: 'flex',
-    maxWidth: '40%',
-    flexDirection: 'column',
-    alignItems: 'center',
-    '&:hover': {
-      textDecoration: 'underline',
-    },
   },
 }));
 
@@ -99,10 +37,9 @@ const DuetRoomOptions: React.FC<Props> = ({
   setUseSmartPiano,
 }) => {
   const classes = useStyles();
+  const lobbySharedStyles = useSharedLobbyStyles();
 
   const [songSelectionDialogOpen, setSongSelectionDialogOpen] = useState(false);
-
-  const genreImage = `url(/images/${song?.genre.name || 'unknown'}.png)`;
 
   return (
     <Box
@@ -118,50 +55,18 @@ const DuetRoomOptions: React.FC<Props> = ({
         open={songSelectionDialogOpen}
         handleClose={() => setSongSelectionDialogOpen(false)}
       />
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
+      <LobbySongSelection
+        iAmReady={iAmReady}
+        setSongSelectionDialogOpen={setSongSelectionDialogOpen}
+        song={song}
         flexGrow={1}
         mb={1}
-      >
-        <Box className={classes.imageContainer} flex="0 0 auto" mr={1}>
-          <Box
-            className={classes.imageSrc}
-            style={{ backgroundImage: genreImage }}
-          ></Box>
-        </Box>
-
-        <Box
-          display="flex"
-          flexDirection="column"
-          alignItems="center"
-          justifyContent="space-evenly"
-          flexGrow={1}
-          alignSelf="stretch"
-          textAlign="center"
-        >
-          <Typography variant="body1" className={classes.songName}>
-            {song?.name || 'No song selected'}
-          </Typography>
-          <Button
-            variant="outlined"
-            color="primary"
-            size="small"
-            disabled={iAmReady}
-            onClick={() => setSongSelectionDialogOpen(true)}
-          >
-            <Typography variant="body2" className={classes.pickSongButtonText}>
-              {song?.name ? 'Pick another song' : 'Pick a song'}
-            </Typography>
-          </Button>
-        </Box>
-      </Box>
+      />
 
       {/* part selection */}
       <Box display="flex" justifyContent="space-between" flexGrow={1}>
         <Box flex="0 0 30%" display="flex" alignItems="center">
-          <Typography variant="body1" className={classes.optionLabel}>
+          <Typography variant="body1" className={lobbySharedStyles.optionLabel}>
             Your part
           </Typography>
         </Box>
@@ -185,63 +90,14 @@ const DuetRoomOptions: React.FC<Props> = ({
       </Box>
 
       {/* speed customisation */}
-      <Box display="flex" justifyContent="space-between" flexGrow={1}>
-        <Box flex="0 0 30%" display="flex" alignItems="center">
-          <Typography variant="body1" className={classes.optionLabel}>
-            Speed
-          </Typography>
-        </Box>
-        <Box flexGrow={2} px={2} display="flex" alignItems="center">
-          <SpeedCustomization speed={speed} setSpeed={changeSpeed} />
-        </Box>
-      </Box>
+      <SpeedCustomization speed={speed} setSpeed={changeSpeed} flexGrow={1} />
 
       {/* keyboard type */}
-      <Box display="flex" justifyContent="space-between" flexGrow={1}>
-        <Box flex="0 0 30%" display="flex" alignItems="center">
-          <Typography variant="body1" className={classes.optionLabel}>
-            Keyboard type
-          </Typography>
-        </Box>
-        <Box display="flex" flexGrow={1} justifyContent="space-around">
-          <ButtonBase
-            className={classes.selectPianoButtonBase}
-            onClick={() => setUseSmartPiano(true)}
-            disabled={useSmartPiano}
-          >
-            <Box
-              textAlign="center"
-              p={1}
-              className={useSmartPiano ? classes.pianoIconSelected : ''}
-            >
-              <SvgIcon
-                component={SmartPianoIcon}
-                viewBox="0 0 200 125"
-                className={classes.pianoIcon}
-              />
-            </Box>
-            <Typography variant="body1">Smart</Typography>
-          </ButtonBase>
-          <ButtonBase
-            className={classes.selectPianoButtonBase}
-            onClick={() => setUseSmartPiano(false)}
-            disabled={!useSmartPiano}
-          >
-            <Box
-              textAlign="center"
-              p={1}
-              className={!useSmartPiano ? classes.pianoIconSelected : ''}
-            >
-              <SvgIcon
-                component={RealisticPiano}
-                viewBox="0 0 200 125"
-                className={classes.pianoIcon}
-              />
-            </Box>
-            <Typography variant="body1">Realistic</Typography>
-          </ButtonBase>
-        </Box>
-      </Box>
+      <LobbyKeyboardTypeSelector
+        useSmartPiano={useSmartPiano}
+        setUseSmartPiano={setUseSmartPiano}
+        flexGrow={1}
+      />
     </Box>
   );
 };
