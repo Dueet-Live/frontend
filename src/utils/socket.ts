@@ -38,11 +38,14 @@ export function addListeners(
   displayNotification: (notification: Notification) => void,
   history: History<unknown>
 ) {
+  // not assigned yet
+  let myPlayerId: number = -1;
   /*************** Create room ***************/
   socket.on(
     CREATE_ROOM_RESPONSE,
     ({ roomInfo, playerId }: RoomCreatedResponse) => {
       setRoomState(roomInfo);
+      myPlayerId = playerId;
       setPlayerId(playerId);
       history.push(`/duet/play?id=${roomInfo.id}`);
     }
@@ -90,68 +93,66 @@ export function addListeners(
 
     const { roomInfo, playerId } = res as JoinRoomSuccessResponse;
     setRoomState(roomInfo);
+    myPlayerId = playerId;
     setPlayerId(playerId);
   });
 
   /****************** Room info updated **********************/
-  socket.on(
-    ROOM_INFO_UPDATED_NOTIFICATION,
-    ({ roomInfo, playerId }: { roomInfo: RoomInfo; playerId: number }) => {
-      let message: Notification | null = null;
-      setRoomState((prevRoomInfo: RoomInfo) => {
-        if (prevRoomInfo.players.length === 0) {
-          return roomInfo;
-        }
-
-        const prevFriend = prevRoomInfo.players.find(
-          player => player.id !== playerId
-        );
-
-        const curFriend = roomInfo.players.find(
-          player => player.id !== playerId
-        );
-
-        if (!prevFriend && !!curFriend) {
-          message = {
-            message: 'Your partner has joined the room',
-            severity: 'info',
-          };
-        } else if (!!prevFriend && !curFriend) {
-          message = {
-            message: 'Your partner has left the room',
-            severity: 'info',
-          };
-        } else if (
-          !!prevFriend &&
-          !!curFriend &&
-          prevFriend.ready &&
-          !curFriend.ready
-        ) {
-          message = {
-            message: 'Your partner has unreadied',
-            severity: 'info',
-          };
-        } else if (
-          !!prevFriend &&
-          !!curFriend &&
-          !prevFriend.ready &&
-          curFriend.ready
-        ) {
-          message = {
-            message: 'Your partner has readied',
-            severity: 'info',
-          };
-        } else {
-          message = null;
-        }
-
+  socket.on(ROOM_INFO_UPDATED_NOTIFICATION, (roomInfo: RoomInfo) => {
+    let message: Notification | null = null;
+    setRoomState((prevRoomInfo: RoomInfo) => {
+      if (prevRoomInfo.players.length === 0) {
         return roomInfo;
-      });
-      if (message !== null) {
-        displayNotification(message);
       }
+
+      const prevFriend = prevRoomInfo.players.find(
+        player => player.id !== myPlayerId
+      );
+
+      const curFriend = roomInfo.players.find(
+        player => player.id !== myPlayerId
+      );
+
+      if (!prevFriend && !!curFriend) {
+        message = {
+          message: 'Your partner has joined the room',
+          severity: 'info',
+        };
+      } else if (!!prevFriend && !curFriend) {
+        message = {
+          message: 'Your partner has left the room',
+          severity: 'info',
+        };
+      } else if (
+        !!prevFriend &&
+        !!curFriend &&
+        prevFriend.ready &&
+        !curFriend.ready
+      ) {
+        message = {
+          message: 'Your partner has unreadied',
+          severity: 'info',
+        };
+      } else if (
+        !!prevFriend &&
+        !!curFriend &&
+        !prevFriend.ready &&
+        curFriend.ready
+      ) {
+        message = {
+          message: 'Your partner has readied',
+          severity: 'info',
+        };
+      } else {
+        message = null;
+      }
+
+      return roomInfo;
+    });
+    if (message !== null) {
+      displayNotification(message);
     }
-  );
+  });
 
   socket.on(START_GAME_NOTIFICATION, ({ inSeconds }: { inSeconds: number }) => {
     setView('duet.play');
