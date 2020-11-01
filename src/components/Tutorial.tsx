@@ -1,6 +1,11 @@
-import { useMediaQuery, useTheme } from '@material-ui/core';
+import { useMediaQuery, useTheme, withStyles } from '@material-ui/core';
 import { AutoRotatingCarousel, Slide } from 'material-auto-rotating-carousel';
 import React, { useEffect } from 'react';
+import AddToHomeScreen from '../svg/add-to-home-screen.svg';
+import Headset from '../svg/headset.svg';
+import Keyboard from '../svg/keyboard.svg';
+import RealisticPiano from '../svg/realistic-piano.svg';
+import TouchApp from '../svg/touchapp.svg';
 import localforage from '../utils/extendedLocalForage';
 
 const SEEN_TUTORIAL = 'seen_tutorial';
@@ -9,6 +14,20 @@ type Props = {
   showTutorial: boolean;
   setShowTutorial: (showTutorial: React.SetStateAction<boolean>) => void;
 };
+
+const StyledSlide = withStyles({
+  mediaBackgroundMobile: {
+    height: 'calc(100% - 280px)',
+  },
+  mediaBackgroundMobileLandscape: {
+    height: '100%',
+    flex: '1 1',
+    alignSelf: 'stretch',
+  },
+  title: {
+    whiteSpace: 'normal',
+  },
+})(Slide);
 
 const Tutorial: React.FC<Props> = ({ showTutorial, setShowTutorial }) => {
   const theme = useTheme();
@@ -30,6 +49,7 @@ const Tutorial: React.FC<Props> = ({ showTutorial, setShowTutorial }) => {
 
   return (
     <AutoRotatingCarousel
+      autoplay={false}
       open={showTutorial}
       mobile={isMobile}
       landscape={isLandscape}
@@ -37,19 +57,38 @@ const Tutorial: React.FC<Props> = ({ showTutorial, setShowTutorial }) => {
       onClose={() => setShowTutorial(false)}
       onStart={() => setShowTutorial(false)}
     >
-      <Slide
+      <StyledSlide
+        media={<>GIF showing clicking on duet and copying link</>}
         title="Play a duet with your friend"
         subtitle="Collaborate with your friend to complete a piece! Your friend is busy now? Don't worry, try our solo mode first."
       />
-      <Slide
+      <StyledSlide
+        media={
+          <>
+            <img src={TouchApp} alt="Touch screen" />
+            <img src={Keyboard} alt="Keyboard" />
+          </>
+        }
         title="Easy to play on all devices"
         subtitle="We support both touch screen and keyboard input. No app downloading required."
       />
-      <Slide
+      <StyledSlide
+        media={
+          <>
+            <img src={RealisticPiano} alt="Realistic Keyboard" />
+          </>
+        }
+        mediaBackgroundStyle={{ padding: theme.spacing(4) }}
         title="You are playing real music"
         subtitle="The realistic keyboard work best on touch screen devices."
       />
-      <Slide
+      <StyledSlide
+        media={
+          <>
+            <img src={Headset} alt="Headset" />
+            <img src={AddToHomeScreen} alt="Add to home screen" />
+          </>
+        }
         title="Game Tips"
         subtitle="For the best experience, use headphones and add Dueet Live to your home screen"
       />
