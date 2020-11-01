@@ -70,14 +70,15 @@ const SmartPianoKey: React.FC<Props> = ({
       }
     : {};
 
-  const getBottomText = () => {
+  const bottomText = (() => {
     if (keyboardShortcut.length === 0) {
       return '';
     } else {
       // If there are multiple shortcuts, display the first shortcut only
       return keyboardShortcut[0];
     }
-  };
+  })();
+  const underlineShortcut = bottomText === 'F' || bottomText === 'J';
 
   const getClassName = () => {
     if (playingNote.length === 0) {
@@ -95,7 +96,14 @@ const SmartPianoKey: React.FC<Props> = ({
       {...eventHandlers}
     >
       <div className="smart-piano__text-container">
-        <div className="smart-piano__text--bottom-text">{getBottomText()}</div>
+        <div
+          className="smart-piano__text--bottom-text"
+          style={
+            underlineShortcut ? { textDecorationLine: 'underline' } : undefined
+          }
+        >
+          {bottomText}
+        </div>
       </div>
     </button>
   );

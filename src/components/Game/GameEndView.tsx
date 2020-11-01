@@ -3,7 +3,12 @@ import makeStyles from '@material-ui/core/styles/makeStyles';
 import React, { useContext, useEffect, useState } from 'react';
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
+import { GameContext } from '../../contexts/GameContext';
 import { RoomContext } from '../../contexts/RoomContext';
+import CrossIcon from '../../icons/CrossIcon';
+import StarIcon from '../../icons/StarIcon';
+import ThumbDownIcon from '../../icons/ThumbDownIcon';
+import ThumbUpIcon from '../../icons/ThumbUpIcon';
 import useSong from '../../utils/useSong';
 
 const useStyles = makeStyles(theme => ({
@@ -33,6 +38,12 @@ const useStyles = makeStyles(theme => ({
     flexDirection: 'column',
     alignItems: 'flex-start',
   },
+  title: {
+    marginBottom: theme.spacing(2),
+  },
+  stats: {
+    marginTop: theme.spacing(1),
+  },
 }));
 
 const GameEndView = () => {
@@ -50,6 +61,10 @@ const GameEndView = () => {
   const finalAccuracy =
     score.total === 0 ? 0 : (score.correct / score.total) * 100;
   const [accuracy, setAccuracy] = useState(0);
+
+  const { gameManagerRef } = useContext(GameContext);
+  const feedbackManager = gameManagerRef?.current.feedbackManager;
+  const gameStats = feedbackManager?.generateStats();
 
   useEffect(() => {
     const handler = setTimeout(() => setAccuracy(finalAccuracy), 100);
@@ -89,7 +104,12 @@ const GameEndView = () => {
           xs={landscape ? 6 : 'auto'}
         >
           <Grid item>
-            <Typography variant="h1" color="primary" align="center">
+            <Typography
+              variant="h1"
+              color="primary"
+              align="center"
+              className={classes.title}
+            >
               {text}
             </Typography>
             <Typography variant="subtitle1" align="center">
@@ -100,6 +120,40 @@ const GameEndView = () => {
             <Typography align="center">
               You just played: {song?.name}
             </Typography>
+          </Grid>
+          {/* Game statistics */}
+          <Grid
+            item
+            container
+            direction="row"
+            justify="center"
+            spacing={1}
+            className={classes.stats}
+          >
+            <Grid item>
+              <StarIcon />
+            </Grid>
+            <Grid item>
+              <Typography>x{gameStats?.perfect}</Typography>
+            </Grid>
+            <Grid item>
+              <ThumbUpIcon />
+            </Grid>
+            <Grid item>
+              <Typography>x{gameStats?.great}</Typography>
+            </Grid>
+            <Grid item>
+              <ThumbDownIcon />
+            </Grid>
+            <Grid item>
+              <Typography>x{gameStats?.bad}</Typography>
+            </Grid>
+            <Grid item>
+              <CrossIcon />
+            </Grid>
+            <Grid item>
+              <Typography>x{gameStats?.miss}</Typography>
+            </Grid>
           </Grid>
         </Grid>
         <Grid

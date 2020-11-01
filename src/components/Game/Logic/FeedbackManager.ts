@@ -273,10 +273,9 @@ export default class FeedbackManager {
     handler.current?.enqueueFeedback(feedback);
   }
 
-  // TODO: if needed in ending screen
   generateStats() {
     return {
-      missed: this.stats[NoteFeedback.MISS],
+      miss: this.stats[NoteFeedback.MISS],
       wrong: this.stats[NoteFeedback.WRONG],
       bad: this.stats[NoteFeedback.BAD],
       good: this.stats[NoteFeedback.GOOD],
