@@ -72,7 +72,6 @@ const DuetRoomHeader: React.FC<Props> = ({
   const history = useHistory();
   const { me, friend } = useContext(PlayerContext);
   const { roomInfo } = useContext(RoomContext);
-  const setNotification = useContext(NotificationContext);
   const { piece } = roomInfo;
   const chosenSong = useSong(piece);
   const theme = useTheme();
