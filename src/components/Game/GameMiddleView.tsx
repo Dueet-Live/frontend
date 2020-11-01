@@ -1,4 +1,4 @@
-import { Typography } from '@material-ui/core';
+import { Box, Typography } from '@material-ui/core';
 import React, { useMemo } from 'react';
 import {
   SmartKeyboardDimension,
@@ -44,9 +44,16 @@ const GameMiddleView: React.FC<Props> = props => {
 
   if (timeToStart !== 0) {
     return (
-      <Typography variant="h1" align="center" color="primary">
-        {timeToStart}
-      </Typography>
+      <Box
+        justifyContent="center"
+        display="flex"
+        flexDirection="column"
+        height="100%"
+      >
+        <Typography variant="h1" color="primary" align="center">
+          {timeToStart}
+        </Typography>
+      </Box>
     );
   }
 
