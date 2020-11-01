@@ -15,7 +15,6 @@ import { PlayerContext } from '../../contexts/PlayerContext';
 import { RoomContext, RoomView } from '../../contexts/RoomContext';
 import PlayerIcon from '../../icons/PlayerIcon';
 import SettingsIcon from '../../icons/SettingsIcon';
-import { updateReady } from '../../utils/socket';
 import useSong from '../../utils/useSong';
 import { Score } from '../Game/types';
 import RoomHeader from '../shared/RoomHeader';
@@ -146,7 +145,6 @@ const DuetRoomHeader: React.FC<Props> = ({
         handleBack = () => {
           setView('duet.lobby');
           resetScore();
-          updateReady(false);
         };
       }
     }

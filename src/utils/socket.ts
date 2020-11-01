@@ -155,6 +155,15 @@ export function addListeners(
 
   socket.on(START_GAME_NOTIFICATION, ({ inSeconds }: { inSeconds: number }) => {
     setView('duet.play');
+    setRoomState((prevRoomState: RoomInfo) => {
+      // server marks them as false when the game starts
+      const unreadiedPlayers = prevRoomState.players.map(player => ({
+        ...player,
+        ready: false,
+      }));
+
+      return { ...prevRoomState, players: unreadiedPlayers };
+    });
   });
 }
 export function removeRoomStateListeners() {
