@@ -38,10 +38,10 @@ const useStyles = makeStyles(theme => ({
   },
 
   myIcon: {
-    border: `3px solid ${theme.palette.me.main}`,
+    border: `medium solid ${theme.palette.me.main}`,
   },
   friendIcon: {
-    border: `3px solid ${theme.palette.friend.main}`,
+    border: `medium solid ${theme.palette.friend.main}`,
   },
 }));
 
