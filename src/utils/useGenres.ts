@@ -6,7 +6,7 @@ export default function useGenres() {
   const [genres, setGenres] = useState<Genre[]>([]);
 
   useEffect(() => {
-    let genreSubscription: Subscription;
+    let genreSubscription: Subscription | undefined;
 
     async function setupHook() {
       await localforage.ready();
@@ -24,7 +24,7 @@ export default function useGenres() {
 
     setupHook();
     return () => {
-      genreSubscription.unsubscribe();
+      genreSubscription?.unsubscribe();
     };
   }, []);
 
