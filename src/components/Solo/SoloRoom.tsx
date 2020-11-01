@@ -1,6 +1,7 @@
 import { Box, makeStyles } from '@material-ui/core';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import songsAPI from '../../api/songs';
+import { NotificationContext } from '../../contexts/NotificationContext';
 import { RoomContext, RoomView } from '../../contexts/RoomContext';
 import { MidiJSON } from '../../types/MidiJSON';
 import { RoomInfo } from '../../types/roomInfo';
@@ -47,6 +48,7 @@ const SoloRoom: React.FC = () => {
   const [view, setView] = useState<RoomView>('solo.select');
   const [songSelectionGenre, setSongSelectionGenre] = useState('');
   const [score, setScore] = useState<Score>({ correct: 0, total: 0 });
+  const displayNotification = useContext(NotificationContext);
 
   const { piece, speed } = roomState;
   const chosenSong = useSong(piece);
@@ -60,12 +62,15 @@ const SoloRoom: React.FC = () => {
         const song = await songsAPI.getSongWithContent(piece);
         setChosenSongMIDI(JSON.parse(song.content) as MidiJSON);
       } catch (err) {
-        // TODO set a notification that it failed to retrieve song
-        // from server
+        displayNotification({
+          message: 'Failed to connect to Song server, please try again later',
+          severity: 'error',
+        });
       }
     }
 
     fetchSongMIDI();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [piece]);
 
   const mainBody = () => {

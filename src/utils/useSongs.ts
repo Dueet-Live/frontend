@@ -6,7 +6,7 @@ export default function useSongs(type: 'solo' | 'duet') {
   const [songs, setSongs] = useState<Song[]>([]);
 
   useEffect(() => {
-    let songSubscription: Subscription;
+    let songSubscription: Subscription | undefined;
 
     async function setupHook() {
       await localforage.ready();
@@ -24,7 +24,7 @@ export default function useSongs(type: 'solo' | 'duet') {
 
     setupHook();
     return () => {
-      songSubscription.unsubscribe();
+      songSubscription?.unsubscribe();
     };
   }, [type]);
 

@@ -1,4 +1,4 @@
-import { Box, makeStyles } from '@material-ui/core';
+import { Box, makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
 import React, { useContext, useEffect, useRef } from 'react';
 import { GameContext } from '../../../contexts/GameContext';
 import { PlayerContext } from '../../../contexts/PlayerContext';
@@ -34,6 +34,10 @@ const NaturalKey: React.FC<Props> = ({
 }) => {
   const classes = useStyles();
   const { me } = useContext(PlayerContext);
+
+  const theme = useTheme();
+  const isMobilePortrait = useMediaQuery(theme.breakpoints.down(400));
+  const fontSize = isMobilePortrait ? 0.5 : 1;
 
   // Used for note feedback
   const { gameManagerRef } = useContext(GameContext);
@@ -74,7 +78,10 @@ const NaturalKey: React.FC<Props> = ({
         data-note={note}
         {...eventHandlers}
       >
-        <div className={'traditional-piano__text-container'}>
+        <div
+          className={'traditional-piano__text-container'}
+          style={{ fontSize: `${fontSize}rem` }}
+        >
           <div className="traditional-piano__text--top-text">{topText}</div>
           <div className="traditional-piano__text--bottom-text">
             {bottomText}

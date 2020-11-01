@@ -8,10 +8,13 @@ import { Part } from '../../types/messages';
 import { MidiJSON } from '../../types/MidiJSON';
 import { calculateSmartKeyboardDimension } from '../../utils/calculateSmartKeyboardDimension';
 import { calculateTraditionalKeyboardDimensionForGame } from '../../utils/calculateTraditionalKeyboardDimension';
-import { calculateSongDuration, getPlaybackNotes } from '../../utils/songInfo';
+import {
+  calculateSongDuration,
+  changeSongSpeed,
+  getPlaybackNotes,
+} from '../../utils/songInfo';
 import { useDimensions } from '../../utils/useDimensions';
 import InstrumentPlayer from '../Piano/InstrumentPlayer';
-import { changeSongSpeed } from '../utils';
 import { calculateLookAheadTime } from '../Waterfall/utils';
 import GameMiddleView from './GameMiddleView';
 import GameSmartPiano from './GameSmartPiano';

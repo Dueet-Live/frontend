@@ -5,6 +5,7 @@ import {
   makeStyles,
   Typography,
   useMediaQuery,
+  useTheme,
 } from '@material-ui/core';
 import { ArrowBack, MusicNoteOutlined } from '@material-ui/icons';
 import React, { useContext } from 'react';
@@ -13,11 +14,10 @@ import { NotificationContext } from '../../contexts/NotificationContext';
 import { PlayerContext } from '../../contexts/PlayerContext';
 import { RoomContext, RoomView } from '../../contexts/RoomContext';
 import PlayerIcon from '../../icons/PlayerIcon';
-import { updateReady } from '../../utils/socket';
 import useSong from '../../utils/useSong';
-import { FlyingNotes, FlyingNotesHandleRef } from './FlyingNotes';
 import { Score } from '../Game/types';
 import RoomHeader from '../shared/RoomHeader';
+import { FlyingNotes, FlyingNotesHandleRef } from './FlyingNotes';
 
 const useStyles = makeStyles(theme => ({
   link: {
@@ -33,6 +33,15 @@ const useStyles = makeStyles(theme => ({
     position: 'absolute',
     left: '50%',
     transform: 'translate(-50%)',
+  },
+  accuracy: {
+    position: 'absolute',
+    left: '50%',
+    transform: 'translate(-50%)',
+  },
+  accuracyOnMobile: {
+    textAlign: 'right',
+    flexGrow: 1,
   },
   avatarBox: {
     position: 'relative',
@@ -66,7 +75,9 @@ const DuetRoomHeader: React.FC<Props> = ({
   const setNotification = useContext(NotificationContext);
   const { piece } = roomInfo;
   const chosenSong = useSong(piece);
-  const hideBackText = useMediaQuery('(min-width:400px)');
+  const theme = useTheme();
+  const isOnMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const displayNotification = useContext(NotificationContext);
 
   const playerIconWithFlyingNotes = (
     num: number,
@@ -107,10 +118,10 @@ const DuetRoomHeader: React.FC<Props> = ({
               component="button"
               variant="body1"
               className={classes.link}
-              onClick={() => {
+              onClick={async () => {
                 navigator.clipboard.writeText(window.location.href);
-                setNotification({
-                  message: 'Link copied to clipboard.',
+                displayNotification({
+                  message: 'Copied to clipboard',
                   severity: 'success',
                 });
               }}
@@ -143,12 +154,11 @@ const DuetRoomHeader: React.FC<Props> = ({
         handleBack = () => {
           setView('duet.lobby');
           resetScore();
-          updateReady(false);
         };
       }
     }
 
-    if (!hideBackText) {
+    if (isOnMobile) {
       backText = '';
     }
 
@@ -173,9 +183,9 @@ const DuetRoomHeader: React.FC<Props> = ({
             {chosenSong.name}
           </Typography>
           <Typography
-            variant="h5"
+            variant={isOnMobile ? 'body1' : 'h5'}
             color="textPrimary"
-            className={classes.header}
+            className={isOnMobile ? classes.accuracyOnMobile : classes.accuracy}
           >
             Accuracy: {accuracy}%
           </Typography>
@@ -188,7 +198,7 @@ const DuetRoomHeader: React.FC<Props> = ({
     <RoomHeader>
       {backButton()}
       {centerComponents()}
-      <Box component="span" className={classes.empty} />
+      {!isOnMobile && <Box component="span" className={classes.empty} />}
       {roomDetails()}
     </RoomHeader>
   );

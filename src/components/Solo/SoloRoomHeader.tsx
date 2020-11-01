@@ -1,16 +1,15 @@
 import {
   Box,
   Button,
-  IconButton,
   makeStyles,
   Typography,
   useMediaQuery,
+  useTheme,
 } from '@material-ui/core';
 import { ArrowBack, MusicNoteOutlined } from '@material-ui/icons';
 import React, { useContext } from 'react';
 import { useHistory } from 'react-router-dom';
 import { RoomContext, RoomView } from '../../contexts/RoomContext';
-import SettingsIcon from '../../icons/SettingsIcon';
 import useSong from '../../utils/useSong';
 import { Score } from '../Game/types';
 import RoomHeader from '../shared/RoomHeader';
@@ -19,10 +18,6 @@ const useStyles = makeStyles(theme => ({
   icon: {
     marginRight: theme.spacing(1),
   },
-  settingIcon: {
-    marginLeft: theme.spacing(1),
-  },
-
   link: {
     color: '#0000EE',
   },
@@ -33,6 +28,15 @@ const useStyles = makeStyles(theme => ({
     position: 'absolute',
     left: '50%',
     transform: 'translate(-50%)',
+  },
+  accuracy: {
+    position: 'absolute',
+    left: '50%',
+    transform: 'translate(-50%)',
+  },
+  accuracyOnMobile: {
+    textAlign: 'right',
+    flexGrow: 1,
   },
 }));
 
@@ -59,7 +63,8 @@ const SoloRoomHeader: React.FC<Props> = ({
     roomInfo: { piece },
   } = useContext(RoomContext);
   const chosenSong = useSong(piece);
-  const hideBackText = useMediaQuery('(min-width:400px)');
+  const theme = useTheme();
+  const isOnMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const backButton = () => {
     let backText = '';
@@ -90,7 +95,7 @@ const SoloRoomHeader: React.FC<Props> = ({
       }
     }
 
-    if (!hideBackText) {
+    if (isOnMobile) {
       backText = '';
     }
 
@@ -123,9 +128,9 @@ const SoloRoomHeader: React.FC<Props> = ({
           </Typography>
 
           <Typography
-            variant="h5"
+            variant={isOnMobile ? 'body1' : 'h5'}
             color="textPrimary"
-            className={classes.header}
+            className={isOnMobile ? classes.accuracyOnMobile : classes.accuracy}
           >
             Accuracy: {accuracy}%
           </Typography>
@@ -138,10 +143,7 @@ const SoloRoomHeader: React.FC<Props> = ({
     <RoomHeader>
       {backButton()}
       {centerComponents()}
-      <Box component="span" className={classes.empty} />
-      <IconButton edge="end" size="small" className={classes.settingIcon}>
-        <SettingsIcon />
-      </IconButton>
+      {!isOnMobile && <Box component="span" className={classes.empty} />}
     </RoomHeader>
   );
 };
