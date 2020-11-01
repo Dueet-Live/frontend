@@ -112,6 +112,19 @@ const DuetLobby: React.FC<Props> = ({
     return (
       <Box display="flex" flexGrow={1} className={classes.root}>
         {/* left half */}
+        <Box display="flex" flexGrow={1} maxWidth="50%">
+          {/* room configurations */}
+          <DuetRoomOptions
+            speed={speed}
+            song={chosenSong}
+            part={myPart}
+            iAmReady={iAmReady}
+            useSmartPiano={useSmartPiano}
+            setUseSmartPiano={setUseSmartPiano}
+          />
+        </Box>
+
+        {/* right half */}
         <Box
           display="flex"
           flexGrow={1}
@@ -132,19 +145,6 @@ const DuetLobby: React.FC<Props> = ({
           >
             <DuetReadyButton isDownloadingSong={isDownloadingSong} />
           </Box>
-        </Box>
-
-        {/* right half */}
-        <Box display="flex" flexGrow={1} maxWidth="50%">
-          {/* room configurations */}
-          <DuetRoomOptions
-            speed={speed}
-            song={chosenSong}
-            part={myPart}
-            iAmReady={iAmReady}
-            useSmartPiano={useSmartPiano}
-            setUseSmartPiano={setUseSmartPiano}
-          />
         </Box>
       </Box>
     );
