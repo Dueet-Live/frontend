@@ -28,6 +28,21 @@ const useStyles = makeStyles(theme => ({
   songCard: {
     display: 'flex',
   },
+  songName: {
+    [theme.breakpoints.up('md')]: {
+      fontSize: theme.typography.h4.fontSize,
+    },
+  },
+  pickSongButtonText: {
+    [theme.breakpoints.up('md')]: {
+      fontSize: theme.typography.h5.fontSize,
+    },
+  },
+  optionLabel: {
+    [theme.breakpoints.up('md')]: {
+      fontSize: theme.typography.h5.fontSize,
+    },
+  },
   imageContainer: {
     position: 'relative',
     width: 'calc(1vh * 20)',
@@ -126,7 +141,7 @@ const DuetRoomOptions: React.FC<Props> = ({
           alignSelf="stretch"
           textAlign="center"
         >
-          <Typography variant="body1">
+          <Typography variant="body1" className={classes.songName}>
             {song?.name || 'No song selected'}
           </Typography>
           <Button
@@ -136,7 +151,7 @@ const DuetRoomOptions: React.FC<Props> = ({
             disabled={iAmReady}
             onClick={() => setSongSelectionDialogOpen(true)}
           >
-            <Typography variant="body2">
+            <Typography variant="body2" className={classes.pickSongButtonText}>
               {song?.name ? 'Pick another song' : 'Pick a song'}
             </Typography>
           </Button>
@@ -146,7 +161,9 @@ const DuetRoomOptions: React.FC<Props> = ({
       {/* part selection */}
       <Box display="flex" justifyContent="space-between" flexGrow={1}>
         <Box flex="0 0 30%" display="flex" alignItems="center">
-          <Typography variant="body1">Your part</Typography>
+          <Typography variant="body1" className={classes.optionLabel}>
+            Your part
+          </Typography>
         </Box>
         <Box
           display="flex"
@@ -170,7 +187,9 @@ const DuetRoomOptions: React.FC<Props> = ({
       {/* speed customisation */}
       <Box display="flex" justifyContent="space-between" flexGrow={1}>
         <Box flex="0 0 30%" display="flex" alignItems="center">
-          <Typography variant="body1">Speed</Typography>
+          <Typography variant="body1" className={classes.optionLabel}>
+            Speed
+          </Typography>
         </Box>
         <Box flexGrow={2} px={2} display="flex" alignItems="center">
           <SpeedCustomization speed={speed} setSpeed={changeSpeed} />
@@ -180,7 +199,9 @@ const DuetRoomOptions: React.FC<Props> = ({
       {/* keyboard type */}
       <Box display="flex" justifyContent="space-between" flexGrow={1}>
         <Box flex="0 0 30%" display="flex" alignItems="center">
-          <Typography variant="body1">Keyboard type</Typography>
+          <Typography variant="body1" className={classes.optionLabel}>
+            Keyboard type
+          </Typography>
         </Box>
         <Box display="flex" flexGrow={1} justifyContent="space-around">
           <ButtonBase
