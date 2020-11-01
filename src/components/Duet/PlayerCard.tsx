@@ -6,14 +6,12 @@ import { Part } from '../../types/messages';
 const useStyles = makeStyles(theme => ({
   root: {
     backgroundColor: '#F0F0F0',
-  },
-  rootPortrait: {
-    height: 'calc(1vw * 40)',
-    width: 'calc(1vw * 40)',
-  },
-  rootLandscape: {
     height: 'calc(1vw * 20)',
     width: 'calc(1vw * 20)',
+    '@media (orientation: portrait)': {
+      height: 'calc(1vw * 40)',
+      width: 'calc(1vw * 40)',
+    },
   },
   mainBox: {
     [theme.breakpoints.down('sm')]: {
@@ -44,7 +42,6 @@ const useStyles = makeStyles(theme => ({
 }));
 
 type Props = {
-  isPortrait: boolean;
   myPlayerId: number;
 } & (
   | { playerId: null }
@@ -112,12 +109,7 @@ const PlayerCard: React.FC<Props> = props => {
   };
 
   return (
-    <Paper
-      elevation={3}
-      className={`${classes.root} ${
-        props.isPortrait ? classes.rootPortrait : classes.rootLandscape
-      }`}
-    >
+    <Paper elevation={3} className={classes.root}>
       <Box
         display="flex"
         flexDirection="column"

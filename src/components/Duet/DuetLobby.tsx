@@ -52,14 +52,9 @@ const DuetLobby: React.FC<Props> = ({
           myPlayerId={myPlayerId}
           isReady={iAmReady}
           part={myPart}
-          isPortrait={isPortrait}
         />
         {friendPlayerId === null && (
-          <PlayerCard
-            playerId={null}
-            myPlayerId={myPlayerId}
-            isPortrait={isPortrait}
-          />
+          <PlayerCard playerId={null} myPlayerId={myPlayerId} />
         )}
         {friendPlayerId !== null && (
           <PlayerCard
@@ -67,7 +62,6 @@ const DuetLobby: React.FC<Props> = ({
             myPlayerId={myPlayerId}
             isReady={friendIsReady}
             part={friendPart}
-            isPortrait={isPortrait}
           />
         )}
       </>
@@ -97,7 +91,6 @@ const DuetLobby: React.FC<Props> = ({
             iAmReady={iAmReady}
             useSmartPiano={useSmartPiano}
             setUseSmartPiano={setUseSmartPiano}
-            isPortrait={isPortrait}
           />
         </Box>
 
@@ -151,7 +144,6 @@ const DuetLobby: React.FC<Props> = ({
             iAmReady={iAmReady}
             useSmartPiano={useSmartPiano}
             setUseSmartPiano={setUseSmartPiano}
-            isPortrait={isPortrait}
           />
         </Box>
       </Box>

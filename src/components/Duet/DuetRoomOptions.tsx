@@ -30,14 +30,12 @@ const useStyles = makeStyles(theme => ({
   },
   imageContainer: {
     position: 'relative',
-  },
-  imageContainerPortrait: {
-    width: 'calc(1vw * 20)',
-    height: 'calc(1vw * 20)',
-  },
-  imageContainerLandscape: {
     width: 'calc(1vh * 20)',
     height: 'calc(1vh * 20)',
+    '@media (orientation: portrait)': {
+      width: 'calc(1vw * 20)',
+      height: 'calc(1vw * 20)',
+    },
   },
   imageSrc: {
     position: 'absolute',
@@ -75,7 +73,6 @@ type Props = {
   part: Part | null;
   useSmartPiano: boolean;
   setUseSmartPiano: (newValue: boolean) => void;
-  isPortrait: boolean;
 };
 
 const DuetRoomOptions: React.FC<Props> = ({
@@ -85,7 +82,6 @@ const DuetRoomOptions: React.FC<Props> = ({
   part,
   useSmartPiano,
   setUseSmartPiano,
-  isPortrait,
 }) => {
   const classes = useStyles();
 
@@ -108,15 +104,7 @@ const DuetRoomOptions: React.FC<Props> = ({
         handleClose={() => setSongSelectionDialogOpen(false)}
       />
       <Box display="flex" justifyContent="space-between" flexGrow={1} mb={1}>
-        <Box
-          className={`${classes.imageContainer} ${
-            isPortrait
-              ? classes.imageContainerPortrait
-              : classes.imageContainerLandscape
-          }`}
-          flex="0 0 auto"
-          mr={1}
-        >
+        <Box className={classes.imageContainer} flex="0 0 auto" mr={1}>
           <Box
             className={classes.imageSrc}
             style={{ backgroundImage: genreImage }}
