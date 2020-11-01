@@ -96,14 +96,20 @@ const DuetRoomOptions: React.FC<Props> = ({
       flexGrow={1}
       p={2}
       className={classes.root}
-      justifyContent="space-around"
+      justifyContent="space-between"
     >
       {/* song selection */}
       <SongSelectionDialog
         open={songSelectionDialogOpen}
         handleClose={() => setSongSelectionDialogOpen(false)}
       />
-      <Box display="flex" justifyContent="space-between" flexGrow={1} mb={1}>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        flexGrow={1}
+        mb={1}
+      >
         <Box className={classes.imageContainer} flex="0 0 auto" mr={1}>
           <Box
             className={classes.imageSrc}
@@ -117,6 +123,7 @@ const DuetRoomOptions: React.FC<Props> = ({
           alignItems="center"
           justifyContent="space-evenly"
           flexGrow={1}
+          alignSelf="stretch"
           textAlign="center"
         >
           <Typography variant="body1">
