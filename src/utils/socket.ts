@@ -23,6 +23,7 @@ import {
   UnknownErrorResponse,
   UNKNOWN_MESSAGE_RESPONSE,
 } from '../types/messages';
+import { Notification } from '../types/Notification';
 import { RoomInfo } from '../types/roomInfo';
 
 const socket = io(process.env.REACT_APP_WS_URL!, {
@@ -32,8 +33,9 @@ const socket = io(process.env.REACT_APP_WS_URL!, {
 
 export function addListeners(
   setPlayerId: (id: number) => void,
-  setRoomState: (roomInfo: RoomInfo) => void,
+  setRoomState: (roomInfo: React.SetStateAction<RoomInfo>) => void,
   setView: (view: RoomView) => void,
+  displayNotification: (notification: Notification) => void,
   history: History<unknown>
 ) {
   /*************** Create room ***************/
@@ -50,27 +52,38 @@ export function addListeners(
   socket.on(
     MALFORMED_MESSAGE_RESPONSE,
     ({ message }: MalformedMessageResponse) => {
-      // TODO decide what to do depending on error. For now we just throw them
-      // to create
-      // TODO snackbar
-      console.log(`received ${MALFORMED_MESSAGE_RESPONSE}`, message);
+      // this is only for validation errors, which should never occur unless
+      // the user is messing around with our internals
+      displayNotification({
+        message: 'An error has been encountered, please reload the app',
+        severity: 'error',
+      });
       history.push('/duet');
     }
   );
   socket.on(UNKNOWN_MESSAGE_RESPONSE, ({ error }: UnknownErrorResponse) => {
-    // TODO decide what to do depending on error. For now we just throw them
-    // to create
-    // TODO snackbar
-    console.log(`received ${UNKNOWN_MESSAGE_RESPONSE}`, error);
+    displayNotification({
+      message: 'An error has been encountered, please reload the app',
+      severity: 'error',
+    });
     history.push('/duet');
   });
 
   /********************* Join room ****************/
   socket.on(JOIN_ROOM_RESPONSE, (res: JoinRoomResponse) => {
     if (!res.success) {
+      if (res.code === 100) {
+        displayNotification({
+          message: "We couldn't find this room. Do you have the right code?",
+          severity: 'error',
+        });
+      } else if (res.code === 101) {
+        displayNotification({
+          message: 'This room is already full',
+          severity: 'error',
+        });
+      }
       // failed to join room, redirect back to duet page
-      // TODO snackbar
-      console.log('failed to join room', res);
       history.push('/duet');
       return;
     }
@@ -81,9 +94,64 @@ export function addListeners(
   });
 
   /****************** Room info updated **********************/
-  socket.on(ROOM_INFO_UPDATED_NOTIFICATION, (roomInfo: RoomInfo) => {
-    setRoomState(roomInfo);
-  });
+  socket.on(
+    ROOM_INFO_UPDATED_NOTIFICATION,
+    ({ roomInfo, playerId }: { roomInfo: RoomInfo; playerId: number }) => {
+      let message: Notification | null = null;
+      setRoomState((prevRoomInfo: RoomInfo) => {
+        if (prevRoomInfo.players.length === 0) {
+          return roomInfo;
+        }
+
+        const prevFriend = prevRoomInfo.players.find(
+          player => player.id !== playerId
+        );
+
+        const curFriend = roomInfo.players.find(
+          player => player.id !== playerId
+        );
+
+        if (!prevFriend && !!curFriend) {
+          message = {
+            message: 'Your partner has joined the room',
+            severity: 'info',
+          };
+        } else if (!!prevFriend && !curFriend) {
+          message = {
+            message: 'Your partner has left the room',
+            severity: 'info',
+          };
+        } else if (
+          !!prevFriend &&
+          !!curFriend &&
+          prevFriend.ready &&
+          !curFriend.ready
+        ) {
+          message = {
+            message: 'Your partner has unreadied',
+            severity: 'info',
+          };
+        } else if (
+          !!prevFriend &&
+          !!curFriend &&
+          !prevFriend.ready &&
+          curFriend.ready
+        ) {
+          message = {
+            message: 'Your partner has readied',
+            severity: 'info',
+          };
+        } else {
+          message = null;
+        }
+
+        return roomInfo;
+      });
+      if (message !== null) {
+        displayNotification(message);
+      }
+    }
+  );
 
   socket.on(START_GAME_NOTIFICATION, ({ inSeconds }: { inSeconds: number }) => {
     setView('duet.play');

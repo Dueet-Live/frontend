@@ -10,15 +10,16 @@ import {
 import { ArrowBack, MusicNoteOutlined } from '@material-ui/icons';
 import React, { useContext } from 'react';
 import { useHistory } from 'react-router-dom';
+import { NotificationContext } from '../../contexts/NotificationContext';
 import { PlayerContext } from '../../contexts/PlayerContext';
 import { RoomContext, RoomView } from '../../contexts/RoomContext';
 import PlayerIcon from '../../icons/PlayerIcon';
 import SettingsIcon from '../../icons/SettingsIcon';
 import { updateReady } from '../../utils/socket';
 import useSong from '../../utils/useSong';
-import { FlyingNotes, FlyingNotesHandleRef } from './FlyingNotes';
 import { Score } from '../Game/types';
 import RoomHeader from '../shared/RoomHeader';
+import { FlyingNotes, FlyingNotesHandleRef } from './FlyingNotes';
 
 const useStyles = makeStyles(theme => ({
   settingIcon: {
@@ -68,6 +69,7 @@ const DuetRoomHeader: React.FC<Props> = ({
   const { piece } = roomInfo;
   const chosenSong = useSong(piece);
   const hideBackText = useMediaQuery('(min-width:400px)');
+  const displayNotification = useContext(NotificationContext);
 
   const playerIconWithFlyingNotes = (
     num: number,
@@ -108,10 +110,13 @@ const DuetRoomHeader: React.FC<Props> = ({
               component="button"
               variant="body1"
               className={classes.link}
-              onClick={
-                async () => navigator.clipboard.writeText(window.location.href)
-                // TODO add a notification
-              }
+              onClick={async () => {
+                navigator.clipboard.writeText(window.location.href);
+                displayNotification({
+                  message: 'Copied to clipboard',
+                  severity: 'info',
+                });
+              }}
             >
               (Copy link)
             </Link>
