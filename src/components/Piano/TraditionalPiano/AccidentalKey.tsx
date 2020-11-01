@@ -26,6 +26,7 @@ const useStyles = makeStyles(() => ({
     position: 'relative',
     transform: 'translateX(-50%)',
     zIndex: 99,
+    pointerEvents: 'none',
   },
 }));
 
