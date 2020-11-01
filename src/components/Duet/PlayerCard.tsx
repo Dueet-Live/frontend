@@ -85,19 +85,19 @@ const PlayerCard: React.FC<Props> = props => {
           visibility={part === null ? 'hidden' : 'visible'}
         >
           {/* part pill */}
-          <Box flexGrow={5} display="flex" justifyContent="center">
+          <Box flexGrow={1} display="flex" justifyContent="center">
             <Box width="90%" className={`${classes.pill} ${classes.partPill}`}>
               <Typography variant="body2">{part}</Typography>
             </Box>
           </Box>
           {/* ready pill */}
           <Box
-            flexGrow={2}
+            flexGrow={1}
             display="flex"
             justifyContent="center"
             visibility={isReady ? 'visible' : 'hidden'}
           >
-            <Box width="80%" className={`${classes.pill} ${classes.readyPill}`}>
+            <Box width="90%" className={`${classes.pill} ${classes.readyPill}`}>
               <Typography variant="body2">ready</Typography>
             </Box>
           </Box>
