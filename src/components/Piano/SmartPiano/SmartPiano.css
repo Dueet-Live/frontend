@@ -1,6 +1,6 @@
 .smart-piano__keyboard-container {
   display: flex;
-  justify-items: center;
+  justify-content: center;
   touch-action: none;
   user-select: none;
 }
@@ -24,9 +24,9 @@
   background: #904ae9;
   color: #fff;
 }
-  
+
 .smart-piano__key--playing-by-others {
-  background: #E1A546;
+  background: #e1a546;
   color: #fff;
 }
 
@@ -50,7 +50,7 @@
 .smart-piano__text--top-text {
   pointer-events: none;
   color: rgb(136, 134, 134);
-  margin-bottom: 3px; 
+  margin-bottom: 3px;
 }
 
 .smart-piano__text--bottom-text {

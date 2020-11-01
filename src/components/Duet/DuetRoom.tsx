@@ -14,7 +14,7 @@ import socket, {
   removeRoomStateListeners,
 } from '../../utils/socket';
 import useSong from '../../utils/useSong';
-import { FlyingNotesHandle } from '../Game/FlyingNotes';
+import { FlyingNotesHandle } from './FlyingNotes';
 import GameView from '../Game/GameView';
 import { Score } from '../Game/types';
 import { sendGAEvent } from '../GoogleAnalytics';
@@ -108,7 +108,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   }, [piece]);
 
   useEffect(() => {
-    if (view !== 'duet.play') {
+    if (!view.includes('duet.play')) {
       return;
     }
 
@@ -154,7 +154,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
       );
     }
 
-    if (view === 'duet.play' && !!chosenSongMIDI) {
+    if (view.includes('duet.play') && !!chosenSongMIDI) {
       // at this point, myPart is definitely either primo or secondo, otherwise
       // game should not have started.
 
@@ -162,6 +162,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
         <GameView
           chosenSongMIDI={chosenSongMIDI}
           setScore={setScore}
+          setView={setView}
           speed={speed}
           myPart={myPart}
           handleNotePlay={handleNotePlay}
@@ -175,6 +176,8 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
     <RoomContext.Provider
       value={{
         roomInfo: roomState,
+        view: view,
+        score: score,
         setRoomInfo: setRoomState,
       }}
     >

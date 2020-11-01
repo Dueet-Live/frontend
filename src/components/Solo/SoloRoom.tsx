@@ -97,10 +97,11 @@ const SoloRoom: React.FC = () => {
       );
     }
 
-    if (view === 'solo.play' && !!chosenSongMIDI) {
+    if (view.includes('solo.play') && !!chosenSongMIDI) {
       return (
         <GameView
           speed={speed}
+          setView={setView}
           chosenSongMIDI={chosenSongMIDI}
           setScore={setScore}
           showSmartPiano
@@ -115,6 +116,8 @@ const SoloRoom: React.FC = () => {
     <RoomContext.Provider
       value={{
         roomInfo: roomState,
+        score: score,
+        view: view,
         setRoomInfo: setRoomState,
       }}
     >

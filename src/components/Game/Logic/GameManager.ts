@@ -4,6 +4,7 @@ import { Note } from '../../../types/MidiJSON';
 import InstrumentPlayer from '../../Piano/InstrumentPlayer';
 import { NullSoundFontPlayerNoteAudio } from '../../Piano/InstrumentPlayer/AudioPlayer';
 import { Score } from '../types';
+import FeedbackManager from './FeedbackManager';
 import ScoreManager from './ScoreManager';
 
 export default class GameManager {
@@ -15,29 +16,31 @@ export default class GameManager {
 
   // Managers
   private scoreManager?: ScoreManager;
+  feedbackManager?: FeedbackManager;
 
-  constructor() {
+  constructor(
+    didPlayNote?: (key: number, playerId: number) => void,
+    didStopNote?: (key: number, playerId: number) => void
+  ) {
     this.startTime = -1;
     this.delayedStartTime = -1;
     this.audioHandlers = [];
+
+    this.didPlayNote = didPlayNote;
+    this.didStopNote = didStopNote;
   }
 
   // Must set up game before start scheduling the various events
   setUpGame(
     setStartTime: (value: React.SetStateAction<number>) => void,
     lookAheadTime: number,
-    countDown: number,
-    didPlayNote?: (key: number, playerId: number) => void,
-    didStopNote?: (key: number, playerId: number) => void
+    countDown: number
   ) {
     this.startTime = Tone.now() + countDown;
     this.delayedStartTime = this.startTime + lookAheadTime;
     setStartTime(this.startTime);
     console.log('Game start', this.startTime);
     Tone.Transport.start();
-
-    this.didPlayNote = didPlayNote;
-    this.didStopNote = didStopNote;
   }
 
   scheduleCountDown(
@@ -83,15 +86,23 @@ export default class GameManager {
     this.scoreManager.startChecking();
   }
 
-  scheduleEndingScreen(
-    songDuration: number,
-    setGameEnd: (value: React.SetStateAction<boolean>) => void
-  ) {
+  scheduleEndingScreen(songDuration: number, endGame: () => void) {
     Tone.Transport.schedule(() => {
-      setGameEnd(true);
+      endGame();
       this.scoreManager?.didEndGame();
+      this.feedbackManager?.didEndGame();
+      // TODO: game stats
+      console.log(this.feedbackManager?.generateStats());
       // Slightly delay the ending screen
     }, this.delayedStartTime + songDuration - Tone.now() + 0.1);
+  }
+
+  setUpFeedbackManager(playerNotes: Note[], isSmartPiano: boolean) {
+    this.feedbackManager = new FeedbackManager(
+      this.delayedStartTime,
+      playerNotes
+    );
+    this.feedbackManager.startTrackingMissedNotes(isSmartPiano);
   }
 
   handleNotePlay(note: number, playedBy: number, myPlayerId: number) {
