@@ -198,7 +198,7 @@ const DuetRoomHeader: React.FC<Props> = ({
     <RoomHeader>
       {backButton()}
       {centerComponents()}
-      {!isOnMobile && <Box component="span" className={classes.empty} />}
+      <Box component="span" className={classes.empty} />
       {roomDetails()}
     </RoomHeader>
   );
