@@ -79,7 +79,7 @@ const DuetLobby: React.FC<Props> = ({
       <Box
         display="flex"
         flexDirection="column"
-        height="100%"
+        flexGrow={1}
         justifyContent="space-around"
         className={classes.root}
       >
@@ -117,23 +117,16 @@ const DuetLobby: React.FC<Props> = ({
 
   const landscapeView = () => {
     return (
-      <Box display="flex" height="100%" className={classes.root}>
+      <Box display="flex" flexGrow={1} className={classes.root}>
         {/* left half */}
         <Box
           display="flex"
-          height="100%"
           flexGrow={1}
           flexDirection="column"
-          alignItems="center"
           justifyContent="space-between"
         >
           {/* player cards */}
-          <Box
-            display="flex"
-            justifyContent="space-evenly"
-            width="100%"
-            flexGrow={1}
-          >
+          <Box display="flex" justifyContent="space-evenly">
             {playerCards()}
           </Box>
           {/* ready button */}
@@ -141,22 +134,15 @@ const DuetLobby: React.FC<Props> = ({
             display="flex"
             flexDirection="column"
             alignItems="center"
-            justifyContent="space-around"
+            justifyContent="center"
             flexGrow={1}
           >
-            <Box
-              height="100%"
-              display="flex"
-              flexDirection="column"
-              alignItems="center"
-            >
-              <DuetReadyButton isDownloadingSong={isDownloadingSong} />
-            </Box>
+            <DuetReadyButton isDownloadingSong={isDownloadingSong} />
           </Box>
         </Box>
 
         {/* right half */}
-        <Box display="flex" height="100%" flexGrow={1} maxWidth="50%">
+        <Box display="flex" flexGrow={1} maxWidth="50%">
           {/* room configurations */}
           <DuetRoomOptions
             speed={speed}
