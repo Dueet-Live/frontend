@@ -15,7 +15,13 @@ type Props = {
   setShowTutorial: (showTutorial: React.SetStateAction<boolean>) => void;
 };
 
-const StyledSlide = withStyles({
+const StyledSlide = withStyles(theme => ({
+  root: {
+    backgroundColor: theme.palette.primary.dark,
+  },
+  mediaBackground: {
+    backgroundColor: theme.palette.primary.light,
+  },
   mediaBackgroundMobile: {
     height: 'calc(100% - 280px)',
   },
@@ -27,7 +33,7 @@ const StyledSlide = withStyles({
   title: {
     whiteSpace: 'normal',
   },
-})(Slide);
+}))(Slide);
 
 const Tutorial: React.FC<Props> = ({ showTutorial, setShowTutorial }) => {
   const theme = useTheme();
@@ -60,7 +66,12 @@ const Tutorial: React.FC<Props> = ({ showTutorial, setShowTutorial }) => {
       <StyledSlide
         media={<>GIF showing clicking on duet and copying link</>}
         title="Play a duet with your friend"
-        subtitle="Collaborate with your friend to complete a piece! Your friend is busy now? Don't worry, try our solo mode first."
+        subtitle="Collaborate with your friend to complete a piece! Oh, your friend is busy now? Don't worry, try our solo mode first."
+      />
+      <StyledSlide
+        media={<>GIF showing picking options</>}
+        title="Customize your playing options"
+        subtitle="Pick your song, speed, and part of the duet to play and have some fun!"
       />
       <StyledSlide
         media={
