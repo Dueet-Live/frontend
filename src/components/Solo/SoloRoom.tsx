@@ -109,6 +109,7 @@ const SoloRoom: React.FC = () => {
           setView={setView}
           chosenSongMIDI={chosenSongMIDI}
           setScore={setScore}
+          showSmartPiano
         />
       );
     }

@@ -1,200 +1,155 @@
-import {
-  FormControlLabel,
-  Grid,
-  makeStyles,
-  Paper,
-  Radio,
-  RadioGroup,
-  Typography,
-} from '@material-ui/core';
+import { Box, makeStyles, useMediaQuery } from '@material-ui/core';
 import React, { useContext } from 'react';
 import { PlayerContext } from '../../contexts/PlayerContext';
 import { RoomContext } from '../../contexts/RoomContext';
-import PlayerIcon from '../../icons/PlayerIcon';
-import { Part } from '../../types/messages';
 import { Song } from '../../types/song';
-import { getMyPart, getPartsSelection } from '../../utils/roomInfo';
-import { changeSpeed, choosePart } from '../../utils/socket';
-import PickASongButton from '../PickASongButton';
-import SpeedCustomization from '../shared/SpeedCustomization';
+import { getParts, getReady } from '../../utils/roomInfo';
 import DuetReadyButton from './DuetReadyButton';
+import DuetRoomOptions from './DuetRoomOptions';
+import PlayerCard from './PlayerCard';
 
 const useStyles = makeStyles(theme => ({
   root: {
-    flex: 1,
-    alignItems: 'stretch',
-  },
-  content: {
-    flexGrow: 1,
-  },
-  readyButton: {
-    paddingLeft: theme.spacing(2),
-    paddingRight: theme.spacing(2),
-    paddingBottom: theme.spacing(1),
-  },
-  box: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-  },
-  // TODO: put in theme colors
-  primo: {
-    backgroundColor: '#B0A3F9',
-  },
-  secondo: {
-    backgroundColor: '#F2BC92',
-  },
-  paper: {
-    marginLeft: theme.spacing(1),
-    marginRight: theme.spacing(1),
-    width: '70%',
-    height: '100%',
-    display: 'flex',
-    justifyContent: 'space-evenly',
-    alignItems: 'center',
-    position: 'relative',
-  },
-  label: {
-    position: 'absolute',
-    bottom: 0,
-    '&:first-letter': {
-      textTransform: 'capitalize',
+    margin: theme.spacing(2),
+    [theme.breakpoints.up('md')]: {
+      margin: theme.spacing(4),
     },
-  },
-  partCard: {
-    height: '50%',
-  },
-  form: {
-    paddingLeft: theme.spacing(2),
-    paddingRight: theme.spacing(2),
-    paddingTop: theme.spacing(1),
-  },
-  error: {
-    position: 'absolute',
-    bottom: '25%',
-    color: 'red',
   },
 }));
 
 type Props = {
   chosenSong: Song | null;
   isPieceDownloaded: boolean;
-  tryPiano: () => void;
+  useSmartPiano: boolean;
+  setUseSmartPiano: (newValue: boolean) => void;
 };
 
 const DuetLobby: React.FC<Props> = ({
   chosenSong,
   isPieceDownloaded,
-  tryPiano,
+  useSmartPiano,
+  setUseSmartPiano,
 }) => {
   const classes = useStyles();
-  const { me: myPlayerId } = useContext(PlayerContext);
+  const { me: myPlayerId, friend: friendPlayerId } = useContext(PlayerContext);
   const { roomInfo } = useContext(RoomContext);
-  const { primo, secondo } = getPartsSelection(roomInfo);
-  const myPart = getMyPart(roomInfo, myPlayerId);
-
+  const { me: iAmReady, friend: friendIsReady } = getReady(
+    roomInfo,
+    myPlayerId
+  );
   const { speed } = roomInfo;
-
-  const handlePartChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const val = event.target.value;
-    if (val === '' || (val !== 'primo' && val !== 'secondo')) return;
-
-    choosePart(val);
-  };
-
-  const partCard = (part: Part, className: string, players: number[]) => {
-    return (
-      <Grid
-        item
-        xs={6}
-        container
-        direction="column"
-        alignItems="center"
-        spacing={1}
-        className={classes.partCard}
-      >
-        {/* TODO make player icon larger on larger screen sizes */}
-        <Paper elevation={5} className={`${classes.paper} ${className}`}>
-          {players.map(id => (
-            <PlayerIcon num={id} key={id} myPlayerId={myPlayerId} />
-          ))}
-          <Typography variant="body1" align="center" className={classes.label}>
-            {part}
-          </Typography>
-        </Paper>
-      </Grid>
-    );
-  };
+  const { me: myPart, friend: friendPart } = getParts(roomInfo, myPlayerId);
 
   const isDownloadingSong = chosenSong !== null && !isPieceDownloaded;
 
-  let error = '';
-  if (myPart === null) {
-    error = 'Choose your part on the left!';
-  } else if (primo.length === 2 || secondo.length === 2) {
-    error = 'Both of you must play different parts!';
-  } else if (primo.length === 0 || secondo.length === 0) {
-    error = 'Waiting for your friend to pick a part...';
-  }
+  const isPortrait = useMediaQuery('(orientation: portrait)');
 
-  return (
-    <Grid container direction="column" className={classes.root}>
-      <Grid item container className={classes.content}>
-        <Grid
-          item
-          xs={7}
-          spacing={2}
-          container
-          direction="column"
-          justify="center"
-          className={classes.form}
+  const playerCards = () => {
+    return (
+      <>
+        <PlayerCard
+          playerId={myPlayerId}
+          myPlayerId={myPlayerId}
+          isReady={iAmReady}
+          part={myPart}
+        />
+        {friendPlayerId === null && (
+          <PlayerCard playerId={null} myPlayerId={myPlayerId} />
+        )}
+        {friendPlayerId !== null && (
+          <PlayerCard
+            playerId={friendPlayerId}
+            myPlayerId={myPlayerId}
+            isReady={friendIsReady}
+            part={friendPart}
+          />
+        )}
+      </>
+    );
+  };
+
+  const portraitView = () => {
+    return (
+      <Box
+        display="flex"
+        flexDirection="column"
+        flexGrow={1}
+        justifyContent="space-around"
+        className={classes.root}
+      >
+        {/* player cards */}
+        <Box display="flex" justifyContent="space-evenly" flexGrow={1}>
+          {playerCards()}
+        </Box>
+
+        {/* room configurations */}
+        <Box flexGrow={3}>
+          <DuetRoomOptions
+            speed={speed}
+            song={chosenSong}
+            part={myPart}
+            iAmReady={iAmReady}
+            useSmartPiano={useSmartPiano}
+            setUseSmartPiano={setUseSmartPiano}
+          />
+        </Box>
+
+        {/* ready button */}
+        <Box
+          flexGrow={1}
+          display="flex"
+          flexDirection="column"
+          alignItems="center"
+          justifyContent="center"
         >
-          <Grid item style={{ maxWidth: '100%' }}>
-            <Typography variant="body1" color="textPrimary">
-              Pick a song
-            </Typography>
-            <PickASongButton />
-          </Grid>
-          <Grid item>
-            <Typography variant="body1" color="textPrimary">
-              Choose your part
-            </Typography>
-            <RadioGroup
-              row
-              aria-label="part"
-              name="part"
-              value={myPart}
-              onChange={handlePartChange}
-            >
-              <FormControlLabel
-                value="primo"
-                control={<Radio />}
-                label="Primo"
-              />
-              <FormControlLabel
-                value="secondo"
-                control={<Radio />}
-                label="Secondo"
-              />
-            </RadioGroup>
-          </Grid>
-          <Grid item>
-            <SpeedCustomization speed={speed} setSpeed={changeSpeed} />
-          </Grid>
-        </Grid>
-        <Grid item xs={5} container justify="center" alignItems="center">
-          {partCard('primo', classes.primo, primo)}
-          {partCard('secondo', classes.secondo, secondo)}
-          <Typography variant="body2" align="center" className={classes.error}>
-            {error}
-          </Typography>
-        </Grid>
-      </Grid>
-      <div className={classes.readyButton}>
-        <DuetReadyButton isDownloadingSong={isDownloadingSong} />
-      </div>
-    </Grid>
-  );
+          <DuetReadyButton isDownloadingSong={isDownloadingSong} />
+        </Box>
+      </Box>
+    );
+  };
+
+  const landscapeView = () => {
+    return (
+      <Box display="flex" flexGrow={1} className={classes.root}>
+        {/* left half */}
+        <Box display="flex" flexGrow={1} maxWidth="50%">
+          {/* room configurations */}
+          <DuetRoomOptions
+            speed={speed}
+            song={chosenSong}
+            part={myPart}
+            iAmReady={iAmReady}
+            useSmartPiano={useSmartPiano}
+            setUseSmartPiano={setUseSmartPiano}
+          />
+        </Box>
+
+        {/* right half */}
+        <Box
+          display="flex"
+          flexGrow={1}
+          flexDirection="column"
+          justifyContent="space-between"
+        >
+          {/* player cards */}
+          <Box display="flex" justifyContent="space-evenly">
+            {playerCards()}
+          </Box>
+          {/* ready button */}
+          <Box
+            display="flex"
+            flexDirection="column"
+            alignItems="center"
+            justifyContent="center"
+            flexGrow={1}
+          >
+            <DuetReadyButton isDownloadingSong={isDownloadingSong} />
+          </Box>
+        </Box>
+      </Box>
+    );
+  };
+  return isPortrait ? portraitView() : landscapeView();
 };
 
 export default DuetLobby;

@@ -25,6 +25,7 @@ const App: React.FC = () => {
     }
     fetch();
   }, []);
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />

@@ -46,6 +46,8 @@ const useStyles = makeStyles(theme => ({
   avatarBox: {
     position: 'relative',
     marginRight: theme.spacing(2),
+    height: '2em',
+    width: '2em',
   },
 }));
 
@@ -195,7 +197,7 @@ const DuetRoomHeader: React.FC<Props> = ({
     <RoomHeader>
       {backButton()}
       {centerComponents()}
-      {!isOnMobile && <Box component="span" className={classes.empty} />}
+      <Box component="span" className={classes.empty} />
       {roomDetails()}
     </RoomHeader>
   );

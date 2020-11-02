@@ -47,7 +47,7 @@ type Props = {
   setView: (view: RoomView) => void;
   speed: number;
   myPart?: Part | null;
-  showSmartPiano?: boolean;
+  showSmartPiano: boolean;
   handleNotePlay?: (key: number, playerId: number) => void;
   handleNoteStop?: (key: number, playerId: number) => void;
 };
@@ -58,7 +58,7 @@ const GameView: React.FC<Props> = ({
   setView,
   speed,
   myPart,
-  showSmartPiano = true,
+  showSmartPiano,
   handleNotePlay = noOp,
   handleNoteStop = noOp,
 }) => {
