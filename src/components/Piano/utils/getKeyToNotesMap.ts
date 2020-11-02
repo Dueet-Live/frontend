@@ -52,7 +52,8 @@ console.assert(
   "Default values' length do not match"
 );
 const FIRST_MIDI_NOTE_OF_FIRST_OCTAVE = 12;
-const ENDING_BUFFER_TIME = 10; // determines how long the very last mapping of notes last for
+// determines how long the very last mapping of notes last for; NOTE: assumes that song won't last longer than 10 minutes
+const ENDING_BUFFER_TIME = 600;
 
 /** Returns an initial mapping of midi notes to indices (of the array). */
 const getStartingKeyboardNotes = (notes: NamedNote[]) => {
