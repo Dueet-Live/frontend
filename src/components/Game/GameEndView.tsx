@@ -43,6 +43,7 @@ const useStyles = makeStyles(theme => ({
   },
   stats: {
     marginTop: theme.spacing(1),
+    alignItems: 'center',
   },
 }));
 

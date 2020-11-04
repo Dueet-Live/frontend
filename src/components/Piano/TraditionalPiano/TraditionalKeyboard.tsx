@@ -72,7 +72,6 @@ const TraditionalKeyboard: React.FC<Props> = ({
       // Relay to server
       if (isDuetMode && playerId === me) {
         stopNote(note);
-        feedbackManager?.didPlayNote(note, note);
       }
 
       instrumentPlayer.stopNote(note);

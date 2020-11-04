@@ -127,6 +127,7 @@ export default class FeedbackManager {
       startTime: noteStartTime,
       keyIdentifier: keyboardIndex,
     } = this.playingNotes[midi];
+    delete this.playingNotes[midi];
 
     if (keyIdentifier !== keyboardIndex) {
       console.error(
@@ -142,7 +143,6 @@ export default class FeedbackManager {
     );
 
     this.showFeedbackToUI(keyboardIndex, performance);
-    delete this.playingNotes[midi];
   }
 
   didEndGame() {
