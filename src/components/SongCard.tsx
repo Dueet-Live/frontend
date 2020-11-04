@@ -4,7 +4,6 @@ import { Song } from '../types/song';
 
 const useStyles = makeStyles({
   root: {
-    height: '40px',
     backgroundColor: '#c5c9f7',
     width: '70%',
     margin: 'auto',
