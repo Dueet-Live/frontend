@@ -43,8 +43,6 @@ const useStyles = makeStyles(theme => ({
 type Props = {
   score: Score;
   view: RoomView;
-  selectedGenre: string;
-  setGenre: (genre: string) => void;
   setView: (roomView: RoomView) => void;
   resetScore: () => void;
 };
@@ -52,8 +50,6 @@ type Props = {
 const SoloRoomHeader: React.FC<Props> = ({
   score,
   view,
-  selectedGenre,
-  setGenre,
   setView,
   resetScore,
 }) => {
@@ -72,13 +68,8 @@ const SoloRoomHeader: React.FC<Props> = ({
 
     switch (view) {
       case 'solo.select': {
-        if (selectedGenre) {
-          backText = 'Genres';
-          handleBack = () => setGenre('');
-        } else {
-          backText = 'Home';
-          handleBack = () => history.push('/');
-        }
+        backText = 'Home';
+        handleBack = () => history.push('/');
         break;
       }
       case 'solo.try':
@@ -110,7 +101,7 @@ const SoloRoomHeader: React.FC<Props> = ({
     if (view === 'solo.select') {
       return (
         <Typography variant="h6" color="textPrimary" className={classes.header}>
-          Song Selection
+          Solo Mode
         </Typography>
       );
     }

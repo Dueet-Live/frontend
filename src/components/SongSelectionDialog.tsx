@@ -52,7 +52,9 @@ const useStyles = makeStyles(theme => ({
     height: 500,
   },
   dialogNotFullscreen: {
-    height: 600,
+    maxHeight: 'calc(var(--vh, 1vh) * 80)',
+    width: 600,
+    maxWidth: 'calc(1vw * 80)',
     paddingBottom: theme.spacing(2),
   },
 }));
@@ -111,7 +113,7 @@ const SongSelectionDialog: React.FC<Props> = ({
 
   const classes = useStyles();
   const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down('xs'));
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   const genres = useGenres();
   const songs = useSongs(type);
