@@ -166,7 +166,38 @@ const SoloSelectSong: React.FC<Props> = ({
     );
   };
 
-  return isPortrait ? landscapeView() : landscapeView();
+  const portraitView = () => {
+    return (
+      <Box
+        flexGrow={1}
+        display="flex"
+        flexDirection="column"
+        justifyContent="space-between"
+        p={2}
+      >
+        {/* song selection */}
+        <Box flexGrow={2} display="flex" flexDirection="column" mb={2}>
+          {songSelection()}
+        </Box>
+        {/* other options */}
+        <Box flexGrow={2} display="flex" flexDirection="column" mb={2}>
+          {otherOptions()}
+        </Box>
+        {/* play button */}
+        <Box
+          flexGrow={1}
+          display="flex"
+          flexDirection="column"
+          justifyContent="space-around"
+          alignItems="center"
+        >
+          {readyButton()}
+        </Box>
+      </Box>
+    );
+  };
+
+  return isPortrait ? portraitView() : landscapeView();
 };
 
 export default SoloSelectSong;
