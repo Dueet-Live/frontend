@@ -17,7 +17,6 @@ export const getIndexToNotesMap = (notes: NamedNote[]) => {
   const startKeyboardNotes = getStartingKeyboardNotes(notes);
   const map = startKeyboardNotes.map(note => [note]);
 
-  let prevNote = notes[0];
   for (let i = 0; i < notes.length; i++) {
     const note = notes[i];
     const prefix = getPrefixOfNote(note.name);
@@ -25,6 +24,7 @@ export const getIndexToNotesMap = (notes: NamedNote[]) => {
 
     const notesAtIndex = map[index];
     const lastAddedNoteAtIndex = notesAtIndex[notesAtIndex.length - 1];
+    const prevNote = getPrevNote(notes, i);
 
     if (isMoreThanOctaveChange(lastAddedNoteAtIndex.midi, note.midi)) {
       const newOctave = getOctave(note.midi);
@@ -36,8 +36,6 @@ export const getIndexToNotesMap = (notes: NamedNote[]) => {
         prevNote.time + prevNote.duration / 2 // to mitigate issues with early playing
       );
     }
-
-    prevNote = note;
   }
 
   return map;
@@ -54,6 +52,19 @@ console.assert(
 const FIRST_MIDI_NOTE_OF_FIRST_OCTAVE = 12;
 // determines how long the very last mapping of notes last for; NOTE: assumes that song won't last longer than 10 minutes
 const ENDING_BUFFER_TIME = 600;
+
+/**
+ * Returns the closest previous note (temporally) to that located at `notes[currentIndex]`.
+ * If none, exists, returns the first note.
+ */
+const getPrevNote = (notes: NamedNote[], currentIndex: number) => {
+  let prevIndex = currentIndex > 0 ? currentIndex - 1 : 0;
+  while (prevIndex > 0 && notes[prevIndex].time >= notes[currentIndex].time) {
+    prevIndex--;
+  }
+
+  return notes[prevIndex];
+};
 
 /** Returns an initial mapping of midi notes to indices (of the array). */
 const getStartingKeyboardNotes = (notes: NamedNote[]) => {
@@ -133,8 +144,8 @@ const updateMap = (
     notesAtIndex.push({
       midi:
         affectedIndex === i
-          ? changeToOctave(lastAddedNoteAtIndex.midi, octave)
-          : currentNote.midi,
+          ? currentNote.midi
+          : changeToOctave(lastAddedNoteAtIndex.midi, octave),
       expiry: expiry + ENDING_BUFFER_TIME,
     } as MappedNote);
   }
