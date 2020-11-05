@@ -157,8 +157,9 @@ export function addListeners(
   });
 
   socket.on(START_GAME_NOTIFICATION, ({ inSeconds }: { inSeconds: number }) => {
-    // Immediatelt set game start time
+    // Immediately set game start time
     setGameStartTime(Tone.now() + inSeconds);
+    setView('duet.play');
     setRoomState((prevRoomState: RoomInfo) => {
       // server marks them as false when the game starts
       const unreadiedPlayers = prevRoomState.players.map(player => ({
@@ -168,7 +169,6 @@ export function addListeners(
 
       return { ...prevRoomState, players: unreadiedPlayers };
     });
-    setView('duet.play');
   });
 }
 export function removeRoomStateListeners() {
@@ -185,7 +185,7 @@ export function addNotePlayListener(
   handleNoteStopByFriend: (note: number) => void
 ) {
   socket.on(NOTE_PLAYED, ({ note, event }: NotePlayedMessage) => {
-    console.log(`Received ${event} event for note ${note}`);
+    // console.log(`Received ${event} event for note ${note}`);
     if (event === 'keydown') {
       handleNotePlayByFriend(note);
     }

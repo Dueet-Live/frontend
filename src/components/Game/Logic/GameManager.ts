@@ -60,7 +60,8 @@ export default class GameManager {
           note.midi,
           note.time + this.delayedStartTime,
           note.duration,
-          note.velocity
+          // Manually soften playback volume
+          note.velocity * 0.5
         );
         this.audioHandlers.push(handler);
         // Schedule 1 sec before the note play

@@ -62,7 +62,7 @@ const GameView: React.FC<Props> = ({
   showSmartPiano,
   handleNotePlay = noOp,
   handleNoteStop = noOp,
-  gameStartTime: startTime,
+  gameStartTime,
 }) => {
   const classes = useStyles();
 
@@ -91,7 +91,7 @@ const GameView: React.FC<Props> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   // Actual start time (including the lookAheadTime(1 bar rest))
-  const delayedStartTime = lookAheadTime + startTime;
+  const delayedStartTime = lookAheadTime + gameStartTime;
 
   /*************** Player track information *****************/
   // 0 for solo
@@ -112,13 +112,13 @@ const GameView: React.FC<Props> = ({
   );
 
   useEffect(() => {
-    if (startTime === -1) {
+    if (gameStartTime === -1) {
       return;
     }
 
     // Set up game
     const gameManager = gameManagerRef.current;
-    gameManager.setUpGame(startTime, lookAheadTime);
+    gameManager.setUpGame(gameStartTime, lookAheadTime);
 
     // Schedule countdown
     gameManager.scheduleCountDown(countDown, setTimeToStart);
@@ -141,7 +141,7 @@ const GameView: React.FC<Props> = ({
       gameManager.cleanup();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [startTime]);
+  }, [gameStartTime]);
 
   /*************** Keyboard dimension *****************/
   const [middleBoxDimensions, middleBoxRef] = useDimensions<HTMLDivElement>();
@@ -180,7 +180,7 @@ const GameView: React.FC<Props> = ({
   return (
     <div className={classes.root}>
       <ProgressBar
-        startTime={startTime}
+        startTime={gameStartTime}
         delayedStartTime={delayedStartTime}
         songDuration={songDuration}
       />
@@ -191,7 +191,7 @@ const GameView: React.FC<Props> = ({
             gameEnd={gameEnd}
             showSmartPiano={showSmartPiano}
             middleBoxDimensions={middleBoxDimensions}
-            startTime={startTime}
+            startTime={gameStartTime}
             lookAheadTime={lookAheadTime}
             keyboardDimension={keyboardDimension}
             normalPlayerNotes={playerNotes}
