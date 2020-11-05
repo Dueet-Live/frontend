@@ -64,7 +64,7 @@ const PlayerCard: React.FC<Props> = props => {
           textAlign="center"
         >
           <Typography variant="body1">
-            Invite your friend using the game PIN!
+            Invite your friend using the Room PIN!
           </Typography>
         </Box>
       );
