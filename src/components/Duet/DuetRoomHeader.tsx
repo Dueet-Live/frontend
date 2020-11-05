@@ -28,6 +28,7 @@ const useStyles = makeStyles(theme => ({
   },
   roomId: {
     marginRight: theme.spacing(1),
+    userSelect: 'text',
   },
   header: {
     position: 'absolute',
@@ -111,7 +112,7 @@ const DuetRoomHeader: React.FC<Props> = ({
               color="textPrimary"
               className={classes.roomId}
             >
-              {`Room ID: ${roomInfo.id}`}
+              {`Room PIN: ${roomInfo.id}`}
             </Typography>
             <Link
               component="button"
