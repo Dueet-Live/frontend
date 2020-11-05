@@ -28,6 +28,7 @@ const useStyles = makeStyles(theme => ({
   },
   roomId: {
     marginRight: theme.spacing(1),
+    userSelect: 'text',
   },
   header: {
     position: 'absolute',
