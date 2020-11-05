@@ -2,7 +2,7 @@ import { Box, makeStyles, Typography } from '@material-ui/core';
 import React, { useState } from 'react';
 import { Part } from '../../types/messages';
 import { Song } from '../../types/song';
-import { changeSpeed, choosePart } from '../../utils/socket';
+import { changeSpeed, choosePart, choosePiece } from '../../utils/socket';
 import LobbyKeyboardTypeSelector from '../shared/LobbyKeyboardTypeSelector';
 import useSharedLobbyStyles from '../shared/LobbySharedStyles';
 import LobbySongSelection from '../shared/LobbySongSelection';
@@ -54,6 +54,11 @@ const DuetRoomOptions: React.FC<Props> = ({
       <SongSelectionDialog
         open={songSelectionDialogOpen}
         handleClose={() => setSongSelectionDialogOpen(false)}
+        type="duet"
+        onChooseSong={(song: Song) => {
+          // send socket request
+          choosePiece(song.id);
+        }}
       />
       <LobbySongSelection
         iAmReady={iAmReady}
