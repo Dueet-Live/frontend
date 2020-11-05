@@ -35,6 +35,9 @@ const useStyles = makeStyles(theme => ({
     left: '50%',
     transform: 'translate(-50%)',
   },
+  backButton: {
+    justifyContent: 'flex-start',
+  },
   accuracy: {
     position: 'absolute',
     left: '50%',
@@ -163,7 +166,11 @@ const DuetRoomHeader: React.FC<Props> = ({
     }
 
     return (
-      <Button onClick={handleBack} startIcon={<ArrowBack />}>
+      <Button
+        onClick={handleBack}
+        startIcon={<ArrowBack />}
+        className={classes.backButton}
+      >
         {backText}
       </Button>
     );

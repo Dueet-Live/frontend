@@ -32,6 +32,9 @@ const useStyles = makeStyles(theme => ({
   button: {
     width: '148px',
   },
+  backButton: {
+    justifyContent: 'flex-start',
+  },
 }));
 
 const PinField = styled(TextField)({
@@ -100,7 +103,11 @@ const DuetHome: React.FC = () => {
     <Box className={classes.outer}>
       <Box className={classes.header}>
         <RoomHeader>
-          <Button onClick={handleBack} startIcon={<ArrowBack />}>
+          <Button
+            onClick={handleBack}
+            startIcon={<ArrowBack />}
+            className={classes.backButton}
+          >
             home
           </Button>
         </RoomHeader>
