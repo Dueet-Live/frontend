@@ -83,7 +83,7 @@ const DuetLobby: React.FC<Props> = ({
         </Box>
 
         {/* room configurations */}
-        <Box flexGrow={3}>
+        <Box flexGrow={3} display="flex">
           <DuetRoomOptions
             speed={speed}
             song={chosenSong}
