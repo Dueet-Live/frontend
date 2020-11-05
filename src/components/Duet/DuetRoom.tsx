@@ -64,6 +64,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
   const [view, setView] = useState<RoomView>('duet.lobby');
   const [score, setScore] = useState<Score>({ correct: 0, total: 0 });
   const [useSmartPiano, setUseSmartPiano] = useState(true);
+  const [gameStartTime, setGameStartTime] = useState(-1);
   const displayNotification = useContext(NotificationContext);
 
   const { piece, speed } = roomState;
@@ -77,6 +78,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
       setPlayerId,
       setRoomState,
       setView,
+      setGameStartTime,
       displayNotification,
       history
     );
@@ -178,6 +180,7 @@ const DuetRoom: React.FC<{ maybeRoomId: string | null; isCreate: boolean }> = ({
           myPart={myPart}
           handleNotePlay={handleNotePlay}
           showSmartPiano={useSmartPiano}
+          gameStartTime={gameStartTime}
         />
       );
     }

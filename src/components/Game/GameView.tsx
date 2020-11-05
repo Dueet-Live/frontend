@@ -50,6 +50,7 @@ type Props = {
   showSmartPiano: boolean;
   handleNotePlay?: (key: number, playerId: number) => void;
   handleNoteStop?: (key: number, playerId: number) => void;
+  gameStartTime: number;
 };
 
 const GameView: React.FC<Props> = ({
@@ -61,6 +62,7 @@ const GameView: React.FC<Props> = ({
   showSmartPiano,
   handleNotePlay = noOp,
   handleNoteStop = noOp,
+  gameStartTime: startTime,
 }) => {
   const classes = useStyles();
 
@@ -68,9 +70,6 @@ const GameView: React.FC<Props> = ({
     new GameManager(handleNotePlay, handleNoteStop)
   );
   const { view } = useContext(RoomContext);
-
-  // Game start time (after the countdown)
-  const [startTime, setStartTime] = useState(-1);
   const countDown = 3;
   const [timeToStart, setTimeToStart] = useState(countDown);
   const gameEnd = view.includes('play.end');
@@ -113,9 +112,13 @@ const GameView: React.FC<Props> = ({
   );
 
   useEffect(() => {
+    if (startTime === -1) {
+      return;
+    }
+
     // Set up game
     const gameManager = gameManagerRef.current;
-    gameManager.setUpGame(setStartTime, lookAheadTime, countDown);
+    gameManager.setUpGame(startTime, lookAheadTime);
 
     // Schedule countdown
     gameManager.scheduleCountDown(countDown, setTimeToStart);
@@ -138,7 +141,7 @@ const GameView: React.FC<Props> = ({
       gameManager.cleanup();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [startTime]);
 
   /*************** Keyboard dimension *****************/
   const [middleBoxDimensions, middleBoxRef] = useDimensions<HTMLDivElement>();
@@ -200,4 +203,8 @@ const GameView: React.FC<Props> = ({
   );
 };
 
-export default React.memo(GameView, () => true);
+function areEqual(prevProps: Props, nextProps: Props) {
+  return prevProps.gameStartTime === nextProps.gameStartTime;
+}
+
+export default React.memo(GameView, areEqual);

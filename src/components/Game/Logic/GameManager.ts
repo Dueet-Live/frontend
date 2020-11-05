@@ -31,14 +31,9 @@ export default class GameManager {
   }
 
   // Must set up game before start scheduling the various events
-  setUpGame(
-    setStartTime: (value: React.SetStateAction<number>) => void,
-    lookAheadTime: number,
-    countDown: number
-  ) {
-    this.startTime = Tone.now() + countDown;
+  setUpGame(startTime: number, lookAheadTime: number) {
+    this.startTime = startTime;
     this.delayedStartTime = this.startTime + lookAheadTime;
-    setStartTime(this.startTime);
     console.log('Game start', this.startTime);
     Tone.Transport.start();
   }
@@ -48,7 +43,7 @@ export default class GameManager {
     setTimeToStart: (value: React.SetStateAction<number>) => void
   ) {
     for (let i = 0; i < countDown; i++) {
-      Tone.Transport.schedule(() => {
+      Tone.Transport.scheduleOnce(() => {
         setTimeToStart(countDown - 1 - i);
       }, this.startTime - (countDown - 1 - i) - Tone.now());
     }
@@ -60,7 +55,7 @@ export default class GameManager {
   ) {
     instrumentPlayer.setInstrument('acoustic_grand_piano');
     playbackNotes.forEach(note => {
-      Tone.Transport.schedule(() => {
+      Tone.Transport.scheduleOnce(() => {
         const handler = instrumentPlayer.playNoteWithDuration(
           note.midi,
           note.time + this.delayedStartTime,
@@ -86,7 +81,7 @@ export default class GameManager {
   }
 
   scheduleEndingScreen(songDuration: number, endGame: () => void) {
-    Tone.Transport.schedule(() => {
+    Tone.Transport.scheduleOnce(() => {
       endGame();
       this.scoreManager?.didEndGame();
       this.feedbackManager?.didEndGame();

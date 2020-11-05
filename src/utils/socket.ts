@@ -25,6 +25,7 @@ import {
 } from '../types/messages';
 import { Notification } from '../types/Notification';
 import { RoomInfo } from '../types/roomInfo';
+import * as Tone from 'tone';
 
 const socket = io(process.env.REACT_APP_WS_URL!, {
   transports: ['websocket', 'polling'],
@@ -35,6 +36,7 @@ export function addListeners(
   setPlayerId: (id: number) => void,
   setRoomState: (roomInfo: React.SetStateAction<RoomInfo>) => void,
   setView: (view: RoomView) => void,
+  setGameStartTime: (startTime: number) => void,
   displayNotification: (notification: Notification) => void,
   history: History<unknown>
 ) {
@@ -155,7 +157,8 @@ export function addListeners(
   });
 
   socket.on(START_GAME_NOTIFICATION, ({ inSeconds }: { inSeconds: number }) => {
-    setView('duet.play');
+    // Immediatelt set game start time
+    setGameStartTime(Tone.now() + inSeconds);
     setRoomState((prevRoomState: RoomInfo) => {
       // server marks them as false when the game starts
       const unreadiedPlayers = prevRoomState.players.map(player => ({
@@ -165,6 +168,7 @@ export function addListeners(
 
       return { ...prevRoomState, players: unreadiedPlayers };
     });
+    setView('duet.play');
   });
 }
 export function removeRoomStateListeners() {
