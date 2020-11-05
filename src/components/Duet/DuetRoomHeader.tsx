@@ -111,7 +111,7 @@ const DuetRoomHeader: React.FC<Props> = ({
               color="textPrimary"
               className={classes.roomId}
             >
-              {`Room ID: ${roomInfo.id}`}
+              {`Room PIN: ${roomInfo.id}`}
             </Typography>
             <Link
               component="button"
