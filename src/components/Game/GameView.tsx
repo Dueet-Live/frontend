@@ -50,6 +50,7 @@ type Props = {
   showSmartPiano: boolean;
   handleNotePlay?: (key: number, playerId: number) => void;
   handleNoteStop?: (key: number, playerId: number) => void;
+  gameStartTime: number;
 };
 
 const GameView: React.FC<Props> = ({
@@ -61,6 +62,7 @@ const GameView: React.FC<Props> = ({
   showSmartPiano,
   handleNotePlay = noOp,
   handleNoteStop = noOp,
+  gameStartTime,
 }) => {
   const classes = useStyles();
 
@@ -68,9 +70,6 @@ const GameView: React.FC<Props> = ({
     new GameManager(handleNotePlay, handleNoteStop)
   );
   const { view } = useContext(RoomContext);
-
-  // Game start time (after the countdown)
-  const [startTime, setStartTime] = useState(-1);
   const countDown = 3;
   const [timeToStart, setTimeToStart] = useState(countDown);
   const gameEnd = view.includes('play.end');
@@ -92,7 +91,7 @@ const GameView: React.FC<Props> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   // Actual start time (including the lookAheadTime(1 bar rest))
-  const delayedStartTime = lookAheadTime + startTime;
+  const delayedStartTime = lookAheadTime + gameStartTime;
 
   /*************** Player track information *****************/
   // 0 for solo
@@ -113,9 +112,13 @@ const GameView: React.FC<Props> = ({
   );
 
   useEffect(() => {
+    if (gameStartTime === -1) {
+      return;
+    }
+
     // Set up game
     const gameManager = gameManagerRef.current;
-    gameManager.setUpGame(setStartTime, lookAheadTime, countDown);
+    gameManager.setUpGame(gameStartTime, lookAheadTime);
 
     // Schedule countdown
     gameManager.scheduleCountDown(countDown, setTimeToStart);
@@ -138,7 +141,7 @@ const GameView: React.FC<Props> = ({
       gameManager.cleanup();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [gameStartTime]);
 
   /*************** Keyboard dimension *****************/
   const [middleBoxDimensions, middleBoxRef] = useDimensions<HTMLDivElement>();
@@ -177,7 +180,7 @@ const GameView: React.FC<Props> = ({
   return (
     <div className={classes.root}>
       <ProgressBar
-        startTime={startTime}
+        startTime={gameStartTime}
         delayedStartTime={delayedStartTime}
         songDuration={songDuration}
       />
@@ -188,7 +191,7 @@ const GameView: React.FC<Props> = ({
             gameEnd={gameEnd}
             showSmartPiano={showSmartPiano}
             middleBoxDimensions={middleBoxDimensions}
-            startTime={startTime}
+            startTime={gameStartTime}
             lookAheadTime={lookAheadTime}
             keyboardDimension={keyboardDimension}
             normalPlayerNotes={playerNotes}
@@ -200,4 +203,8 @@ const GameView: React.FC<Props> = ({
   );
 };
 
-export default React.memo(GameView, () => true);
+function areEqual(prevProps: Props, nextProps: Props) {
+  return prevProps.gameStartTime === nextProps.gameStartTime;
+}
+
+export default React.memo(GameView, areEqual);

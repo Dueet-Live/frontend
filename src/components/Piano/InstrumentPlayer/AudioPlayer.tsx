@@ -32,7 +32,7 @@ export class AudioPlayer {
   audioContext: BaseContext;
   soundFontPlayer: NullSoundFontPlayer | Player;
   defaultVolume: number;
-  maxVolume: number = 5;
+  maxVolume: number = 10;
 
   constructor(defaultVolume: number = 1) {
     this.audioContext = Tone.context;

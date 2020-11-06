@@ -12,6 +12,7 @@ import { Score } from '../Game/types';
 import FreePlayPiano from '../Piano/TraditionalPiano/FreePlayPiano';
 import SoloRoomHeader from './SoloRoomHeader';
 import SoloSelectSong from './SoloSelectSong';
+import * as Tone from 'tone';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -47,6 +48,7 @@ const SoloRoom: React.FC = () => {
   const [chosenSongMIDI, setChosenSongMIDI] = useState<MidiJSON | undefined>();
   const [view, setView] = useState<RoomView>('solo.select');
   const [score, setScore] = useState<Score>({ correct: 0, total: 0 });
+  const [gameStartTime, setGameStartTime] = useState(-1);
   const displayNotification = useContext(NotificationContext);
   const [useSmartPiano, setUseSmartPiano] = useState(true);
 
@@ -79,8 +81,9 @@ const SoloRoom: React.FC = () => {
         <SoloSelectSong
           isPieceDownloaded={!!chosenSongMIDI}
           handleStart={() => {
-            setView('solo.play');
             startAudioContext(); // AudioContext has to be started with a click event
+            setGameStartTime(Tone.now() + 3);
+            setView('solo.play');
           }}
           tryPiano={() => setView('solo.try')}
           chosenSong={chosenSong}
@@ -110,6 +113,7 @@ const SoloRoom: React.FC = () => {
           chosenSongMIDI={chosenSongMIDI}
           setScore={setScore}
           showSmartPiano={useSmartPiano}
+          gameStartTime={gameStartTime}
         />
       );
     }
