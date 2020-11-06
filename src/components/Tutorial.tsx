@@ -83,8 +83,12 @@ const Tutorial: React.FC<Props> = ({ showTutorial, setShowTutorial }) => {
       <StyledSlide
         media={
           <>
-            <img src={Touchscreen} alt="Touch screen" />
-            <img src={Desktop} alt="Keyboard" />
+            <img
+              style={{ width: '50%' }}
+              src={Touchscreen}
+              alt="Touch screen"
+            />
+            <img style={{ width: '50%' }} src={Desktop} alt="Keyboard" />
           </>
         }
         title="Easy to play on all devices"
@@ -102,8 +106,12 @@ const Tutorial: React.FC<Props> = ({ showTutorial, setShowTutorial }) => {
       <StyledSlide
         media={
           <>
-            <img src={Headset} alt="Headset" />
-            <img src={AddToHome} alt="Add to home screen" />
+            <img style={{ width: '50%' }} src={Headset} alt="Headset" />
+            <img
+              style={{ width: '50%' }}
+              src={AddToHome}
+              alt="Add to home screen"
+            />
           </>
         }
         title="Game Tips"
