@@ -46,9 +46,9 @@ const SoloRoom: React.FC = () => {
   } as RoomInfo);
   const [chosenSongMIDI, setChosenSongMIDI] = useState<MidiJSON | undefined>();
   const [view, setView] = useState<RoomView>('solo.select');
-  const [songSelectionGenre, setSongSelectionGenre] = useState('');
   const [score, setScore] = useState<Score>({ correct: 0, total: 0 });
   const displayNotification = useContext(NotificationContext);
+  const [useSmartPiano, setUseSmartPiano] = useState(true);
 
   const { piece, speed } = roomState;
   const chosenSong = useSong(piece);
@@ -77,8 +77,6 @@ const SoloRoom: React.FC = () => {
     if (view === 'solo.select') {
       return (
         <SoloSelectSong
-          genre={songSelectionGenre}
-          setGenre={setSongSelectionGenre}
           isPieceDownloaded={!!chosenSongMIDI}
           handleStart={() => {
             setView('solo.play');
@@ -90,6 +88,8 @@ const SoloRoom: React.FC = () => {
           setSpeed={(speed: number) =>
             setRoomState((prevState: RoomInfo) => ({ ...prevState, speed }))
           }
+          useSmartPiano={useSmartPiano}
+          setUseSmartPiano={setUseSmartPiano}
         />
       );
     }
@@ -109,7 +109,7 @@ const SoloRoom: React.FC = () => {
           setView={setView}
           chosenSongMIDI={chosenSongMIDI}
           setScore={setScore}
-          showSmartPiano
+          showSmartPiano={useSmartPiano}
         />
       );
     }
@@ -133,8 +133,6 @@ const SoloRoom: React.FC = () => {
             score={score}
             view={view}
             setView={setView}
-            selectedGenre={songSelectionGenre}
-            setGenre={setSongSelectionGenre}
             resetScore={() => setScore({ correct: 0, total: 0 })}
           />
         </div>

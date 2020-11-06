@@ -6,6 +6,12 @@ const useSharedLobbyStyles = makeStyles(theme => ({
       fontSize: theme.typography.h5.fontSize,
     },
   },
+  roundedBorder: {
+    borderColor: theme.palette.primary.main,
+    borderStyle: 'solid',
+    borderRadius: '3vh',
+    borderWidth: '2px',
+  },
 }));
 
 export default useSharedLobbyStyles;

@@ -41,13 +41,13 @@ const useStyles = makeStyles(theme => ({
 }));
 
 type Props = BoxProps & {
-  iAmReady: boolean;
+  disabled: boolean;
   setSongSelectionDialogOpen: (newValue: boolean) => void;
   song: Song | null;
 };
 
 const LobbySongSelection: React.FC<Props> = ({
-  iAmReady,
+  disabled,
   setSongSelectionDialogOpen,
   song,
   ...boxProps
@@ -57,7 +57,7 @@ const LobbySongSelection: React.FC<Props> = ({
   return (
     <Box
       display="flex"
-      justifyContent="space-between"
+      justifyContent="space-around"
       alignItems="center"
       {...boxProps}
     >
@@ -73,7 +73,6 @@ const LobbySongSelection: React.FC<Props> = ({
         flexDirection="column"
         alignItems="center"
         justifyContent="space-evenly"
-        flexGrow={1}
         alignSelf="stretch"
         textAlign="center"
       >
@@ -84,7 +83,7 @@ const LobbySongSelection: React.FC<Props> = ({
           variant="outlined"
           color="primary"
           size="small"
-          disabled={iAmReady}
+          disabled={disabled}
           onClick={() => setSongSelectionDialogOpen(true)}
         >
           <Typography variant="body2" className={classes.pickSongButtonText}>

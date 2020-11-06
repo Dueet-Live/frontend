@@ -12,10 +12,8 @@ import {
   useTheme,
 } from '@material-ui/core';
 import { ArrowBack, Close } from '@material-ui/icons';
-import React, { useContext, useState } from 'react';
-import { RoomContext } from '../contexts/RoomContext';
-import { RoomInfo } from '../types/roomInfo';
-import { choosePiece } from '../utils/socket';
+import React, { useState } from 'react';
+import { Song } from '../types/song';
 import useGenres from '../utils/useGenres';
 import useSongs from '../utils/useSongs';
 import GenreCard from './GenreCard';
@@ -54,7 +52,9 @@ const useStyles = makeStyles(theme => ({
     height: 500,
   },
   dialogNotFullscreen: {
-    height: 600,
+    maxHeight: 'calc(var(--vh, 1vh) * 80)',
+    width: 600,
+    maxWidth: 'calc(1vw * 80)',
     paddingBottom: theme.spacing(2),
   },
 }));
@@ -99,18 +99,24 @@ const DialogTitleWithButtons: React.FC<DialogTitleWithButtonsProps> = ({
 type Props = {
   open: boolean;
   handleClose: () => void;
+  type: 'solo' | 'duet';
+  onChooseSong: (song: Song) => void;
 };
 
-const SongSelectionDialog: React.FC<Props> = ({ open, handleClose }) => {
-  const [genre, setGenre] = useState('');
+const SongSelectionDialog: React.FC<Props> = ({
+  open,
+  handleClose,
+  type,
+  onChooseSong,
+}) => {
+  const [genre, setGenre] = useState<string | null>(null);
 
   const classes = useStyles();
   const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down('xs'));
-  const { setRoomInfo } = useContext(RoomContext);
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   const genres = useGenres();
-  const songs = useSongs('duet');
+  const songs = useSongs(type);
 
   const pickingGenre = () => {
     return (
@@ -136,7 +142,7 @@ const SongSelectionDialog: React.FC<Props> = ({ open, handleClose }) => {
       <>
         <DialogTitleWithButtons
           onClose={handleClose}
-          onBack={() => setGenre('')}
+          onBack={() => setGenre(null)}
         >
           Choose a Song
         </DialogTitleWithButtons>
@@ -148,12 +154,7 @@ const SongSelectionDialog: React.FC<Props> = ({ open, handleClose }) => {
                 <SongCard
                   song={song}
                   onClick={() => {
-                    choosePiece(song.id);
-                    // pre-empt, and for SoloRoom
-                    setRoomInfo((prevState: RoomInfo) => ({
-                      ...prevState,
-                      piece: song.id,
-                    }));
+                    onChooseSong(song);
                     handleClose();
                   }}
                 />
@@ -172,7 +173,7 @@ const SongSelectionDialog: React.FC<Props> = ({ open, handleClose }) => {
       onClose={handleClose}
       PaperProps={fullScreen ? {} : { className: classes.dialogNotFullscreen }}
     >
-      {genre === '' ? pickingGenre() : pickingSong()}
+      {genre === null ? pickingGenre() : pickingSong()}
     </Dialog>
   );
 };

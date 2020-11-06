@@ -29,6 +29,9 @@ const useStyles = makeStyles(theme => ({
     left: '50%',
     transform: 'translate(-50%)',
   },
+  backButton: {
+    justifyContent: 'flex-start',
+  },
   accuracy: {
     position: 'absolute',
     left: '50%',
@@ -43,8 +46,6 @@ const useStyles = makeStyles(theme => ({
 type Props = {
   score: Score;
   view: RoomView;
-  selectedGenre: string;
-  setGenre: (genre: string) => void;
   setView: (roomView: RoomView) => void;
   resetScore: () => void;
 };
@@ -52,8 +53,6 @@ type Props = {
 const SoloRoomHeader: React.FC<Props> = ({
   score,
   view,
-  selectedGenre,
-  setGenre,
   setView,
   resetScore,
 }) => {
@@ -72,13 +71,8 @@ const SoloRoomHeader: React.FC<Props> = ({
 
     switch (view) {
       case 'solo.select': {
-        if (selectedGenre) {
-          backText = 'Genres';
-          handleBack = () => setGenre('');
-        } else {
-          backText = 'Home';
-          handleBack = () => history.push('/');
-        }
+        backText = 'Home';
+        handleBack = () => history.push('/');
         break;
       }
       case 'solo.try':
@@ -100,7 +94,11 @@ const SoloRoomHeader: React.FC<Props> = ({
     }
 
     return (
-      <Button onClick={handleBack} startIcon={<ArrowBack />}>
+      <Button
+        onClick={handleBack}
+        startIcon={<ArrowBack />}
+        className={classes.backButton}
+      >
         {backText}
       </Button>
     );
@@ -110,7 +108,7 @@ const SoloRoomHeader: React.FC<Props> = ({
     if (view === 'solo.select') {
       return (
         <Typography variant="h6" color="textPrimary" className={classes.header}>
-          Song Selection
+          Solo Mode
         </Typography>
       );
     }

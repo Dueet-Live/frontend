@@ -1,186 +1,203 @@
-import {
-  Grid,
-  List,
-  ListItem,
-  makeStyles,
-  Typography,
-} from '@material-ui/core';
-import React, { useContext } from 'react';
+import { Box, Typography, useMediaQuery } from '@material-ui/core';
+import React, { useContext, useState } from 'react';
 import { RoomContext } from '../../contexts/RoomContext';
 import { RoomInfo } from '../../types/roomInfo';
 import { Song } from '../../types/song';
-import { choosePiece } from '../../utils/socket';
-import useGenres from '../../utils/useGenres';
-import useSongs from '../../utils/useSongs';
-import GenreCard from '../GenreCard';
 import { sendGAEvent } from '../GoogleAnalytics';
+import LobbyKeyboardTypeSelector from '../shared/LobbyKeyboardTypeSelector';
+import useSharedLobbyStyles from '../shared/LobbySharedStyles';
+import LobbySongSelection from '../shared/LobbySongSelection';
 import SpeedCustomization from '../shared/SpeedCustomization';
-import SongCard from '../SongCard';
+import SongSelectionDialog from '../SongSelectionDialog';
 import SoloReadyButton from './SoloReadyButton';
-
-const useStyles = makeStyles(theme => ({
-  genreContainer: {
-    display: 'flex',
-    flexDirection: 'row',
-    overflowY: 'auto',
-    height: 0,
-    flex: '1 1 auto',
-    alignContent: 'start',
-  },
-  songContainer: {
-    display: 'flex',
-    flexDirection: 'column',
-    overflowY: 'auto',
-    height: 0,
-    flex: '1 1 auto',
-  },
-  content: {
-    flexGrow: 1,
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  title: {
-    paddingLeft: theme.spacing(2),
-    paddingRight: theme.spacing(2),
-    paddingTop: theme.spacing(1),
-    paddingBottom: theme.spacing(1),
-    '&:first-letter': {
-      textTransform: 'capitalize',
-    },
-  },
-  details: {
-    paddingBottom: theme.spacing(2),
-    paddingLeft: theme.spacing(2),
-    paddingRight: theme.spacing(2),
-    paddingTop: theme.spacing(1),
-    display: 'flex',
-    alignItems: 'flex-end',
-  },
-  speedContainer: {
-    flex: '1 1 auto',
-    textAlign: 'right',
-    paddingLeft: '16px',
-  },
-}));
 
 type Props = {
   chosenSong: Song | null;
-  genre: string;
-  setGenre: (genre: string) => void;
   isPieceDownloaded: boolean;
   handleStart: () => void;
   tryPiano: () => void;
   speed: number;
   setSpeed: (speed: number) => void;
+  useSmartPiano: boolean;
+  setUseSmartPiano: (newValue: boolean) => void;
 };
 
 const SoloSelectSong: React.FC<Props> = ({
   chosenSong,
-  genre,
-  setGenre,
   isPieceDownloaded,
   handleStart,
-  tryPiano,
   speed,
   setSpeed,
+  useSmartPiano,
+  setUseSmartPiano,
 }) => {
-  const classes = useStyles();
+  const lobbySharedStyles = useSharedLobbyStyles();
 
   const { setRoomInfo } = useContext(RoomContext);
 
-  const genres = useGenres();
-  const songs = useSongs('solo');
-
-  const pickingGenre = () => {
-    return (
-      <>
-        <Typography
-          variant="h5"
-          color="primary"
-          align="center"
-          className={classes.title}
-        >
-          Choose a genre
-        </Typography>
-        <Grid container justify="center" className={classes.genreContainer}>
-          {genres.map(genre => (
-            <GenreCard
-              genre={genre.name}
-              onClick={() => setGenre(genre.name)}
-              key={genre.name}
-            />
-          ))}
-        </Grid>
-      </>
-    );
-  };
-
-  const pickingSong = () => {
-    return (
-      <>
-        <Typography
-          variant="h5"
-          color="primary"
-          align="center"
-          className={classes.title}
-        >
-          {genre}
-        </Typography>
-        <List className={classes.songContainer}>
-          {songs
-            .filter(song => song.genre.name === genre)
-            .map(song => (
-              <ListItem key={song.id}>
-                <SongCard
-                  song={song}
-                  onClick={() => {
-                    choosePiece(song.id);
-                    // pre-empt, and for SoloRoom
-                    setRoomInfo((prevState: RoomInfo) => ({
-                      ...prevState,
-                      piece: song.id,
-                    }));
-                  }}
-                />
-              </ListItem>
-            ))}
-        </List>
-      </>
-    );
-  };
+  const [songSelectionDialogOpen, setSongSelectionDialogOpen] = useState(false);
 
   const downloadingSong = chosenSong !== null && !isPieceDownloaded;
 
-  return (
-    <>
-      <div className={classes.content}>
-        {genre === '' ? pickingGenre() : pickingSong()}
-      </div>
-      <div className={classes.details}>
-        <div>
-          <Typography variant="h6" color="textPrimary" gutterBottom>
-            Song chosen: {chosenSong === null ? 'None' : chosenSong.name}{' '}
-          </Typography>
-          <SoloReadyButton
-            disabled={chosenSong === null || downloadingSong}
-            handleStart={() => {
-              sendGAEvent({
-                category: 'Solo',
-                action: 'Play',
-                label: chosenSong?.name,
-              });
-              handleStart();
-            }}
+  const isPortrait = useMediaQuery('(orientation: portrait)');
+
+  const songSelection = () => {
+    return (
+      <>
+        <SongSelectionDialog
+          open={songSelectionDialogOpen}
+          handleClose={() => setSongSelectionDialogOpen(false)}
+          type="solo"
+          onChooseSong={(song: Song) => {
+            setRoomInfo((prevState: RoomInfo) => ({
+              ...prevState,
+              piece: song.id,
+            }));
+          }}
+        />
+        <Box>
+          <Typography variant="h6">Song Selection</Typography>
+        </Box>
+        <Box
+          flexGrow={3}
+          display="flex"
+          flexDirection="column"
+          justifyContent="space-between"
+          className={lobbySharedStyles.roundedBorder}
+          p={2}
+        >
+          <LobbySongSelection
+            song={chosenSong}
+            disabled={false}
+            setSongSelectionDialogOpen={setSongSelectionDialogOpen}
+            flexGrow={1}
+          />
+        </Box>
+      </>
+    );
+  };
+
+  const otherOptions = () => {
+    return (
+      <>
+        <Box>
+          <Typography variant="h6">Other Options</Typography>
+        </Box>
+        <Box
+          flexGrow={3}
+          display="flex"
+          flexDirection="column"
+          justifyContent="space-between"
+          className={lobbySharedStyles.roundedBorder}
+          p={2}
+        >
+          <SpeedCustomization speed={speed} setSpeed={setSpeed} flexGrow={1} />
+          <LobbyKeyboardTypeSelector
+            useSmartPiano={useSmartPiano}
+            setUseSmartPiano={setUseSmartPiano}
+            flexGrow={1}
+          />
+        </Box>
+      </>
+    );
+  };
+
+  const readyButton = () => {
+    return (
+      <SoloReadyButton
+        disabled={chosenSong === null || downloadingSong}
+        handleStart={() => {
+          sendGAEvent({
+            category: 'Solo',
+            action: 'Play',
+            label: chosenSong?.name,
+          });
+          handleStart();
+        }}
+      >
+        {downloadingSong ? 'Loading' : 'Play'}
+      </SoloReadyButton>
+    );
+  };
+
+  const landscapeView = () => {
+    return (
+      <Box
+        flexGrow={1}
+        display="flex"
+        flexDirection="column"
+        justifyContent="space-between"
+        p={2}
+      >
+        <Box flexGrow={3} display="flex" justifyContent="space-between">
+          {/* left side */}
+          <Box
+            flexGrow={1}
+            display="flex"
+            flexDirection="column"
+            maxWidth="50%"
+            mr={1}
           >
-            {downloadingSong ? 'Loading' : 'Play'}
-          </SoloReadyButton>
-        </div>
-        <div className={classes.speedContainer}>
-          <SpeedCustomization speed={speed} setSpeed={setSpeed} />
-        </div>
-      </div>
-    </>
-  );
+            {songSelection()}
+          </Box>
+          {/* right side */}
+          <Box
+            flexGrow={1}
+            display="flex"
+            flexDirection="column"
+            maxWidth="50%"
+            ml={1}
+          >
+            {otherOptions()}
+          </Box>
+        </Box>
+        {/* play button */}
+        <Box
+          flexGrow={1}
+          display="flex"
+          flexDirection="column"
+          justifyContent="space-around"
+          alignItems="center"
+          mt={1}
+        >
+          {readyButton()}
+        </Box>
+      </Box>
+    );
+  };
+
+  const portraitView = () => {
+    return (
+      <Box
+        flexGrow={1}
+        display="flex"
+        flexDirection="column"
+        justifyContent="space-between"
+        p={2}
+      >
+        {/* song selection */}
+        <Box flexGrow={2} display="flex" flexDirection="column" mb={2}>
+          {songSelection()}
+        </Box>
+        {/* other options */}
+        <Box flexGrow={2} display="flex" flexDirection="column" mb={2}>
+          {otherOptions()}
+        </Box>
+        {/* play button */}
+        <Box
+          flexGrow={1}
+          display="flex"
+          flexDirection="column"
+          justifyContent="space-around"
+          alignItems="center"
+        >
+          {readyButton()}
+        </Box>
+      </Box>
+    );
+  };
+
+  return isPortrait ? portraitView() : landscapeView();
 };
 
 export default SoloSelectSong;

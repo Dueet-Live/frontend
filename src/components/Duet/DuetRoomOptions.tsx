@@ -1,23 +1,14 @@
-import { Box, makeStyles, Typography } from '@material-ui/core';
+import { Box, Typography } from '@material-ui/core';
 import React, { useState } from 'react';
 import { Part } from '../../types/messages';
 import { Song } from '../../types/song';
-import { changeSpeed, choosePart } from '../../utils/socket';
+import { changeSpeed, choosePart, choosePiece } from '../../utils/socket';
 import LobbyKeyboardTypeSelector from '../shared/LobbyKeyboardTypeSelector';
 import useSharedLobbyStyles from '../shared/LobbySharedStyles';
 import LobbySongSelection from '../shared/LobbySongSelection';
 import SpeedCustomization from '../shared/SpeedCustomization';
 import SongSelectionDialog from '../SongSelectionDialog';
 import PartPill from './PartPill';
-
-const useStyles = makeStyles(theme => ({
-  root: {
-    borderColor: theme.palette.primary.main,
-    borderStyle: 'solid',
-    borderRadius: '3vh',
-    borderWidth: '2px',
-  },
-}));
 
 type Props = {
   iAmReady: boolean;
@@ -36,7 +27,6 @@ const DuetRoomOptions: React.FC<Props> = ({
   useSmartPiano,
   setUseSmartPiano,
 }) => {
-  const classes = useStyles();
   const lobbySharedStyles = useSharedLobbyStyles();
 
   const [songSelectionDialogOpen, setSongSelectionDialogOpen] = useState(false);
@@ -47,16 +37,21 @@ const DuetRoomOptions: React.FC<Props> = ({
       flexDirection="column"
       flexGrow={1}
       p={2}
-      className={classes.root}
+      className={lobbySharedStyles.roundedBorder}
       justifyContent="space-between"
     >
       {/* song selection */}
       <SongSelectionDialog
         open={songSelectionDialogOpen}
         handleClose={() => setSongSelectionDialogOpen(false)}
+        type="duet"
+        onChooseSong={(song: Song) => {
+          // send socket request
+          choosePiece(song.id);
+        }}
       />
       <LobbySongSelection
-        iAmReady={iAmReady}
+        disabled={iAmReady}
         setSongSelectionDialogOpen={setSongSelectionDialogOpen}
         song={song}
         flexGrow={1}
