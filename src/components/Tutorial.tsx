@@ -1,11 +1,12 @@
 import { useMediaQuery, useTheme, withStyles } from '@material-ui/core';
 import { AutoRotatingCarousel, Slide } from 'material-auto-rotating-carousel';
 import React, { useEffect } from 'react';
-import AddToHomeScreen from '../svg/add-to-home-screen.svg';
+import AddToHome from '../svg/add-to-home.svg';
+import Desktop from '../svg/desktop.svg';
 import Headset from '../svg/headset.svg';
-import Keyboard from '../svg/keyboard.svg';
-import RealisticPiano from '../svg/realistic-piano.svg';
-import TouchApp from '../svg/touchapp.svg';
+import PianoTutorial from '../svg/piano-tutorial.svg';
+import Touchscreen from '../svg/touchscreen.svg';
+import TurnUpSound from '../svg/turn-up-sound.svg';
 import localforage from '../utils/extendedLocalForage';
 
 const SEEN_TUTORIAL = 'seen_tutorial';
@@ -20,7 +21,7 @@ const StyledSlide = withStyles(theme => ({
     backgroundColor: theme.palette.primary.dark,
   },
   mediaBackground: {
-    backgroundColor: theme.palette.primary.light,
+    backgroundColor: 'white',
   },
   mediaBackgroundMobile: {
     height: 'calc(100% - 280px)',
@@ -64,20 +65,26 @@ const Tutorial: React.FC<Props> = ({ showTutorial, setShowTutorial }) => {
       onStart={() => setShowTutorial(false)}
     >
       <StyledSlide
-        media={<>GIF showing clicking on duet and copying link</>}
+        media={
+          <img
+            style={{ maxWidth: '100%' }}
+            src={'/images/duet.gif'}
+            alt="duet"
+          />
+        }
         title="Play a duet with your friend"
         subtitle="Collaborate with your friend to complete a piece! Oh, your friend is busy now? Don't worry, try our solo mode first."
       />
       <StyledSlide
-        media={<>GIF showing picking options</>}
-        title="Customize your playing options"
-        subtitle="Pick your song, speed, and part of the duet to play and have some fun!"
+        media={<img src={TurnUpSound} alt="Turn up sound" />}
+        title="Remember to turn up the sound!"
+        subtitle="Turn off silent mode if you're playing on a mobile device"
       />
       <StyledSlide
         media={
           <>
-            <img src={TouchApp} alt="Touch screen" />
-            <img src={Keyboard} alt="Keyboard" />
+            <img src={Touchscreen} alt="Touch screen" />
+            <img src={Desktop} alt="Keyboard" />
           </>
         }
         title="Easy to play on all devices"
@@ -86,10 +93,9 @@ const Tutorial: React.FC<Props> = ({ showTutorial, setShowTutorial }) => {
       <StyledSlide
         media={
           <>
-            <img src={RealisticPiano} alt="Realistic Keyboard" />
+            <img src={PianoTutorial} alt="Realistic Keyboard" />
           </>
         }
-        mediaBackgroundStyle={{ padding: theme.spacing(4) }}
         title="You are playing real music"
         subtitle="The realistic keyboard work best on touch screen devices."
       />
@@ -97,7 +103,7 @@ const Tutorial: React.FC<Props> = ({ showTutorial, setShowTutorial }) => {
         media={
           <>
             <img src={Headset} alt="Headset" />
-            <img src={AddToHomeScreen} alt="Add to home screen" />
+            <img src={AddToHome} alt="Add to home screen" />
           </>
         }
         title="Game Tips"
