@@ -36,6 +36,15 @@ const StyledSlide = withStyles(theme => ({
   },
 }))(Slide);
 
+const StyledCarousel = withStyles(theme => ({
+  footerMobileLandscape: {
+    width: 'auto',
+    display: 'inline-block',
+    transform: 'translateY(-45vh)',
+    marginTop: '-3px',
+  },
+}))(AutoRotatingCarousel);
+
 const Tutorial: React.FC<Props> = ({ showTutorial, setShowTutorial }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -55,7 +64,7 @@ const Tutorial: React.FC<Props> = ({ showTutorial, setShowTutorial }) => {
   }, []);
 
   return (
-    <AutoRotatingCarousel
+    <StyledCarousel
       autoplay={false}
       open={showTutorial}
       mobile={isMobile}
@@ -81,12 +90,12 @@ const Tutorial: React.FC<Props> = ({ showTutorial, setShowTutorial }) => {
             <img src={PianoTutorial} alt="Realistic Keyboard" />
           </>
         }
-        title="You are playing real music"
+        title="Try the realistic keyboard for a more challenging experience."
         subtitle="The realistic keyboard work best on touch screen devices."
       />
       <StyledSlide
         media={<img src={TurnUpSound} alt="Turn up volume" />}
-        title="Remember to turn up the volumne!"
+        title="Remember to turn up the volume!"
         subtitle="Turn off silent mode if you're playing on a mobile device"
       />
       <StyledSlide
@@ -117,7 +126,7 @@ const Tutorial: React.FC<Props> = ({ showTutorial, setShowTutorial }) => {
         title="Game Tips"
         subtitle="For the best experience, use headphones and add Dueet Live to your home screen"
       />
-    </AutoRotatingCarousel>
+    </StyledCarousel>
   );
 };
 

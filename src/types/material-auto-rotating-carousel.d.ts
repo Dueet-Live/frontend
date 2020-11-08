@@ -10,7 +10,7 @@ declare module 'material-auto-rotating-carousel' {
     ButtonProps?: ButtonProps;
 
     // Override the inline-styles of the carousel container.
-    containerStyle?: React.CSSProperties;
+    containerStyle?: { [className: string]: React.CSSProperties };
 
     // Properties applied to the Modal element.
     ModalProps?: ModalProps;
