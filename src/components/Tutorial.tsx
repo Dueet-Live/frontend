@@ -82,7 +82,7 @@ const Tutorial: React.FC<Props> = ({ showTutorial, setShowTutorial }) => {
           />
         }
         title="Play a duet with your friend"
-        subtitle="Collaborate with your friend to complete a piece! Oh, your friend is busy now? Don't worry, try our solo mode first."
+        subtitle="Collaborate with your friend to complete a piece! Oh, is your friend busy now? Don't worry, try our solo mode first."
       />
       <StyledSlide
         media={<img src={TurnUpSound} alt="Turn up volume" />}
