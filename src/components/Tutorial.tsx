@@ -76,8 +76,17 @@ const Tutorial: React.FC<Props> = ({ showTutorial, setShowTutorial }) => {
         subtitle="Collaborate with your friend to complete a piece! Oh, your friend is busy now? Don't worry, try our solo mode first."
       />
       <StyledSlide
-        media={<img src={TurnUpSound} alt="Turn up sound" />}
-        title="Remember to turn up the sound!"
+        media={
+          <>
+            <img src={PianoTutorial} alt="Realistic Keyboard" />
+          </>
+        }
+        title="You are playing real music"
+        subtitle="The realistic keyboard work best on touch screen devices."
+      />
+      <StyledSlide
+        media={<img src={TurnUpSound} alt="Turn up volume" />}
+        title="Remember to turn up the volumne!"
         subtitle="Turn off silent mode if you're playing on a mobile device"
       />
       <StyledSlide
@@ -93,15 +102,6 @@ const Tutorial: React.FC<Props> = ({ showTutorial, setShowTutorial }) => {
         }
         title="Easy to play on all devices"
         subtitle="We support both touch screen and keyboard input. No app downloading required."
-      />
-      <StyledSlide
-        media={
-          <>
-            <img src={PianoTutorial} alt="Realistic Keyboard" />
-          </>
-        }
-        title="You are playing real music"
-        subtitle="The realistic keyboard work best on touch screen devices."
       />
       <StyledSlide
         media={
