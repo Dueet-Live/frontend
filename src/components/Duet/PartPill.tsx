@@ -13,7 +13,7 @@ const useStyles = makeStyles(theme => ({
       height: '1.5rem',
     },
     width: '40%',
-    '&:disabled': {
+    '&:disabled, &:hover, &:disabled:hover': {
       background: theme.palette.secondaryComplementary.main,
     },
   },
