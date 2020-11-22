@@ -25,9 +25,6 @@ const useStyles = makeStyles(theme => ({
     maxWidth: '40%',
     flexDirection: 'column',
     alignItems: 'center',
-    '&:hover': {
-      textDecoration: 'underline',
-    },
   },
 }));
 

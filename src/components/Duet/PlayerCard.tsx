@@ -2,6 +2,7 @@ import { Box, makeStyles, Paper, Typography } from '@material-ui/core';
 import React from 'react';
 import PlayerIcon from '../../icons/PlayerIcon';
 import { Part } from '../../types/messages';
+import { getDisplayNameForPart } from '../../utils/partNames';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -84,7 +85,9 @@ const PlayerCard: React.FC<Props> = props => {
           {/* part pill */}
           <Box flexGrow={1} display="flex" justifyContent="center">
             <Box width="90%" className={`${classes.pill} ${classes.partPill}`}>
-              <Typography variant="body2">{part}</Typography>
+              <Typography variant="body2">
+                {part ? getDisplayNameForPart(part) : ''}
+              </Typography>
             </Box>
           </Box>
           {/* ready pill */}

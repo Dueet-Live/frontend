@@ -1,6 +1,7 @@
 import { Button, makeStyles, Typography } from '@material-ui/core';
 import React from 'react';
 import { Part } from '../../types/messages';
+import { getDisplayNameForPart } from '../../utils/partNames';
 
 const useStyles = makeStyles(theme => ({
   pill: {
@@ -12,7 +13,7 @@ const useStyles = makeStyles(theme => ({
       height: '1.5rem',
     },
     width: '40%',
-    '&:disabled': {
+    '&:disabled, &:hover, &:disabled:hover': {
       background: theme.palette.secondaryComplementary.main,
     },
   },
@@ -33,7 +34,7 @@ const PartPill: React.FC<Props> = ({ part, selected, onClick }) => {
       disabled={selected}
       size="small"
     >
-      <Typography variant="body2">{part}</Typography>
+      <Typography variant="body2">{getDisplayNameForPart(part)}</Typography>
     </Button>
   );
 };
